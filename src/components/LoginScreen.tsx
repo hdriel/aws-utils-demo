@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   TextField,
   Button,
@@ -8,45 +8,45 @@ import {
   Box,
   Typography,
   MenuItem,
-} from '@mui/material';
-import { CloudUpload } from '@mui/icons-material';
-import { AWSCredentials } from '../types/aws';
-import { s3Service } from '../services/s3Service';
-import '../styles/login.scss';
+} from "@mui/material";
+import { CloudUpload } from "@mui/icons-material";
+import { s3Service } from "../services/s3Service";
+import { AWSCredentials } from "../types/aws";
+import "../styles/login.scss";
 
 interface LoginScreenProps {
   onLoginSuccess: (bucketName: string) => void;
 }
 
 const awsRegions = [
-  { value: 'us-east-1', label: 'US East (N. Virginia)' },
-  { value: 'us-east-2', label: 'US East (Ohio)' },
-  { value: 'us-west-1', label: 'US West (N. California)' },
-  { value: 'us-west-2', label: 'US West (Oregon)' },
-  { value: 'eu-west-1', label: 'EU (Ireland)' },
-  { value: 'eu-central-1', label: 'EU (Frankfurt)' },
-  { value: 'ap-southeast-1', label: 'Asia Pacific (Singapore)' },
-  { value: 'ap-northeast-1', label: 'Asia Pacific (Tokyo)' },
+  { value: "us-east-1", label: "US East (N. Virginia)" },
+  { value: "us-east-2", label: "US East (Ohio)" },
+  { value: "us-west-1", label: "US West (N. California)" },
+  { value: "us-west-2", label: "US West (Oregon)" },
+  { value: "eu-west-1", label: "EU (Ireland)" },
+  { value: "eu-central-1", label: "EU (Frankfurt)" },
+  { value: "ap-southeast-1", label: "Asia Pacific (Singapore)" },
+  { value: "ap-northeast-1", label: "Asia Pacific (Tokyo)" },
 ];
 
 export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
   const [credentials, setCredentials] = useState<AWSCredentials>({
-    accessKeyId: '',
-    secretAccessKey: '',
-    region: 'us-east-1',
+    accessKeyId: "",
+    secretAccessKey: "",
+    region: "us-east-1",
   });
-  const [bucketName, setBucketName] = useState('');
+  const [bucketName, setBucketName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const handleChange = (field: keyof AWSCredentials) => (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setCredentials({ ...credentials, [field]: event.target.value });
-    setError(null);
-    setSuccess(false);
-  };
+  const handleChange =
+    (field: keyof AWSCredentials) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setCredentials({ ...credentials, [field]: event.target.value });
+      setError(null);
+      setSuccess(false);
+    };
 
   const handleBucketChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setBucketName(event.target.value);
@@ -55,8 +55,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
   };
 
   const handleConnect = async () => {
-    if (!credentials.accessKeyId || !credentials.secretAccessKey || !bucketName) {
-      setError('Please fill in all fields');
+    if (
+      !credentials.accessKeyId ||
+      !credentials.secretAccessKey ||
+      !bucketName
+    ) {
+      setError("Please fill in all fields");
       return;
     }
 
@@ -65,7 +69,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
     setSuccess(false);
 
     try {
-      s3Service.initialize(credentials, bucketName);
+      await s3Service.initialize(credentials, bucketName);
       const isConnected = await s3Service.testConnection();
 
       if (isConnected) {
@@ -74,10 +78,14 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
           onLoginSuccess(bucketName);
         }, 500);
       } else {
-        setError('Failed to connect. Please check your credentials and bucket name.');
+        setError(
+          "Failed to connect. Please check your credentials and bucket name.",
+        );
       }
     } catch (err) {
-      setError('Connection failed. Please verify your AWS credentials and bucket name.');
+      setError(
+        "Connection failed. Please verify your AWS credentials and bucket name.",
+      );
       console.error(err);
     } finally {
       setLoading(false);
@@ -85,8 +93,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
   };
 
   const handleKeyPress = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter') {
-      handleConnect();
+    if (event.key === "Enter") {
+      return handleConnect();
     }
   };
 
@@ -94,7 +102,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
     <div className="login-container">
       <Paper className="login-card" elevation={3}>
         <div className="login-header">
-          <CloudUpload sx={{ fontSize: 48, color: '#667eea', mb: 2 }} />
+          <CloudUpload sx={{ fontSize: 48, color: "#667eea", mb: 2 }} />
           <Typography variant="h4" component="h1">
             AWS S3 File Explorer
           </Typography>
@@ -109,7 +117,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
             variant="outlined"
             fullWidth
             value={credentials.accessKeyId}
-            onChange={handleChange('accessKeyId')}
+            onChange={handleChange("accessKeyId")}
             onKeyPress={handleKeyPress}
             disabled={loading}
             className="form-field"
@@ -122,7 +130,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
             type="password"
             fullWidth
             value={credentials.secretAccessKey}
-            onChange={handleChange('secretAccessKey')}
+            onChange={handleChange("secretAccessKey")}
             onKeyPress={handleKeyPress}
             disabled={loading}
             className="form-field"
@@ -135,7 +143,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
             select
             fullWidth
             value={credentials.region}
-            onChange={handleChange('region')}
+            onChange={handleChange("region")}
             disabled={loading}
             className="form-field"
             required
@@ -168,7 +176,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
             className="connect-button"
             startIcon={loading ? <CircularProgress size={20} /> : null}
           >
-            {loading ? 'Connecting...' : 'Connect to S3'}
+            {loading ? "Connecting..." : "Connect to S3"}
           </Button>
 
           {error && (
