@@ -140,6 +140,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
         loadLocalstackBucketList();
     }, []);
 
+    const selectedOption = isLocalstack ? localstackBuckets.find((b) => b.id === bucketName) : undefined;
+
     return (
         <div className="login-container">
             <Paper className="login-card" elevation={3}>
@@ -255,12 +257,23 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                                 );
                             }}
                             endCmpExternal={
-                                <Tooltip title={isPublicAccess ? 'Public bucket access' : 'Private bucket access'}>
+                                <Tooltip
+                                    title={
+                                        <Text>
+                                            {isPublicAccess ? 'Public bucket access' : 'Private bucket access'}
+                                            <br />
+                                            {selectedOption
+                                                ? ' (Exists localstack bucket - checkbox is in read only mode)'
+                                                : ''}
+                                        </Text>
+                                    }
+                                >
                                     <Checkbox
+                                        readOnly={!!selectedOption}
                                         icon="PublicOff"
                                         checkedIcon="Public"
-                                        color={'primary'}
-                                        checked={isPublicAccess}
+                                        color="primary"
+                                        checked={selectedOption ? selectedOption.public : isPublicAccess}
                                         onChange={(e) => {
                                             e.stopPropagation();
                                             setIsPublicAccess(e.target.checked);
