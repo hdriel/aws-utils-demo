@@ -8,8 +8,8 @@
         "typecheck": "tsc --noEmit -p tsconfig.app.json"
     },
     "dependencies": {
+        "@hdriel/aws-utils": "^1.0.0",
         "@types/body-parser": "^1.19.6",
-        "aws-api-utils": "file:.yalc/aws-api-utils",
         "body-parser": "^2.2.0",
         "cors": "^2.8.5",
         "dotenv": "^17.2.3",

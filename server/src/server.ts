@@ -1,4 +1,4 @@
-import './dotenv';
+import env from './dotenv';
 import express, { Express } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
@@ -7,7 +7,7 @@ import { initAppRoutes } from './routes/route';
 
 export const app: Express = express();
 
-app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(cors({ origin: [env.CLIENT_URL as string].filter((v) => v) }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 

@@ -1,5 +1,5 @@
 import env from '../dotenv';
-import { ACLs, S3BucketUtil } from 'aws-api-utils';
+import { ACLs, S3BucketUtil } from '@hdriel/aws-utils';
 import logger from '../logger';
 
 let s3BucketUtil: null | S3BucketUtil;
