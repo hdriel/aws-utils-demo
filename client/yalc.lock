@@ -1,9 +1,0 @@
-{
-  "version": "v1",
-  "packages": {
-    "aws-api-utils": {
-      "signature": "e31fe195936c1b89670479a6d0403eae",
-      "file": true
-    }
-  }
-}

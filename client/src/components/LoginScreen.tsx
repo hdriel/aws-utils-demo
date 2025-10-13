@@ -13,6 +13,7 @@ import {
     InputAutocomplete,
     Avatar,
     SVGIcon,
+    Text,
 } from 'mui-simple';
 import { s3Service } from '../services/s3Service.ts';
 import { AWSCredentials, BucketInfo } from '../types/aws.ts';
@@ -143,10 +144,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
         <div className="login-container">
             <Paper className="login-card" elevation={3}>
                 <div className="login-header">
-                    <SVGIcon muiIconName='CloudUpload' sx={{ fontSize: 48, color: '#667eea', mb: 2 }}/>
-                    <Typography variant="h4" component="h1">
+                    <SVGIcon muiIconName="CloudUpload" size={60} sx={{ margin: 'auto', color: '#667eea', mb: 2 }} />
+                    <Text variant="h4" component="h1" width="100%" justifyContent="center">
                         AWS S3 File Explorer
-                    </Typography>
+                    </Text>
                     <Typography variant="body2" color="textSecondary">
                         Enter your AWS credentials to access your S3 bucket
                     </Typography>
@@ -205,6 +206,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                             disabled={loading}
                             className="form-field"
                             required
+                            options={[...localstackBuckets, { id: bucketName, label: bucketName }]}
+                            helperText="Enter the name of your S3 bucket"
                             renderOption={(props, option, { selected }) => {
                                 console.log('renderOption', option);
                                 if (option.inputValue) {
@@ -226,7 +229,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                                             </ListItemAvatar>
                                         )}
                                         <ListItemText
-                                            primary={option.label}
+                                            primary={<Text bold={selected}>{option.label}</Text>}
                                             secondary={
                                                 option.date ? `Created at: ${option.date?.toLocaleString()}` : undefined
                                             }
@@ -251,13 +254,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                                     </ListItem>
                                 );
                             }}
-                            options={[...localstackBuckets, { id: bucketName, label: bucketName }]}
-                            helperText="Enter the name of your S3 bucket"
                             endCmpExternal={
                                 <Tooltip title={isPublicAccess ? 'Public bucket access' : 'Private bucket access'}>
                                     <Checkbox
-                                        icon='PublicOff'
-                                        checkedIcon='Public'
+                                        icon="PublicOff"
+                                        checkedIcon="Public"
                                         color={'primary'}
                                         checked={isPublicAccess}
                                         onChange={(e) => {
@@ -283,8 +284,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                             endCmp={
                                 <Tooltip title={isPublicAccess ? 'Public bucket access' : 'Private bucket access'}>
                                     <Checkbox
-                                        icon='PublicOff'
-                                        checkedIcon='Public'
+                                        icon="PublicOff"
+                                        checkedIcon="Public"
                                         color={'primary'}
                                         checked={isPublicAccess}
                                         onChange={(e) => setIsPublicAccess(e.target.checked)}
