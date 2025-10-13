@@ -20,8 +20,9 @@
 
 .file-panel {
   flex: 1;
-  height: 100%;
+  align-content: stretch;
   display: flex;
+  height: 100%;
   flex-direction: column;
   background-color: white;
   overflow: hidden;
@@ -171,9 +172,18 @@
     }
 
     .file-actions {
-      margin-top: 24px;
-      padding-top: 24px;
-      border-top: 1px solid #e2e8f0;
+      position: relative;
+      width: 100%;
+
+      &.top-spacing {
+        margin-top: 24px;
+        padding-top: 24px;
+        border-top: 1px solid #e2e8f0;
+      }
+      &:not(.top-spacing) {
+        padding-inline-start: 8px;
+      }
+
 
       h3 {
         font-size: 15px;
@@ -184,7 +194,7 @@
 
       .actions-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 12px;
 
         button {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuid } from 'uuid';
-import { Box, DialogTitle, DialogContent } from '@mui/material';
+import { Box, DialogTitle, DialogContent, useMediaQuery } from '@mui/material';
 import {
     Typography,
     Button,
@@ -20,6 +20,7 @@ import { formatFileSize, isVideoFile, downloadFile, getFileIcon, isImageFile } f
 import { S3File } from '../types/aws.ts';
 import '../styles/filePanel.scss';
 import { FILE_TYPE } from '../types/ui.ts';
+import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
 
 interface FilePanelProps {
     currentPath: string;
@@ -27,6 +28,9 @@ interface FilePanelProps {
 }
 
 const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh }) => {
+    const largeLayout = useMediaQuery((theme) => theme.breakpoints.up('xl'));
+    const [pinnedActions, setPinnedActions] = useState(largeLayout);
+
     const [files, setFiles] = useState<S3File[]>([]);
     const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
     const [allowedMultipleFiles, setAllowedMultipleFiles] = useState(false);
@@ -252,6 +256,144 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh }) => {
             ? `${import.meta.env.VITE_SERVER_URL}/files/stream?file=${encodeURIComponent(file.key)}`
             : null;
 
+    const showImagePreview = fileKey && isImageFile(fileKey) && selectedFiles.size === 1;
+    const showExtraPanel = (videoPrivateUrl || showImagePreview) && pinnedActions;
+
+    const actionStateCmp = (
+        <Box className={`file-actions ${!pinnedActions || selectedFiles.size > 1 ? 'top-spacing' : ''}`}>
+            <Text variant="subtitle1" component="h3" fullWidth>
+                Actions
+                <Button
+                    color="primary"
+                    tooltipProps={{ title: pinnedActions ? 'Move Panel Down' : 'Move Panel Right' }}
+                    icon={pinnedActions ? 'PictureInPictureAlt' : 'PictureInPicture'}
+                    onClick={() => setPinnedActions((v) => !v)}
+                    sx={{ position: 'absolute', top: 0, right: 0 }}
+                />
+            </Text>
+
+            <Box className="actions-grid">
+                <Button
+                    variant="outlined"
+                    startIcon="Download"
+                    onClick={() => {
+                        if (isDownloading) {
+                            handleAbortDownload();
+                        } else {
+                            setIsDownloading(true);
+                            handleDownload()
+                                .then(() => {
+                                    console.log('download as zip done!');
+                                })
+                                .finally(() => {
+                                    setIsDownloading(false);
+                                });
+                        }
+                    }}
+                    fullWidth
+                    color={isDownloading ? 'info' : 'primary'}
+                    endIcon={
+                        isDownloading ? (
+                            <Box
+                                sx={{
+                                    position: 'absolute',
+                                    right: '12px',
+                                    top: '5px',
+                                    bottom: 0,
+                                }}
+                            >
+                                <CircularProgress color="info" size={15} value={downloadProgress} />
+                            </Box>
+                        ) : null
+                    }
+                    tooltipProps={{ title: 'Download via streaming into your machine.' }}
+                    label={isDownloading ? 'Downloading...' : `Download ${selectedFiles.size > 1 ? 'as ZIP' : ''}`}
+                />
+
+                {selectedFiles.size === 1 && (
+                    <Button
+                        variant="outlined"
+                        startIcon="OpenInNew"
+                        onClick={() => {
+                            if (isDownloading) {
+                                handleAbortDownload();
+                            } else {
+                                setIsDownloading(true);
+                                handleDownloadViaSignedLink()
+                                    .then(() => {
+                                        console.log('download via link done!');
+                                    })
+                                    .finally(() => {
+                                        setIsDownloading(false);
+                                    });
+                            }
+                        }}
+                        fullWidth
+                        color={isDownloading ? 'info' : 'primary'}
+                        endIcon={
+                            isDownloading ? (
+                                <Box
+                                    sx={{
+                                        position: 'absolute',
+                                        right: '12px',
+                                        top: '5px',
+                                        bottom: 0,
+                                    }}
+                                >
+                                    <CircularProgress color="info" size={15} value={downloadProgress} />
+                                </Box>
+                            ) : null
+                        }
+                        tooltipProps={{ title: 'Download via sign open link.' }}
+                        label={isDownloading ? 'Downloading...' : `Download`}
+                    />
+                )}
+
+                {selectedFiles.size === 1 && (
+                    <>
+                        <Button
+                            variant="outlined"
+                            fullWidth
+                            startIcon="Label"
+                            onClick={() => setTagDialogOpen(true)}
+                            label="Tag Version"
+                        />
+                        <Button
+                            variant="outlined"
+                            fullWidth
+                            startIcon="Link"
+                            onClick={generateTempLink}
+                            label="Generate Link"
+                        />
+                    </>
+                )}
+
+                <Button
+                    variant="outlined"
+                    fullWidth
+                    color="error"
+                    startIcon="Delete"
+                    onClick={() => setDeleteDialogOpen(true)}
+                    label="Delete Selected"
+                />
+            </Box>
+
+            {videoPrivateUrl && (
+                <Box className="video-preview">
+                    <video controls src={videoPrivateUrl}>
+                        Your browser does not support the video tag.
+                    </video>
+                </Box>
+            )}
+
+            {showImagePreview && (
+                <Box className="video-preview" mt={2}>
+                    <img src={`${import.meta.env.VITE_SERVER_URL}/files/image?file=${fileKey}`} alt={fileKey} />
+                </Box>
+            )}
+        </Box>
+    );
+
     return (
         <div className="file-panel">
             <div className="file-header">
@@ -335,187 +477,82 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh }) => {
 
                 {files.length > 0 ? (
                     <>
-                        <Box className="file-list">
-                            <Box className="file-list-header">
-                                <Typography variant="subtitle1" component="h3">
-                                    Files in Current Folder
-                                </Typography>
-                                {selectedFiles.size > 0 && (
-                                    <Typography className="selection-info">
-                                        {selectedFiles.size} file{selectedFiles.size > 1 ? 's' : ''} selected
-                                    </Typography>
-                                )}
-                            </Box>
-
-                            <Box className="file-items">
-                                {files.map((file) => (
-                                    <Box
-                                        key={file.id}
-                                        className={`file-item ${selectedFiles.has(file.key) ? 'selected' : ''}`}
-                                        onClick={() => handleFileSelect(file.key)}
-                                    >
-                                        <Box className="file-info">
-                                            <Checkbox
-                                                checked={selectedFiles.has(file.key)}
-                                                onClick={(e: Event) => {
-                                                    e.stopPropagation();
-                                                    handleFileSelect(file.key);
-                                                }}
-                                            />
-                                            <Box className="file-icon">
-                                                <SVGIcon muiIconName={getFileIcon(file.name)} />
-                                            </Box>
-                                            <Box className="file-details">
-                                                <Typography className="file-name">{file.name}</Typography>
-                                                <Typography className="file-meta">
-                                                    {formatFileSize(file.size)} • {file.lastModified.toLocaleString()}
-                                                </Typography>
-                                            </Box>
-                                        </Box>
+                        <PanelGroup
+                            autoSaveId="files-section"
+                            direction="horizontal"
+                            style={{ width: '100%', height: 'unset' }}
+                        >
+                            <Panel
+                                defaultSize={30}
+                                minSize={30}
+                                style={{ width: '100%', paddingInlineEnd: showExtraPanel ? '8px' : 0 }}
+                            >
+                                <Box className="file-list">
+                                    <Box className="file-list-header">
+                                        <Typography variant="subtitle1" component="h3">
+                                            Files in Current Folder
+                                        </Typography>
+                                        {selectedFiles.size > 0 && (
+                                            <Typography className="selection-info">
+                                                {selectedFiles.size} file{selectedFiles.size > 1 ? 's' : ''} selected
+                                            </Typography>
+                                        )}
                                     </Box>
-                                ))}
-                            </Box>
-                        </Box>
 
-                        {selectedFiles.size > 0 && (
-                            <Box className="file-actions">
-                                <Typography variant="subtitle1" component="h3">
-                                    Actions
-                                </Typography>
-
-                                <Box className="actions-grid">
-                                    {selectedFiles.size === 1 && (
-                                        <Button
-                                            variant="outlined"
-                                            startIcon="Download"
-                                            onClick={() => {
-                                                if (isDownloading) {
-                                                    handleAbortDownload();
-                                                } else {
-                                                    setIsDownloading(true);
-                                                    handleDownloadViaSignedLink()
-                                                        .then(() => {
-                                                            console.log('download via link done!');
-                                                        })
-                                                        .finally(() => {
-                                                            setIsDownloading(false);
-                                                        });
-                                                }
-                                            }}
-                                            fullWidth
-                                            color={isDownloading ? 'info' : 'primary'}
-                                            endIcon={
-                                                isDownloading ? (
-                                                    <Box
-                                                        sx={{
-                                                            position: 'absolute',
-                                                            right: '12px',
-                                                            top: '5px',
-                                                            bottom: 0,
+                                    <Box className="file-items">
+                                        {files.map((file) => (
+                                            <Box
+                                                key={file.id}
+                                                className={`file-item ${selectedFiles.has(file.key) ? 'selected' : ''}`}
+                                                onClick={() => handleFileSelect(file.key)}
+                                            >
+                                                <Box className="file-info">
+                                                    <Checkbox
+                                                        checked={selectedFiles.has(file.key)}
+                                                        onClick={(e: Event) => {
+                                                            e.stopPropagation();
+                                                            handleFileSelect(file.key);
                                                         }}
-                                                    >
-                                                        <CircularProgress
-                                                            color="info"
-                                                            size={15}
-                                                            value={downloadProgress}
-                                                        />
+                                                    />
+                                                    <Box className="file-icon">
+                                                        <SVGIcon muiIconName={getFileIcon(file.name)} />
                                                     </Box>
-                                                ) : null
-                                            }
-                                            label={isDownloading ? 'Downloading...' : `Download via signed link`}
-                                        />
-                                    )}
-                                    <Button
-                                        variant="outlined"
-                                        startIcon="Download"
-                                        onClick={() => {
-                                            if (isDownloading) {
-                                                handleAbortDownload();
-                                            } else {
-                                                setIsDownloading(true);
-                                                handleDownload()
-                                                    .then(() => {
-                                                        console.log('download as zip done!');
-                                                    })
-                                                    .finally(() => {
-                                                        setIsDownloading(false);
-                                                    });
-                                            }
-                                        }}
-                                        fullWidth
-                                        color={isDownloading ? 'info' : 'primary'}
-                                        endIcon={
-                                            isDownloading ? (
-                                                <Box
-                                                    sx={{
-                                                        position: 'absolute',
-                                                        right: '12px',
-                                                        top: '5px',
-                                                        bottom: 0,
-                                                    }}
-                                                >
-                                                    <CircularProgress color="info" size={15} value={downloadProgress} />
+                                                    <Box className="file-details">
+                                                        <Typography className="file-name">{file.name}</Typography>
+                                                        <Typography className="file-meta">
+                                                            {formatFileSize(file.size)} •{' '}
+                                                            {file.lastModified.toLocaleString()}
+                                                        </Typography>
+                                                    </Box>
                                                 </Box>
-                                            ) : null
-                                        }
-                                        label={
-                                            isDownloading
-                                                ? 'Downloading...'
-                                                : `Download ${selectedFiles.size > 1 ? 'as ZIP' : ''}`
-                                        }
-                                    />
-
-                                    {selectedFiles.size === 1 && (
-                                        <>
-                                            <Button
-                                                variant="outlined"
-                                                fullWidth
-                                                startIcon="Label"
-                                                onClick={() => setTagDialogOpen(true)}
-                                                label="Tag Version"
-                                            />
-                                            <Button
-                                                variant="outlined"
-                                                fullWidth
-                                                startIcon="Link"
-                                                onClick={generateTempLink}
-                                                label="Generate Link"
-                                            />
-                                        </>
-                                    )}
-
-                                    <Button
-                                        variant="outlined"
-                                        fullWidth
-                                        color="error"
-                                        startIcon="Delete"
-                                        onClick={() => setDeleteDialogOpen(true)}
-                                        label="Delete Selected"
-                                    />
+                                            </Box>
+                                        ))}
+                                    </Box>
                                 </Box>
+                            </Panel>
+                            {showExtraPanel && (
+                                <>
+                                    <PanelResizeHandle style={{ background: '#757575', width: '3px' }} />
+                                    <Panel
+                                        minSize={10}
+                                        style={{
+                                            width: '100%',
+                                            borderRadius: '20px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                        }}
+                                    >
+                                        {actionStateCmp}
+                                    </Panel>
+                                </>
+                            )}
+                        </PanelGroup>
 
-                                {videoPrivateUrl && (
-                                    <Box className="video-preview">
-                                        <video controls src={videoPrivateUrl}>
-                                            Your browser does not support the video tag.
-                                        </video>
-                                    </Box>
-                                )}
-
-                                {fileKey && isImageFile(fileKey) && selectedFiles.size === 1 && (
-                                    <Box className="video-preview" mt={2}>
-                                        <img
-                                            src={`${import.meta.env.VITE_SERVER_URL}/files/image?file=${fileKey}`}
-                                            alt={fileKey}
-                                        />
-                                    </Box>
-                                )}
-                            </Box>
-                        )}
+                        {(selectedFiles.size > 1 || !pinnedActions) && actionStateCmp}
                     </>
                 ) : (
                     <Box className="empty-state">
-                        <SVGIcon muiIconName='FolderOpen' className="empty-icon"/>
+                        <SVGIcon muiIconName="FolderOpen" className="empty-icon" />
                         <Text variant="h6" component="h3" fullWidth justifyContent="center">
                             No Files
                         </Text>
