@@ -1,4 +1,4 @@
-# AWS S3 File Explorer
+# AWS S3 File Explorer Project
 
 A comprehensive fullstack S3 file explorer built in two weeks, designed to showcase and test my perfect package: `@hdriel/aws-utils`
 
