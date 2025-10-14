@@ -14,23 +14,27 @@ import {
     Text,
     CircularProgress,
 } from 'mui-simple';
-
 import { s3Service } from '../services/s3Service.ts';
 import { formatFileSize, isVideoFile, downloadFile, getFileIcon, isImageFile } from '../utils/fileUtils.ts';
 import { S3File } from '../types/aws.ts';
 import '../styles/filePanel.scss';
 import { FILE_TYPE } from '../types/ui.ts';
 import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
+import { EmptyStatement } from './EmptyStatement.tsx';
 
 interface FilePanelProps {
+    isPublicBucket: boolean;
     currentPath: string;
     onRefresh: () => void;
 }
 
-const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh }) => {
+const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicBucket }) => {
     const largeLayout = useMediaQuery((theme) => theme.breakpoints.up('xl'));
-    const [pinnedActions, setPinnedActions] = useState(largeLayout);
+    const smallLayout = useMediaQuery((theme) => theme.breakpoints.down('xl'));
+    const mobileLayout = useMediaQuery((theme) => theme.breakpoints.down('lg'));
 
+    const [flatPanels, setFlatPanels] = useState(mobileLayout);
+    const [pinnedActions, setPinnedActions] = useState(largeLayout);
     const [files, setFiles] = useState<S3File[]>([]);
     const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
     const [allowedMultipleFiles, setAllowedMultipleFiles] = useState(false);
@@ -53,6 +57,10 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh }) => {
     useEffect(() => {
         loadFiles();
     }, [currentPath]);
+
+    useEffect(() => {
+        setFlatPanels(mobileLayout);
+    }, [mobileLayout]);
 
     const loadFiles = async () => {
         try {
@@ -257,71 +265,162 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh }) => {
             : null;
 
     const showImagePreview = fileKey && isImageFile(fileKey) && selectedFiles.size === 1;
-    const showExtraPanel = (videoPrivateUrl || showImagePreview) && pinnedActions;
+    const showPreviewFile = videoPrivateUrl || showImagePreview;
 
-    const actionStateCmp = (
-        <Box className={`file-actions ${!pinnedActions || selectedFiles.size > 1 ? 'top-spacing' : ''}`}>
-            <Text variant="subtitle1" component="h3" fullWidth>
-                Actions
+    const uploadSectionCmp = (
+        <Box className="upload-section">
+            <Text variant="subtitle1" component="h3" sx={{ display: 'flex', alignItems: 'center' }}>
+                Upload Files
                 <Button
-                    color="primary"
-                    tooltipProps={{ title: pinnedActions ? 'Move Panel Down' : 'Move Panel Right' }}
-                    icon={pinnedActions ? 'PictureInPictureAlt' : 'PictureInPicture'}
-                    onClick={() => setPinnedActions((v) => !v)}
-                    sx={{ position: 'absolute', top: 0, right: 0 }}
+                    icon={<SVGIcon muiIconName="LibraryAdd" size={20} sx={{ marginTop: '-5px' }} />}
+                    color={allowedMultipleFiles ? 'primary' : undefined}
+                    onClick={() => setAllowedMultipleFiles((v) => !v)}
+                    tooltipProps={{ title: 'Allow upload multiple files', placement: 'right' }}
                 />
             </Text>
-
-            <Box className="actions-grid">
+            <Box className="upload-buttons">
+                <Button
+                    variant="contained"
+                    startIcon="CloudUpload"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    label={'Upload File' + (allowedMultipleFiles ? 's' : '')}
+                />
                 <Button
                     variant="outlined"
-                    startIcon="Download"
-                    onClick={() => {
-                        if (isDownloading) {
-                            handleAbortDownload();
-                        } else {
-                            setIsDownloading(true);
-                            handleDownload()
-                                .then(() => {
-                                    console.log('download as zip done!');
-                                })
-                                .finally(() => {
-                                    setIsDownloading(false);
-                                });
-                        }
-                    }}
-                    fullWidth
-                    color={isDownloading ? 'info' : 'primary'}
-                    endIcon={
-                        isDownloading ? (
-                            <Box
-                                sx={{
-                                    position: 'absolute',
-                                    right: '12px',
-                                    top: '5px',
-                                    bottom: 0,
-                                }}
-                            >
-                                <CircularProgress color="info" size={15} value={downloadProgress} />
-                            </Box>
-                        ) : null
-                    }
-                    tooltipProps={{ title: 'Download via streaming into your machine.' }}
-                    label={isDownloading ? 'Downloading...' : `Download ${selectedFiles.size > 1 ? 'as ZIP' : ''}`}
+                    startIcon={allowedMultipleFiles ? 'PermMedia' : 'Image'}
+                    onClick={() => imageInputRef.current?.click()}
+                    disabled={uploading}
+                    label={'Upload Image' + (allowedMultipleFiles ? 's' : '')}
                 />
 
-                {selectedFiles.size === 1 && (
+                <Button
+                    variant="outlined"
+                    startIcon={allowedMultipleFiles ? 'VideoLibrary' : 'Slideshow'}
+                    onClick={() => videoInputRef.current?.click()}
+                    disabled={uploading}
+                    label={'Upload Video' + (allowedMultipleFiles ? 's' : '')}
+                />
+            </Box>
+
+            <input
+                ref={fileInputRef}
+                type="file"
+                style={{ display: 'none' }}
+                multiple={allowedMultipleFiles}
+                onChange={handleFileUpload()}
+            />
+            <input
+                ref={imageInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                multiple={allowedMultipleFiles}
+                onChange={handleFileUpload('image' as FILE_TYPE)}
+            />
+            <input
+                ref={videoInputRef}
+                type="file"
+                accept="video/*"
+                style={{ display: 'none' }}
+                multiple={allowedMultipleFiles}
+                onChange={handleFileUpload('video' as FILE_TYPE)}
+            />
+
+            {uploading && (
+                <Box className="upload-progress">
+                    <Box className="progress-info">
+                        <Typography variant="body2">Uploading: {uploadingFileName}</Typography>
+                    </Box>
+                    <LinearProgress variant="determinate" value={uploadProgress} />
+                </Box>
+            )}
+        </Box>
+    );
+
+    const fileListSectionCmp = (
+        <Box className="file-list">
+            <Box className="file-list-header" sx={{ position: pinnedActions && !flatPanels ? 'sticky' : 'relative' }}>
+                <Typography variant="subtitle1" component="h3">
+                    Files in Current Folder
+                </Typography>
+                {selectedFiles.size > 0 && (
+                    <Typography className="selection-info">
+                        {selectedFiles.size} file{selectedFiles.size > 1 ? 's' : ''} selected
+                    </Typography>
+                )}
+            </Box>
+
+            <Box className="file-items">
+                {files.map((file) => (
+                    <Box
+                        key={file.id}
+                        className={`file-item ${selectedFiles.has(file.key) ? 'selected' : ''}`}
+                        onClick={() => handleFileSelect(file.key)}
+                    >
+                        <Box className="file-info">
+                            <Checkbox
+                                checked={selectedFiles.has(file.key)}
+                                onClick={(e: Event) => {
+                                    e.stopPropagation();
+                                    handleFileSelect(file.key);
+                                }}
+                            />
+                            <Box className="file-icon">
+                                <SVGIcon muiIconName={getFileIcon(file.name)} />
+                            </Box>
+                            <Box className="file-details">
+                                <Typography className="file-name">{file.name}</Typography>
+                                <Typography className="file-meta">
+                                    {formatFileSize(file.size)} • {file.lastModified.toLocaleString()}
+                                </Typography>
+                            </Box>
+                        </Box>
+                    </Box>
+                ))}
+            </Box>
+        </Box>
+    );
+    const fileActionsSectionCmp = (
+        <Box className="file-actions" height="100%" mt={flatPanels ? 2 : 0}>
+            <Box
+                sx={{
+                    position: 'sticky',
+                    top: 0,
+                    background: 'white',
+                    zIndex: 1,
+                    height: '25px',
+                }}
+            >
+                <Text variant="subtitle1" component="h3" fullWidth>
+                    Actions
+                    {!smallLayout && (
+                        <Button
+                            color="primary"
+                            tooltipProps={{
+                                title: pinnedActions ? 'Move Panel Down' : 'Move Panel Right',
+                            }}
+                            icon={pinnedActions ? 'PictureInPictureAlt' : 'PictureInPicture'}
+                            onClick={() => setPinnedActions((v) => !v)}
+                            sx={{ position: 'absolute', top: '-7px', right: '-5px' }}
+                        />
+                    )}
+                </Text>
+            </Box>
+
+            {selectedFiles.size > 0 && (
+                <Box className="actions-grid">
                     <Button
                         variant="outlined"
-                        startIcon="OpenInNew"
+                        startIcon="Download"
                         onClick={() => {
                             if (isDownloading) {
                                 handleAbortDownload();
                             } else {
                                 setIsDownloading(true);
-                                handleDownloadViaSignedLink()
+                                handleDownload()
                                     .then(() => {
-                                        console.log('download via link done!');
+                                        console.log('download as zip done!');
                                     })
                                     .finally(() => {
                                         setIsDownloading(false);
@@ -344,40 +443,88 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh }) => {
                                 </Box>
                             ) : null
                         }
-                        tooltipProps={{ title: 'Download via sign open link.' }}
-                        label={isDownloading ? 'Downloading...' : `Download`}
+                        tooltipProps={{
+                            title: 'Download via streaming into your machine.',
+                        }}
+                        label={isDownloading ? 'Downloading...' : `Download ${selectedFiles.size > 1 ? 'as ZIP' : ''}`}
                     />
-                )}
 
-                {selectedFiles.size === 1 && (
-                    <>
+                    {selectedFiles.size === 1 && (
                         <Button
                             variant="outlined"
+                            startIcon="OpenInNew"
+                            onClick={() => {
+                                if (isDownloading) {
+                                    handleAbortDownload();
+                                } else {
+                                    setIsDownloading(true);
+                                    handleDownloadViaSignedLink()
+                                        .then(() => {
+                                            console.log('download via link done!');
+                                        })
+                                        .finally(() => {
+                                            setIsDownloading(false);
+                                        });
+                                }
+                            }}
                             fullWidth
-                            startIcon="Label"
-                            onClick={() => setTagDialogOpen(true)}
-                            label="Tag Version"
+                            color={isDownloading ? 'info' : 'primary'}
+                            endIcon={
+                                isDownloading ? (
+                                    <Box
+                                        sx={{
+                                            position: 'absolute',
+                                            right: '12px',
+                                            top: '5px',
+                                            bottom: 0,
+                                        }}
+                                    >
+                                        <CircularProgress color="info" size={15} value={downloadProgress} />
+                                    </Box>
+                                ) : null
+                            }
+                            tooltipProps={{ title: 'Download via sign open link.' }}
+                            label={isDownloading ? 'Downloading...' : `Download`}
                         />
-                        <Button
-                            variant="outlined"
-                            fullWidth
-                            startIcon="Link"
-                            onClick={generateTempLink}
-                            label="Generate Link"
-                        />
-                    </>
-                )}
+                    )}
 
-                <Button
-                    variant="outlined"
-                    fullWidth
-                    color="error"
-                    startIcon="Delete"
-                    onClick={() => setDeleteDialogOpen(true)}
-                    label="Delete Selected"
+                    {selectedFiles.size === 1 && (
+                        <>
+                            <Button
+                                variant="outlined"
+                                fullWidth
+                                startIcon="Label"
+                                onClick={() => setTagDialogOpen(true)}
+                                label="Tag Version"
+                            />
+                            <Button
+                                variant="outlined"
+                                fullWidth
+                                startIcon="Link"
+                                onClick={generateTempLink}
+                                label="Generate Link"
+                            />
+                        </>
+                    )}
+
+                    <Button
+                        variant="outlined"
+                        fullWidth
+                        color="error"
+                        startIcon="Delete"
+                        onClick={() => setDeleteDialogOpen(true)}
+                        label="Delete Selected"
+                    />
+                </Box>
+            )}
+
+            {!showPreviewFile && (
+                <EmptyStatement
+                    icon="Image"
+                    title="File Preview"
+                    subtitle={`Select single image / video to preview ${isPublicBucket ? 'public' : 'private'} bucket content`}
                 />
-            </Box>
-
+            )}
             {videoPrivateUrl && (
                 <Box className="video-preview">
                     <video controls src={videoPrivateUrl}>
@@ -387,7 +534,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh }) => {
             )}
 
             {showImagePreview && (
-                <Box className="video-preview" mt={2}>
+                <Box className="video-preview">
                     <img src={`${import.meta.env.VITE_SERVER_URL}/files/image?file=${fileKey}`} alt={fileKey} />
                 </Box>
             )}
@@ -403,165 +550,99 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh }) => {
                 <Typography className="current-path">{currentPath || '/ (root)'}</Typography>
             </div>
 
-            <div className="file-content">
-                <Box className="upload-section">
-                    <Typography variant="subtitle1" component="h3">
-                        Upload Files
-                    </Typography>
-                    <Box sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1 }}>
-                        <Button
-                            icon="AutoAwesomeMotion"
-                            color={allowedMultipleFiles ? 'primary' : undefined}
-                            onClick={() => setAllowedMultipleFiles((v) => !v)}
-                            tooltipProps={{ title: 'Allow upload multiple files', placement: 'left' }}
-                        />
-                    </Box>
-                    <Box className="upload-buttons">
-                        <Button
-                            variant="contained"
-                            startIcon="CloudUpload"
-                            onClick={() => fileInputRef.current?.click()}
-                            disabled={uploading}
-                            label={'Upload File' + (allowedMultipleFiles ? 's' : '')}
-                        />
-                        <Button
-                            variant="outlined"
-                            startIcon={allowedMultipleFiles ? 'PermMedia' : 'Image'}
-                            onClick={() => imageInputRef.current?.click()}
-                            disabled={uploading}
-                            label={'Upload Image' + (allowedMultipleFiles ? 's' : '')}
-                        />
+            {flatPanels && (
+                <div className="file-content">
+                    {uploadSectionCmp}
 
-                        <Button
-                            variant="outlined"
-                            startIcon={allowedMultipleFiles ? 'VideoLibrary' : 'Slideshow'}
-                            onClick={() => videoInputRef.current?.click()}
-                            disabled={uploading}
-                            label={'Upload Video' + (allowedMultipleFiles ? 's' : '')}
-                        />
-                    </Box>
-
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        style={{ display: 'none' }}
-                        multiple={allowedMultipleFiles}
-                        onChange={handleFileUpload()}
-                    />
-                    <input
-                        ref={imageInputRef}
-                        type="file"
-                        accept="image/*"
-                        style={{ display: 'none' }}
-                        multiple={allowedMultipleFiles}
-                        onChange={handleFileUpload('image' as FILE_TYPE)}
-                    />
-                    <input
-                        ref={videoInputRef}
-                        type="file"
-                        accept="video/*"
-                        style={{ display: 'none' }}
-                        multiple={allowedMultipleFiles}
-                        onChange={handleFileUpload('video' as FILE_TYPE)}
-                    />
-
-                    {uploading && (
-                        <Box className="upload-progress">
-                            <Box className="progress-info">
-                                <Typography variant="body2">Uploading: {uploadingFileName}</Typography>
-                            </Box>
-                            <LinearProgress variant="determinate" value={uploadProgress} />
-                        </Box>
+                    {files.length > 0 ? (
+                        <>
+                            {fileListSectionCmp}
+                            {fileActionsSectionCmp}
+                        </>
+                    ) : (
+                        <EmptyStatement icon="FolderOpen" title="No Files" subtitle="Upload files to get started" />
                     )}
-                </Box>
+                </div>
+            )}
 
-                {files.length > 0 ? (
-                    <>
-                        <PanelGroup
-                            autoSaveId="files-section"
-                            direction="horizontal"
-                            style={{ width: '100%', height: 'unset' }}
-                        >
-                            <Panel
-                                defaultSize={30}
-                                minSize={30}
-                                style={{ width: '100%', paddingInlineEnd: showExtraPanel ? '8px' : 0 }}
+            {!flatPanels && (
+                <div className="file-content">
+                    {pinnedActions && uploadSectionCmp}
+
+                    {files.length > 0 ? (
+                        <>
+                            <PanelGroup
+                                autoSaveId="files-section"
+                                direction={pinnedActions ? 'horizontal' : 'vertical'}
+                                style={{
+                                    width: '100%',
+                                    height: pinnedActions ? 'calc(100vh - 410px)' : '100%',
+                                }}
                             >
-                                <Box className="file-list">
-                                    <Box className="file-list-header">
-                                        <Typography variant="subtitle1" component="h3">
-                                            Files in Current Folder
-                                        </Typography>
-                                        {selectedFiles.size > 0 && (
-                                            <Typography className="selection-info">
-                                                {selectedFiles.size} file{selectedFiles.size > 1 ? 's' : ''} selected
-                                            </Typography>
-                                        )}
-                                    </Box>
-
-                                    <Box className="file-items">
-                                        {files.map((file) => (
-                                            <Box
-                                                key={file.id}
-                                                className={`file-item ${selectedFiles.has(file.key) ? 'selected' : ''}`}
-                                                onClick={() => handleFileSelect(file.key)}
-                                            >
-                                                <Box className="file-info">
-                                                    <Checkbox
-                                                        checked={selectedFiles.has(file.key)}
-                                                        onClick={(e: Event) => {
-                                                            e.stopPropagation();
-                                                            handleFileSelect(file.key);
-                                                        }}
-                                                    />
-                                                    <Box className="file-icon">
-                                                        <SVGIcon muiIconName={getFileIcon(file.name)} />
-                                                    </Box>
-                                                    <Box className="file-details">
-                                                        <Typography className="file-name">{file.name}</Typography>
-                                                        <Typography className="file-meta">
-                                                            {formatFileSize(file.size)} •{' '}
-                                                            {file.lastModified.toLocaleString()}
-                                                        </Typography>
-                                                    </Box>
-                                                </Box>
-                                            </Box>
-                                        ))}
-                                    </Box>
-                                </Box>
-                            </Panel>
-                            {showExtraPanel && (
-                                <>
-                                    <PanelResizeHandle style={{ background: '#757575', width: '3px' }} />
-                                    <Panel
-                                        minSize={10}
-                                        style={{
-                                            width: '100%',
-                                            borderRadius: '20px',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                        }}
+                                <Panel
+                                    defaultSize={30}
+                                    minSize={30}
+                                    style={{ width: '100%', height: 'inherit', overflowY: 'auto' }}
+                                >
+                                    <PanelGroup
+                                        autoSaveId="files-section"
+                                        direction={flatPanels ? 'vertical' : 'horizontal'}
+                                        style={{ width: '100%', height: '100%' }}
                                     >
-                                        {actionStateCmp}
-                                    </Panel>
-                                </>
-                            )}
-                        </PanelGroup>
-
-                        {(selectedFiles.size > 1 || !pinnedActions) && actionStateCmp}
-                    </>
-                ) : (
-                    <Box className="empty-state">
-                        <SVGIcon muiIconName="FolderOpen" className="empty-icon" />
-                        <Text variant="h6" component="h3" fullWidth justifyContent="center">
-                            No Files
-                        </Text>
-                        <Text variant="body2" fullWidth justifyContent="center">
-                            Upload files to get started
-                        </Text>
-                    </Box>
-                )}
-            </div>
+                                        <Panel
+                                            defaultSize={30}
+                                            minSize={30}
+                                            style={{
+                                                width: '100%',
+                                                height: 'inherit',
+                                                overflowY: 'auto',
+                                                paddingInlineEnd: '1em',
+                                                paddingBottom: '1em',
+                                            }}
+                                        >
+                                            {fileListSectionCmp}
+                                        </Panel>
+                                        {!pinnedActions && !flatPanels && (
+                                            <>
+                                                <PanelResizeHandle style={{ background: '#757575', width: '3px' }} />
+                                                <Panel
+                                                    minSize={30}
+                                                    style={{
+                                                        width: '100%',
+                                                        overflowY: 'hidden',
+                                                        padding: '1em',
+                                                    }}
+                                                >
+                                                    {uploadSectionCmp}
+                                                </Panel>
+                                            </>
+                                        )}
+                                    </PanelGroup>
+                                </Panel>
+                                <PanelResizeHandle
+                                    style={{
+                                        background: '#757575',
+                                        ...(pinnedActions ? { width: '3px' } : { height: '3px' }),
+                                    }}
+                                />
+                                <Panel
+                                    minSize={30}
+                                    style={{
+                                        width: '100%',
+                                        overflowY: pinnedActions ? 'auto' : 'hidden',
+                                        paddingInlineStart: '1em',
+                                        paddingTop: pinnedActions ? 0 : '1em',
+                                    }}
+                                >
+                                    {fileActionsSectionCmp}
+                                </Panel>
+                            </PanelGroup>
+                        </>
+                    ) : (
+                        <EmptyStatement icon="FolderOpen" title="No Files" subtitle="Upload files to get started" />
+                    )}
+                </div>
+            )}
 
             <Dialog
                 open={deleteDialogOpen}
@@ -636,6 +717,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh }) => {
                         value={tempLink}
                         endCmp={[<Button onClick={copyToClipboard} edge="end" icon="ContentCopy" />]}
                         readOnly
+                        sx={{ mb: 2 }}
                     />
 
                     {videoPreviewUrl && (

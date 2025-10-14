@@ -89,7 +89,7 @@ const MainScreen: React.FC<MainScreenProps> = ({ bucketName, bucketAccess, onLog
                     <Button
                         variant="contained"
                         color={'#FFFFFF'}
-                        icon='LogoutOutlined'
+                        icon="LogoutOutlined"
                         onClick={handleLogout}
                         className="logout-button"
                     />
@@ -97,7 +97,7 @@ const MainScreen: React.FC<MainScreenProps> = ({ bucketName, bucketAccess, onLog
                     <Button
                         variant="outlined"
                         color="#FFFFFF"
-                        startIcon='LogoutOutlined'
+                        startIcon="LogoutOutlined"
                         onClick={handleLogout}
                         className="logout-button"
                         label="Logout"
@@ -134,7 +134,11 @@ const MainScreen: React.FC<MainScreenProps> = ({ bucketName, bucketAccess, onLog
                         minSize={mobileLayout ? 35 : 50}
                         style={{ width: '100%', height: '100%', borderRadius: '20px' }}
                     >
-                        <FilePanel currentPath={currentPath} onRefresh={handleRefresh} />
+                        <FilePanel
+                            currentPath={currentPath}
+                            onRefresh={handleRefresh}
+                            isPublicBucket={isPublicAccess}
+                        />
                     </Panel>
                 </PanelGroup>
             </Box>

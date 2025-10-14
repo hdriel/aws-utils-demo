@@ -1,18 +1,17 @@
 
 .video-preview {
-  margin-top: 16px;
   border-radius: 8px;
   overflow: hidden;
   background-color: #000;
   width: 100%;
-  display: flex;
   justify-content: center;
   align-content: center;
+  display: grid;
 
   video, img {
     width: 100%;
     max-width: 100%;
-    max-height: 400px;
+    max-height: 340px;
     display: block;
     object-fit: contain;
   }
@@ -100,6 +99,9 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 16px;
+        top: 0;
+        z-index: 1;
+        background: #FFFFFF;
 
         h3 {
           font-size: 15px;
@@ -174,12 +176,14 @@
     .file-actions {
       position: relative;
       width: 100%;
+      display: grid;
 
       &.top-spacing {
         margin-top: 24px;
         padding-top: 24px;
         border-top: 1px solid #e2e8f0;
       }
+
       &:not(.top-spacing) {
         padding-inline-start: 8px;
       }
@@ -195,7 +199,10 @@
       .actions-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        grid-template-rows: 45px;
+        grid-auto-rows: 45px;
         gap: 12px;
+        height: max-content;
 
         button {
           text-transform: none;
