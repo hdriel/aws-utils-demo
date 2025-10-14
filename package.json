@@ -6,6 +6,9 @@
     "license": "MIT",
     "scripts": {
         "format": "prettier --write .",
+        "client": "cd client && npm run dev",
+        "server": "cd server && npm run server",
+        "docker": "npm run docker:localstack:restart",
         "docker:localstack:restart": "cross-env NODE_ENV=localhost && docker-compose -f docker-compose.localstack.yml --env-file .env.local up -d --build",
         "docker:localstack:down": "docker-compose -f docker-compose.localstack.yml down"
     },

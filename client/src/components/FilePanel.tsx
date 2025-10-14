@@ -382,10 +382,15 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
         </Box>
     );
     const fileActionsSectionCmp = (
-        <Box className="file-actions" height="100%" mt={flatPanels ? 2 : 0}>
+        <Box
+            className="file-actions"
+            height="100%"
+            mt={flatPanels ? 2 : 0}
+            sx={{ ...(flatPanels && { display: 'block !important' }) }}
+        >
             <Box
                 sx={{
-                    position: 'sticky',
+                    position: pinnedActions && !flatPanels ? 'sticky' : 'relative',
                     top: 0,
                     background: 'white',
                     zIndex: 1,

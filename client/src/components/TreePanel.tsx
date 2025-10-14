@@ -364,7 +364,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                     <Button
                         variant="outlined"
                         size="small"
-                        icon="AddCircleOutlined"
+                        icon={<SVGIcon muiIconName="AddCircleOutlined" size="22px" sx={{ marginTop: '-3px' }} />}
                         tooltipProps={{ title: 'New Folder' }}
                         onClick={() => setCreateDialogOpen(true)}
                     />
