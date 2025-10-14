@@ -27,12 +27,15 @@ interface LoginScreenProps {
 
 const defaultOptionValue = AWS_REGIONS.find((v) => v.default)?.value as string;
 
+const initializeCredentials = {
+    accessKeyId: import.meta.env.VITE_LOCALSTACK_ACCESS_KEY_ID ?? '',
+    secretAccessKey: import.meta.env.VITE_LOCALSTACK_SECRET_ACCESS_KEY ?? '',
+    region: import.meta.env.VITE_LOCALSTACK_AWS_REGION ?? defaultOptionValue,
+};
+console.log('initialize credentials', initializeCredentials);
+
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
-    const [credentials, setCredentials] = useState<AWSCredentials>({
-        accessKeyId: import.meta.env.VITE_LOCALSTACK_ACCESS_KEY_ID ?? '',
-        secretAccessKey: import.meta.env.VITE_LOCALSTACK_SECRET_ACCESS_KEY ?? '',
-        region: import.meta.env.VITE_LOCALSTACK_AWS_REGION ?? defaultOptionValue,
-    });
+    const [credentials, setCredentials] = useState<AWSCredentials>({ ...initializeCredentials });
     const [localstackBuckets, setLocalstackBuckets] = useState<
         Array<{
             id: string;
@@ -315,11 +318,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                         onChange={(e) => {
                             setIsLocalstack(e.target.checked);
                             if (e.target.checked) {
-                                setCredentials({
-                                    accessKeyId: import.meta.env.VITE_LOCALSTACK_ACCESS_KEY_ID ?? '',
-                                    secretAccessKey: import.meta.env.VITE_LOCALSTACK_SECRET_ACCESS_KEY ?? '',
-                                    region: import.meta.env.VITE_LOCALSTACK_AWS_REGION ?? defaultOptionValue,
-                                });
+                                setCredentials({ ...initializeCredentials });
                             }
                         }}
                     />
