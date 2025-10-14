@@ -9,9 +9,9 @@
         "client": "cd client && npm run dev",
         "server": "cd server && npm run server",
         "docker": "npm run docker:localstack:restart",
-        "docker:full:restart": "cross-env NODE_ENV=localhost && docker-compose -f docker-compose.yml --env-file server/.env.local up -d --build",
         "docker:localstack:restart": "cross-env NODE_ENV=localhost && docker-compose -f docker-compose.localstack.yml --env-file server/.env.local up -d --build",
-        "docker:localstack:down": "docker-compose -f docker-compose.localstack.yml down"
+        "docker:localstack:down": "docker-compose -f docker-compose.localstack.yml down",
+        "docker:temp-test": "cross-env NODE_ENV=localhost && docker-compose -f docker-compose.yml --env-file server/.env.local up -d --build"
     },
     "devDependencies": {
         "cross-env": "^10.1.0",
