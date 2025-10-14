@@ -40,4 +40,40 @@ services:
     networks:
       - app-network
 
+  server:
+    container_name: "aws-utils-server"
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-xxxxxxxxx}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-xxxxxxxxxxxxxxxxxxxxx}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-1}
+      - AWS_ENDPOINT=${AWS_ENDPOINT:-http://localstack:4566}
+      - AWS_BUCKET_NAME=${AWS_BUCKET_NAME:-demo}
+      - DEBUG=${DEBUG:-1}
+    volumes:
+      - ./server/src:/app/src
+      - ./server/.env.local:/app/.env.local
+    networks:
+      - app-network
+    depends_on:
+      - localstack
+    restart: unless-stopped
+
+  client:
+    container_name: "aws-utils-client"
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+    depends_on:
+      - server
+    restart: unless-stopped
 
