@@ -572,7 +572,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
 
             {!flatPanels && (
                 <div className="file-content">
-                    {pinnedActions && uploadSectionCmp}
+                    {(!files.length || pinnedActions || flatPanels) && uploadSectionCmp}
 
                     {files.length > 0 ? (
                         <>
