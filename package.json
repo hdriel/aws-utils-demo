@@ -8,10 +8,11 @@
         "format": "prettier --write .",
         "client": "cd client && npm run dev",
         "server": "cd server && npm run server",
-        "docker": "npm run docker:localstack:restart",
-        "docker:localstack:restart": "cross-env NODE_ENV=localhost && docker-compose -f docker-compose.localstack.yml --env-file server/.env.local up -d --build",
+        "docker": "npm run docker:full",
+        "docker:localstack": "cross-env NODE_ENV=localhost && docker-compose -f docker-compose.localstack.yml --env-file server/.env.local up -d --build",
         "docker:localstack:down": "docker-compose -f docker-compose.localstack.yml down",
-        "docker:temp-test": "cross-env NODE_ENV=localhost && docker-compose -f docker-compose.yml --env-file server/.env.local up -d --build"
+        "docker:full": "cross-env NODE_ENV=localhost && docker-compose -f docker-compose.yml --env-file server/.env.local up -d --build",
+        "docker:full:down": "docker-compose -f docker-compose.yml down"
     },
     "devDependencies": {
         "cross-env": "^10.1.0",
