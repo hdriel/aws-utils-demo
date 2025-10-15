@@ -70,6 +70,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
                 id: uuid(),
                 key: file.Key,
                 name: file.Name,
+                link: file.link,
                 size: file.Size,
                 lastModified: new Date(file.LastModified),
                 type: 'file',
@@ -259,6 +260,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
 
     const fileKey = Array.from(selectedFiles)[0] || '';
     const file = fileKey && files?.find((f) => f.key === fileKey);
+    const fileLink = file?.link as string;
     const videoPrivateUrl =
         selectedFiles.size === 1 && file && isVideoFile(file.name)
             ? `${s3Service.baseURL}/files/stream?file=${encodeURIComponent(file.key)}`
@@ -485,8 +487,8 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
                                 variant="outlined"
                                 fullWidth
                                 startIcon="ContentCopy"
-                                onClick={() => copyToClipboard(fileKey)}
-                                label="Copy Key"
+                                onClick={() => copyToClipboard(fileLink ?? '')}
+                                label="Copy File Key"
                             />
                             <Button
                                 variant="outlined"

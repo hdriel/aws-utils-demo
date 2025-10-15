@@ -23,6 +23,10 @@ export const getDirectoryFileListCtrl = async (req: Request, res: Response, _nex
 
     const directory = req.query?.directory ? decodeURIComponent(req.query?.directory as string) : undefined;
     const result = await s3BucketUtil.fileListInfo(directory);
+    result.forEach((file) => {
+        // @ts-ignore
+        file.link = `${s3BucketUtil.link}${file.Key}`;
+    });
 
     res.json(result);
 };

@@ -8,12 +8,14 @@ export interface S3File {
     id: string;
     key: string;
     name: string;
+    link: string;
     size: number;
     lastModified: Date;
     type: 'file' | 'folder';
 }
 
 export interface S3ResponseFile {
+    link: string;
     ChecksumAlgorithm: string[];
     ChecksumType: string;
     ETag: string;
