@@ -22,11 +22,6 @@ services:
     volumes:
         - ./client:/app
         - /app/node_modules
-    environment:
-      - VITE_SERVER_URL=http://localhost:3000
-      - VITE_LOCALSTACK_ACCESS_KEY_ID=${LOCALSTACK_ACCESS_KEY_ID:-zzzzzzzzz}
-      - VITE_LOCALSTACK_SECRET_ACCESS_KEY=${LOCALSTACK_SECRET_ACCESS_KEY:-zzzzzzzzzzzzzzzzzzzzz}
-      - VITE_LOCALSTACK_AWS_REGION=${LOCALSTACK_REGION:-us-east-1}
     networks:
         - app-network
     depends_on:
