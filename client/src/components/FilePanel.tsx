@@ -132,15 +132,15 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
         s3Service.abortDownloadFiles();
     };
 
-    const handleDownloadViaSignedLink = async () => {
+    const handleDownloadViaSignedLink = async (openInNewTab: boolean = false) => {
         if (selectedFiles.size !== 1) return;
 
         const fileKey = Array.from(selectedFiles)[0];
         const url = await s3Service.getSignedUrl(fileKey, 5);
         const fileName = files.find((f) => f.key === fileKey)?.name || 'download';
-        const openInNewTab = isVideoFile(fileKey);
+        const _openInNewTab = openInNewTab || isVideoFile(fileKey) || isImageFile(fileKey);
 
-        if (openInNewTab) {
+        if (_openInNewTab) {
             // Open in new tab - browser will display video player
             window.open(url, '_blank');
 
@@ -253,8 +253,8 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
         }
     };
 
-    const copyToClipboard = () => {
-        navigator.clipboard.writeText(tempLink);
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
     };
 
     const fileKey = Array.from(selectedFiles)[0] || '';
@@ -269,7 +269,12 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
 
     const uploadSectionCmp = (
         <Box className="upload-section">
-            <Text variant="subtitle1" component="h3" sx={{ display: 'flex', alignItems: 'center' }}>
+            <Text
+                variant="subtitle1"
+                component="h3"
+                sx={{ display: 'flex', alignItems: 'center' }}
+                color={allowedMultipleFiles ? 'primary' : undefined}
+            >
                 Upload Files
                 <Button
                     icon={<SVGIcon muiIconName="LibraryAdd" size={20} sx={{ marginTop: '-5px' }} />}
@@ -433,6 +438,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
                             }
                         }}
                         fullWidth
+                        label={isDownloading ? 'Downloading...' : `Download ${selectedFiles.size > 1 ? 'as ZIP' : ''}`}
                         color={isDownloading ? 'info' : 'primary'}
                         endIcon={
                             isDownloading ? (
@@ -446,55 +452,42 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
                                 >
                                     <CircularProgress color="info" size={15} value={downloadProgress} />
                                 </Box>
+                            ) : selectedFiles.size === 1 ? (
+                                <Button
+                                    sx={{ position: 'absolute', right: 0, top: 0 }}
+                                    icon={<SVGIcon muiIconName="OpenInNew" size={22} color="info" />}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+
+                                        if (isDownloading) {
+                                            handleAbortDownload();
+                                        } else {
+                                            setIsDownloading(true);
+                                            handleDownloadViaSignedLink()
+                                                .then(() => {
+                                                    console.log('download via link done!');
+                                                })
+                                                .finally(() => {
+                                                    setIsDownloading(false);
+                                                });
+                                        }
+                                    }}
+                                    color={isDownloading ? 'info' : 'primary'}
+                                    tooltipProps={{ title: 'Download via sign open link.', placement: 'top' }}
+                                />
                             ) : null
                         }
-                        tooltipProps={{
-                            title: 'Download via streaming into your machine.',
-                        }}
-                        label={isDownloading ? 'Downloading...' : `Download ${selectedFiles.size > 1 ? 'as ZIP' : ''}`}
                     />
 
                     {selectedFiles.size === 1 && (
-                        <Button
-                            variant="outlined"
-                            startIcon="OpenInNew"
-                            onClick={() => {
-                                if (isDownloading) {
-                                    handleAbortDownload();
-                                } else {
-                                    setIsDownloading(true);
-                                    handleDownloadViaSignedLink()
-                                        .then(() => {
-                                            console.log('download via link done!');
-                                        })
-                                        .finally(() => {
-                                            setIsDownloading(false);
-                                        });
-                                }
-                            }}
-                            fullWidth
-                            color={isDownloading ? 'info' : 'primary'}
-                            endIcon={
-                                isDownloading ? (
-                                    <Box
-                                        sx={{
-                                            position: 'absolute',
-                                            right: '12px',
-                                            top: '5px',
-                                            bottom: 0,
-                                        }}
-                                    >
-                                        <CircularProgress color="info" size={15} value={downloadProgress} />
-                                    </Box>
-                                ) : null
-                            }
-                            tooltipProps={{ title: 'Download via sign open link.' }}
-                            label={isDownloading ? 'Downloading...' : `Download`}
-                        />
-                    )}
-
-                    {selectedFiles.size === 1 && (
                         <>
+                            <Button
+                                variant="outlined"
+                                fullWidth
+                                startIcon="ContentCopy"
+                                onClick={() => copyToClipboard(fileKey)}
+                                label="Copy Key"
+                            />
                             <Button
                                 variant="outlined"
                                 fullWidth
@@ -720,7 +713,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
                     <InputText
                         fullWidth
                         value={tempLink}
-                        endCmp={[<Button onClick={copyToClipboard} edge="end" icon="ContentCopy" />]}
+                        endCmp={[<Button onClick={() => copyToClipboard(tempLink)} edge="end" icon="ContentCopy" />]}
                         readOnly
                         sx={{ mb: 2 }}
                     />
