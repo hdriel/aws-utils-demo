@@ -12,6 +12,7 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
+      # https://www.innokrea.com/dockerizing-the-frontend-do-it-right-with-react-js-vite
       args:
         - VITE_SERVER_URL=http://localhost:3000
         - VITE_LOCALSTACK_ACCESS_KEY_ID=${LOCALSTACK_ACCESS_KEY_ID:-zzzzzzzzz}
