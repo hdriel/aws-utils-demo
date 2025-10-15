@@ -432,7 +432,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
                                 setIsDownloading(true);
                                 handleDownload()
                                     .then(() => {
-                                        console.log('download as zip done!');
+                                        console.log(`download ${selectedFiles.size > 1 ? 'as zip' : 'file'} done!`);
                                     })
                                     .finally(() => {
                                         setIsDownloading(false);

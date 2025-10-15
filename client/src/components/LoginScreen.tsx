@@ -216,7 +216,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                             options={[...localstackBuckets, { id: bucketName, label: bucketName }]}
                             helperText="Enter the name of your S3 bucket"
                             renderOption={(props, option, { selected }) => {
-                                console.log('renderOption', option);
                                 if (option.inputValue) {
                                     return (
                                         <ListItem {...props} color={selected ? 'primary' : undefined}>
