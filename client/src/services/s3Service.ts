@@ -2,6 +2,7 @@ import { AWSCredentials, BucketInfo, ListObjectsOutput, S3ResponseFile } from '.
 import axios, { Axios, AxiosProgressEvent } from 'axios';
 import qs from 'qs';
 import { AwsTreeItem, FILE_TYPE } from '../types/ui.ts';
+import { getProjectEnvVariables } from '../projectEnvVariables.ts';
 
 class S3Service {
     private api: Axios;
@@ -9,10 +10,14 @@ class S3Service {
 
     constructor() {
         this.api = axios.create({
-            baseURL: import.meta.env.VITE_SERVER_URL,
+            baseURL: this.baseURL,
             timeout: 30000,
             headers: { 'Content-Type': 'application/json' },
         });
+    }
+
+    get baseURL(): string {
+        return getProjectEnvVariables().VITE_SERVER_URL;
     }
 
     async initialize(

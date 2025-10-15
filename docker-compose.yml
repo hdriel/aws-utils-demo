@@ -15,7 +15,7 @@ services:
       context: ./client
       dockerfile: Dockerfile
       args:
-        - VITE_SERVER_URL=${VITE_SERVER_URL:-http://localhost:3000}
+        - VITE_SERVER_URL=${VITE_SERVER_URL:-http://server:3000}
         - VITE_LOCALSTACK_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-xxxxxxxxx}
         - VITE_LOCALSTACK_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-xxxxxxxxxxxxxxxxxxxxx}
         - VITE_LOCALSTACK_AWS_REGION=${AWS_DEFAULT_REGION:-us-east-1}

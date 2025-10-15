@@ -20,6 +20,7 @@ import { AWSCredentials, BucketInfo } from '../types/aws.ts';
 import '../styles/login.scss';
 import { AWS_REGIONS } from '../consts.ts';
 import { AxiosError } from 'axios';
+import { getProjectEnvVariables } from '../projectEnvVariables.ts';
 
 interface LoginScreenProps {
     onLoginSuccess: (bucketInfo: BucketInfo, localstack: boolean) => void;
@@ -28,11 +29,12 @@ interface LoginScreenProps {
 const defaultOptionValue = AWS_REGIONS.find((v) => v.default)?.value as string;
 
 const initializeCredentials = {
-    accessKeyId: import.meta.env.VITE_LOCALSTACK_ACCESS_KEY_ID ?? '',
-    secretAccessKey: import.meta.env.VITE_LOCALSTACK_SECRET_ACCESS_KEY ?? '',
-    region: import.meta.env.VITE_LOCALSTACK_AWS_REGION ?? defaultOptionValue,
+    accessKeyId: getProjectEnvVariables().VITE_LOCALSTACK_ACCESS_KEY_ID ?? '',
+    secretAccessKey: getProjectEnvVariables().VITE_LOCALSTACK_SECRET_ACCESS_KEY ?? '',
+    region: getProjectEnvVariables().VITE_LOCALSTACK_AWS_REGION ?? defaultOptionValue,
 };
-console.log('initialize credentials', initializeCredentials);
+
+console.debug('initialize credentials', initializeCredentials);
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
     const [credentials, setCredentials] = useState<AWSCredentials>({ ...initializeCredentials });

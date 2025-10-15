@@ -1,38 +1,42 @@
-# Build stage
-FROM node:20-alpine AS builder
+FROM node:22.11.0 AS builder
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+COPY package.json package-lock.json ./
 
-# Install dependencies
 RUN npm ci
 
-# Copy source code
 COPY . .
 
-# Run type check
-RUN npm run typecheck
+ENV $(cat .env-temp | xargs)
 
-# Build the application
+ARG VITE_SERVER_URL
+ENV VITE_SERVER_URL=${VITE_SERVER_URL}
+
+ARG VITE_LOCALSTACK_ACCESS_KEY_ID
+ENV VITE_LOCALSTACK_ACCESS_KEY_ID=${VITE_LOCALSTACK_ACCESS_KEY_ID}
+
+ARG VITE_LOCALSTACK_SECRET_ACCESS_KEY
+ENV VITE_LOCALSTACK_SECRET_ACCESS_KEY=${VITE_LOCALSTACK_SECRET_ACCESS_KEY}
+
+ARG VITE_LOCALSTACK_AWS_REGION
+ENV VITE_LOCALSTACK_AWS_REGION=${VITE_LOCALSTACK_AWS_REGION}
+
 RUN npm run build
 
-# Production stage with nginx
 FROM nginx:alpine
 
-# Copy custom nginx config (optional)
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+ARG PORT=80
 
-# Copy built assets from builder stage
-COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE ${PORT}
 
-# Expose port 80
-EXPOSE 80
+COPY config/app/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY config/app/nginx/conf.d/ /etc/nginx/conf.d/
+COPY config/app/entrypoint.sh /entrypoint.sh
+COPY config/app/nginx/init-scripts/ /docker-entrypoint.d/
 
-# Add healthcheck
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:80 || exit 1
+RUN chmod +x /entrypoint.sh /docker-entrypoint.d/*.sh
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+WORKDIR /usr/share/nginx/html
+
+COPY --from=builder /app/dist ./

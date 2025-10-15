@@ -1,6 +1,6 @@
 export const AWS_REGIONS = [
     { value: 'us-east-2', label: 'US East (Ohio)' },
-    { value: 'us-east-1', label: 'US East (N. Virginia)', default: true },
+    { value: 'us-east-1', label: 'US East (N. Virginia)' },
     { value: 'us-west-1', label: 'US West (N. California)' },
     { value: 'us-west-2', label: 'US West (Oregon)' },
     { value: 'af-south-1', label: 'Africa (Cape Town)' },
@@ -26,7 +26,7 @@ export const AWS_REGIONS = [
     { value: 'eu-south-1', label: 'Europe (Milan)' },
     { value: 'eu-west-3', label: 'Europe (Paris)' },
     { value: 'eu-south-2', label: 'Europe (Spain)' },
-    { value: 'eu-north-1', label: 'Europe (Stockholm)' },
+    { value: 'eu-north-1', label: 'Europe (Stockholm)', default: true },
     { value: 'eu-central-2', label: 'Europe (Zurich)' },
     { value: 'il-central-1', label: 'Israel (Tel Aviv)' },
     { value: 'mx-central-1', label: 'Mexico (Central)' },

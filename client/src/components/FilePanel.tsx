@@ -261,7 +261,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
     const file = fileKey && files?.find((f) => f.key === fileKey);
     const videoPrivateUrl =
         selectedFiles.size === 1 && file && isVideoFile(file.name)
-            ? `${import.meta.env.VITE_SERVER_URL}/files/stream?file=${encodeURIComponent(file.key)}`
+            ? `${s3Service.baseURL}/files/stream?file=${encodeURIComponent(file.key)}`
             : null;
 
     const showImagePreview = fileKey && isImageFile(fileKey) && selectedFiles.size === 1;
@@ -540,7 +540,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
 
             {showImagePreview && (
                 <Box className="video-preview">
-                    <img src={`${import.meta.env.VITE_SERVER_URL}/files/image?file=${fileKey}`} alt={fileKey} />
+                    <img src={`${s3Service.baseURL}/files/image?file=${fileKey}`} alt={fileKey} />
                 </Box>
             )}
         </Box>
