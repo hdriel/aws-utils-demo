@@ -51,8 +51,16 @@ The project is tested and validated against **LocalStack** - a Docker image that
 2. **Start LocalStack** using the included docker-compose:
 
 ```bash
+   npm run docker:localstack
+```
+
+OR run this command to run also server & client images: 
+
+```bash
    npm run docker
 ```
+
+then open the browser on: `http://localhost`
 
 ### Using Real AWS Credentials
 
@@ -65,9 +73,20 @@ You can connect with your official AWS credentials to access your actual buckets
 ## 🚀 Running the Project
 
 ### Option 1: Full Docker Setup
-Run everything through Docker using the provided configuration.
+
+Run everything through Docker via: 
+
+```bash
+  npm run docker
+```
+
 
 ### Option 2: Local Development
+
+**Start the localstack docker instance only:**
+```bash
+   npm run docker:localstack
+```
 
 **Start the server:**
 ```bash
