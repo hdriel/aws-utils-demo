@@ -159,6 +159,7 @@ When you select a folder/file from the tree, you'll see:
 4. **Actions Section**
     - **Download to Computer** - Streams files directly (creates a unified ZIP for multiple files)
     - **Download via Public Link** - Opens a public URL for download
+    - **Copy File Key URL** - accessible link for public bucket or public sign url
     - **Version Tagging** - Add version tags (e.g., 1.0.0) to files
     - **Generate Public Link** - Create public access links for files in private buckets
     - **Delete File** - Remove selected files
