@@ -1,3 +1,4 @@
+import env from '../dotenv';
 import { NextFunction, Request, Response } from 'express';
 import { type ACLs, AWSConfigSharingUtil, changeS3BucketUtil } from '../shared';
 import { removeS3BucketUtil } from '../shared/s3BucketUtil.shared';
@@ -5,7 +6,8 @@ import { removeS3BucketUtil } from '../shared/s3BucketUtil.shared';
 export const setCredentialsCtrl = async (req: Request, res: Response, _next: NextFunction) => {
     const localstack = Boolean(req.body.localstack);
     const { accessKeyId, secretAccessKey, region, bucket: bucketName, acl } = req.body;
-    const endpoint = localstack ? 'http://localhost:4566' : undefined;
+    const localstackEndpoint = env?.LOCALSTACK_ENDPOINT || 'http://localhost:4566';
+    const endpoint = localstack ? localstackEndpoint : undefined;
 
     try {
         if ([accessKeyId, region, secretAccessKey].every((v) => v)) {

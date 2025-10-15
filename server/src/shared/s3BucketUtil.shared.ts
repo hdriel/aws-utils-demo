@@ -24,14 +24,18 @@ export const getLocalstackS3BucketUtil = (bucketName?: string) => {
     if (!env) throw Error('env must be a defined');
 
     if (!localstackS3BucketUtil || localstackS3BucketUtil?.bucket !== bucketName) {
-        localstackS3BucketUtil = new S3BucketUtil({
+        const options = {
             accessKeyId: env?.LOCALSTACK_ACCESS_KEY_ID,
             secretAccessKey: env?.LOCALSTACK_SECRET_ACCESS_KEY,
             region: env?.LOCALSTACK_REGION,
-            endpoint: env?.LOCALSTACK_END_POINT,
+            endpoint: env?.LOCALSTACK_ENDPOINT,
             bucket: bucketName ?? 'demo',
             logger,
-        });
+        };
+        localstackS3BucketUtil = new S3BucketUtil(options);
+
+        const { logger: _logger, ...logOptions } = options;
+        logger.info(null, 'localstack s3-bucket-util created', logOptions);
     }
 
     return localstackS3BucketUtil;
