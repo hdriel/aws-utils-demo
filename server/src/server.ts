@@ -1,15 +1,20 @@
 import env from './dotenv';
 import express, { Express } from 'express';
 import bodyParser from 'body-parser';
-import cors from 'cors';
+import cors, { CorsOptions } from 'cors';
 import logger from './logger';
 import { initAppRoutes } from './routes/route';
 
 export const app: Express = express();
 
+const corsOptions: CorsOptions = {
+    origin: env.CLIENT_URL || '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+};
+logger.debug(null, 'cors options', corsOptions);
+
 // @ts-ignore
-app.use(cors());
-// app.use(cors({ origin: [env.CLIENT_URL as string].filter((v) => v) }));
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 

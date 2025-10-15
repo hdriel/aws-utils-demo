@@ -45,7 +45,7 @@ services:
       - LOCALSTACK_REGION=${LOCALSTACK_REGION:-us-east-1}
       - LOCALSTACK_ENDPOINT=http://localstack:4566  # Use service name, not localhost
       - AWS_BUCKET_NAME=${AWS_BUCKET_NAME:-my-bucket}
-      - CLIENT_URL=http://localhost:80
+      - CLIENT_URL=http://localhost
       - SERVER_PORT=3000
       - DEBUG=${DEBUG:-1}
     volumes:
