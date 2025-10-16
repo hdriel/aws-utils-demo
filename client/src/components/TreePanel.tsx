@@ -218,7 +218,6 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
         if (node?.directory) {
             try {
                 const result = await s3Service.listObjects(!node.path || node.path === '/' ? '' : node.path, page);
-                console.log(result);
                 const nodeData = buildTreeFromFiles(result, node.path);
 
                 const children = nodeData.children.map((currNode, index, arr) => {

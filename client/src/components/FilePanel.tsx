@@ -62,6 +62,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
     useFetchingList({
         directory: currentPath,
         listItemSelector: '.file-item',
+        timeout: 2,
         cb: async (page) => loadFiles(page),
         isListEmpty: !files.length,
     });
