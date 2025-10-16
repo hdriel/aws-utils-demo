@@ -367,7 +367,6 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
         }
     };
 
-    console.log('selectedNode', selectedNode);
     useFetchingList({
         directory: selectedNode?.path as string,
         listItemSelector: `li.MuiTreeItem-root[role="treeitem"][parentid="${!selectedNode?.parentId || selectedNode?.parentId === '/' ? 'root' : selectedNode?.parentId}"]`,
