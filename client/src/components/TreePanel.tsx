@@ -22,7 +22,6 @@ interface TreePanelProps {
     onRefresh: () => void;
     bucketName: string;
     refreshTrigger: number;
-    localstack: boolean;
 }
 
 const buildTreeFromFiles = (result: ListObjectsOutput, basePath: string = ''): AwsTreeItem => {
@@ -65,7 +64,7 @@ const buildTreeFromFiles = (result: ListObjectsOutput, basePath: string = ''): A
     };
 };
 
-const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refreshTrigger, localstack }) => {
+const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refreshTrigger }) => {
     const [treeData, setTreeData] = useState<TreeNodeItem | null>(null);
     const [expanded, setExpanded] = useState<string[]>([]);
     // @ts-ignore
@@ -168,22 +167,14 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
 
     const loadRootFiles = async () => {
         try {
-            if (localstack) {
-                const root = await s3Service.treeObjects();
-                const data = buildTreeData(root);
-                if (!data) return;
+            const result = await s3Service.listObjects();
+            const nodeData = buildTreeFromFiles(result);
+            const data = buildTreeData(nodeData);
+            if (!data) return;
 
-                setTreeData(data);
-            } else {
-                const result = await s3Service.listObjects();
-                const nodeData = buildTreeFromFiles(result);
-                const data = buildTreeData(nodeData);
-                if (!data) return;
-
-                setTreeData(data);
-                setSelected(data.id);
-                setExpanded([data.id]);
-            }
+            setTreeData(data);
+            setSelected(data.id);
+            setExpanded([data.id]);
         } catch (error) {
             console.error('Failed to load files:', error);
         }
@@ -217,7 +208,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
         const node = findNodeById(treeData, nodeId) as TreeNodeItem;
         if (node?.directory) {
             try {
-                const result = await s3Service.listObjects(!node.path || node.path === '/' ? '' : node.path, page);
+                const result = await s3Service.listObjects(node.path, page);
                 const nodeData = buildTreeFromFiles(result, node.path);
 
                 const children = nodeData.children.map((currNode, index, arr) => {
@@ -249,7 +240,11 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                 });
 
                 const newChildren = page ? [...node.children, ...children] : children;
-                updateNodeChildren(nodeId, newChildren);
+                updateNodeChildren(
+                    nodeId,
+                    newChildren
+                    // newChildren.sort((a, b) => +b.directory - +a.directory)
+                );
             } catch (error) {
                 console.error('Failed to load folder contents:', error);
             }
@@ -262,9 +257,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
         } else {
             setExpanded([...expanded, nodeId]);
 
-            if (!localstack) {
-                return loadNodeFiles(nodeId);
-            }
+            return loadNodeFiles(nodeId);
         }
     };
 
@@ -348,12 +341,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                     await s3Service.deleteObject(nodeAction.path);
                 }
                 setDeleteDialogOpen(false);
-
-                if (!localstack) {
-                    await handleNodeToggle(nodeAction.id);
-                } else {
-                    await loadRootFiles();
-                }
+                await loadRootFiles();
 
                 setExpanded(['root']);
                 setSelected('root');
