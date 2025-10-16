@@ -31,7 +31,7 @@ export const getDirectoryFileListCtrl = async (req: Request, res: Response, _nex
     const { files: result } = await s3BucketUtil.fileListInfoPaginated(directory, { pageNumber, pageSize });
     result.forEach((file) => {
         // @ts-ignore
-        file.link = `${s3BucketUtil.link}${file.Key}`;
+        file.link = file.Location;
     });
 
     res.json(result);
