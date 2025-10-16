@@ -128,7 +128,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                     />
                 )}
             </Box>
-        ) as any;
+        ) as unknown as string;
 
         return label;
     };
@@ -401,7 +401,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                         }
                     }}
                     nodes={treeData ? [treeData] : undefined}
-                    TreeItemComponent={IndentBorderTreeItem as any}
+                    TreeItemComponent={IndentBorderTreeItem as unknown as React.ReactElement}
                     {...IndentBorderTreeItemIcons}
                     collapseIcon="FolderOpen"
                     expandIcon="Folder"
@@ -426,7 +426,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                     fullWidth
                     value={newFolderName}
                     onChange={(e) => setNewFolderName(e.target.value)}
-                    onKeyUp={(e: any) => e.key === 'Enter' && handleCreateFolder()}
+                    onKeyUp={(e: KeyboardEvent) => e.key === 'Enter' && handleCreateFolder()}
                 />
             </Dialog>
 
