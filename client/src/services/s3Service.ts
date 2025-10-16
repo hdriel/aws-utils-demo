@@ -79,6 +79,16 @@ class S3Service {
         }
     }
 
+    async localstackAlive(): Promise<boolean> {
+        try {
+            const { data: response } = await this.api.get('/health/localstack');
+            return response;
+        } catch (error) {
+            console.error('Failed to get localstack health status:', error);
+            return false;
+        }
+    }
+
     async listFileObjects(directory: string = '', page: number = 0): Promise<S3ResponseFile[]> {
         try {
             const query = qs.stringify({
