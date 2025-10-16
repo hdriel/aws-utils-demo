@@ -1,3 +1,4 @@
+import axios from 'axios';
 import env from '../dotenv';
 import { NextFunction, Request, Response } from 'express';
 import { type ACLs, AWSConfigSharingUtil, changeS3BucketUtil } from '../shared';
@@ -37,5 +38,17 @@ export const unsetCredentialsCtrl = async (_req: Request, res: Response, _next: 
         res.sendStatus(200);
     } catch (err: any) {
         res.status(403).json({ message: err.message });
+    }
+};
+
+export const isLocalstackLiveCtrl = async (_req: Request, res: Response, _next: NextFunction) => {
+    try {
+        const response = await axios(`${env?.LOCALSTACK_ENDPOINT ?? 'http://localhost:4566'}/_localstack/health`, {
+            timeout: 2000,
+        });
+
+        return res.send(response.status === 200);
+    } catch (error: any) {
+        return res.status(403).json({ message: error.message });
     }
 };

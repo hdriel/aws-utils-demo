@@ -35,6 +35,7 @@ const initializeCredentials = {
 };
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
+    const [showLocalstack, setShowLocalstack] = useState<boolean>(true);
     const [credentials, setCredentials] = useState<AWSCredentials>({
         accessKeyId: sessionStorage.getItem('accessKeyId') ?? initializeCredentials.accessKeyId,
         secretAccessKey: sessionStorage.getItem('secretAccessKey') ?? initializeCredentials.secretAccessKey,
@@ -94,13 +95,21 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
             const bucketInfo = await s3Service.getConnectedBucketInfo();
 
             if (bucketInfo) {
-                localStorage.setItem('localstack', isLocalstack ? '1' : '0');
                 setSuccess(true);
-                sessionStorage.setItem('bucketName', bucketName);
-                sessionStorage.setItem('accessKeyId', credentials.accessKeyId);
-                sessionStorage.setItem('secretAccessKey', credentials.secretAccessKey);
-                sessionStorage.setItem('region', credentials.region);
-                sessionStorage.setItem('bucketName', bucketInfo.name);
+                sessionStorage.setItem('localstack', isLocalstack ? '1' : '0');
+
+                if (credentials.accessKeyId !== initializeCredentials.accessKeyId) {
+                    sessionStorage.setItem('accessKeyId', credentials.accessKeyId);
+                }
+                if (credentials.secretAccessKey !== initializeCredentials.secretAccessKey) {
+                    sessionStorage.setItem('secretAccessKey', credentials.secretAccessKey);
+                }
+                if (credentials.region !== initializeCredentials.region) {
+                    sessionStorage.setItem('region', credentials.region);
+                }
+                if (bucketInfo.name !== getProjectEnvVariables().VITE_LOCALSTACK_AWS_BUCKET) {
+                    sessionStorage.setItem('bucketName', bucketInfo.name);
+                }
 
                 setTimeout(() => {
                     onLoginSuccess(bucketInfo, isLocalstack);
@@ -134,7 +143,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
         }
     };
 
-    const loadLocalstackBucketList = () => {
+    const loadLocalstackBucketList = async () => {
         return s3Service
             .localstackBucketsList()
             .then((buckets) => {
@@ -151,8 +160,33 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
             .catch(console.error);
     };
 
+    const isLocalstackAvailable = async (): Promise<boolean> => {
+        return s3Service
+            .localstackAlive()
+            .then((isAlive) => {
+                setShowLocalstack(isAlive);
+                setIsLocalstack(isAlive);
+                if (!isAlive) {
+                    setCredentials({
+                        accessKeyId: sessionStorage.getItem('accessKeyId') ?? '',
+                        secretAccessKey: sessionStorage.getItem('secretAccessKey') ?? '',
+                        region: sessionStorage.getItem('region') ?? defaultOptionValue,
+                    });
+                }
+                return isAlive;
+            })
+            .catch((error) => {
+                console.error(error);
+                return false;
+            });
+    };
+
     useEffect(() => {
-        loadLocalstackBucketList();
+        isLocalstackAvailable()
+            .then((isAlive) => {
+                if (isAlive) return loadLocalstackBucketList();
+            })
+            .catch(console.error);
     }, []);
 
     const selectedOption = isLocalstack ? localstackBuckets.find((b) => b.id === bucketName) : undefined;
@@ -322,17 +356,19 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                         />
                     )}
 
-                    <Checkbox
-                        color="primary"
-                        label={'Localstack'}
-                        checked={isLocalstack}
-                        onChange={(e) => {
-                            setIsLocalstack(e.target.checked);
-                            if (e.target.checked) {
-                                setCredentials({ ...initializeCredentials });
-                            }
-                        }}
-                    />
+                    {showLocalstack && (
+                        <Checkbox
+                            color="primary"
+                            label={'Localstack'}
+                            checked={isLocalstack}
+                            onChange={(e) => {
+                                setIsLocalstack(e.target.checked);
+                                if (e.target.checked) {
+                                    setCredentials({ ...initializeCredentials });
+                                }
+                            }}
+                        />
+                    )}
 
                     <Button
                         variant="contained"

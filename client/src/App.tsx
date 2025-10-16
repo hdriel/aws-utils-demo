@@ -44,14 +44,14 @@ function App() {
                     setIsAuthenticated(!!bucketInfo);
                     setBucketName(bucketInfo.name);
                     setBucketAccess(bucketInfo.publicAccessBlock?.BlockPublicPolicy ? 'private' : 'public');
-                    const localstack = !!+(localStorage.getItem('localstack') ?? '0');
+                    const localstack = !!+(sessionStorage.getItem('localstack') ?? '0');
                     setIsLocalstack(localstack);
                 } else {
-                    localStorage.removeItem('localstack');
+                    sessionStorage.removeItem('localstack');
                 }
             })
             .catch(() => {
-                localStorage.removeItem('localstack');
+                sessionStorage.removeItem('localstack');
             })
             .finally(() => {
                 setIsLoading(false);

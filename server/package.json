@@ -12,6 +12,7 @@
     "dependencies": {
         "@hdriel/aws-utils": "file:.yalc/@hdriel/aws-utils",
         "@types/body-parser": "^1.19.6",
+        "axios": "^1.12.2",
         "body-parser": "^2.2.0",
         "cors": "^2.8.5",
         "dotenv": "^17.2.3",
