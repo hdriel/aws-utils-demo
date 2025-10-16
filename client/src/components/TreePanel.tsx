@@ -361,6 +361,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
 
     useFetchingList({
         directory: selectedNode?.path as string,
+        // todo: need to put in the list some intensifier on the sub list group to pull nested directory by pulling scrollable
         listItemSelector: `li.MuiTreeItem-root[role="treeitem"][parentid="${!selectedNode?.parentId || selectedNode?.parentId === '/' ? 'root' : selectedNode?.parentId}"]`,
         isListEmpty: !selectedNode?.children?.length || !expanded.includes(selectedNode?.id as string),
         timeout: 1000,
