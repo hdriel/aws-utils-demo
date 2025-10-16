@@ -358,7 +358,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
         <Box className="file-list">
             <Box className="file-list-header" sx={{ position: pinnedActions && !flatPanels ? 'sticky' : 'relative' }}>
                 <Typography variant="subtitle1" component="h3">
-                    Files in Current Folder
+                    {files.length} - Files in Current Folder
                 </Typography>
                 {selectedFiles.size > 0 && (
                     <Typography className="selection-info">
