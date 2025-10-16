@@ -56,16 +56,8 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
     const videoInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        loadFiles(0);
+        loadFiles();
     }, [currentPath]);
-
-    useFetchingList({
-        directory: currentPath === '/' ? '' : currentPath,
-        listItemSelector: '.file-item',
-        timeout: 0,
-        cb: async (page) => loadFiles(page),
-        isListEmpty: !files.length,
-    });
 
     useEffect(() => {
         setFlatPanels(mobileLayout);
@@ -89,6 +81,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
             if (selectedFiles.size !== 0) {
                 setSelectedFiles(new Set());
             }
+
             setVideoPreviewUrl('');
             setTempLink('');
         } catch (error) {
@@ -183,10 +176,8 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
 
     const downloadMultipleAsZip = async () => {
         const filePath: string[] = Array.from(selectedFiles).filter((fileKey) => files.find((f) => f.key === fileKey));
-        const [url, filename] = await s3Service.downloadFilesAsZip(
-            filePath,
-            'aws-s3-bucket-utils-download.zip',
-            (progress) => setDownloadProgress(progress)
+        const [url, filename] = await s3Service.downloadFilesAsZip(filePath, 'download.zip', (progress) =>
+            setDownloadProgress(progress)
         );
 
         return downloadFile(url, filename);
@@ -267,6 +258,14 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
     };
+
+    useFetchingList({
+        directory: currentPath === '/' ? '' : currentPath,
+        listItemSelector: '.file-item',
+        timeout: 1000,
+        cb: async (page) => loadFiles(page),
+        isListEmpty: !files.length,
+    });
 
     const fileKey = Array.from(selectedFiles)[0] || '';
     const file = fileKey && files?.find((f) => f.key === fileKey);

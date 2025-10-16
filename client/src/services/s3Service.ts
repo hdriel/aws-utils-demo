@@ -98,7 +98,7 @@ class S3Service {
     async listObjects(directory: string = '', page: number = 0): Promise<ListObjectsOutput> {
         try {
             const query = qs.stringify({
-                ...(directory && { directory: encodeURIComponent(directory) }),
+                ...(directory && directory !== '/' && { directory: encodeURIComponent(directory) }),
                 page,
                 size: 10,
             });
