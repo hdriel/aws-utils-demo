@@ -60,9 +60,9 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
     }, [currentPath]);
 
     useFetchingList({
-        directory: currentPath,
+        directory: currentPath === '/' ? '' : currentPath,
         listItemSelector: '.file-item',
-        timeout: 2,
+        timeout: 0,
         cb: async (page) => loadFiles(page),
         isListEmpty: !files.length,
     });
@@ -557,7 +557,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
                 <Typography variant="h6" component="h2">
                     File Management
                 </Typography>
-                <Typography className="current-path">{currentPath || '/ (root)'}</Typography>
+                <Typography className="current-path">{(currentPath !== '/' && currentPath) || '/ (root)'}</Typography>
             </div>
 
             {flatPanels && (
