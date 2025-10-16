@@ -91,7 +91,7 @@ class S3Service {
 
     async listFileObjects(directory: string = '', page: number = 0): Promise<S3ResponseFile[]> {
         try {
-            const query = qs.stringify({ directory: encodeURIComponent(directory), page });
+            const query = qs.stringify({ ...(directory && { directory: encodeURIComponent(directory) }), page });
             const { data: response } = await this.api.get(`/directories/files?${query}`);
 
             return response;

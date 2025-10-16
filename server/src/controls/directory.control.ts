@@ -8,12 +8,12 @@ export const getDirectoryListCtrl = async (req: Request, res: Response, _next: N
         return;
     }
 
-    const directory = req.query?.directory ? decodeURIComponent(req.query?.directory as string) : undefined;
-    // const pageNumber = req.query?.page ? +req.query?.page : undefined;
-    // const pageSize = req.query?.size ? +req.query?.size : undefined;
-    //
-    // const result = await s3BucketUtil.directoryListPaginated(directory, { pageNumber, pageSize });
-    const result = await s3BucketUtil.directoryList(directory);
+    const directory = req.query?.directory ? decodeURIComponent(req.query?.directory as string) : '';
+    const pageNumber = req.query?.page ? +req.query?.page : undefined;
+    const pageSize = req.query?.size ? +req.query?.size : undefined;
+
+    const result = await s3BucketUtil.directoryListPaginated(directory, { pageNumber, pageSize });
+    // const result = await s3BucketUtil.directoryList(directory);
 
     res.json(result);
 };
@@ -30,6 +30,8 @@ export const getDirectoryFileListCtrl = async (req: Request, res: Response, _nex
     const pageSize = req.query?.size ? +req.query?.size : undefined;
 
     const { files: result } = await s3BucketUtil.fileListInfoPaginated(directory, { pageNumber, pageSize });
+    // const result = await s3BucketUtil.fileListInfo(directory);
+
     result.forEach((file) => {
         // @ts-ignore
         file.link = file.Location;

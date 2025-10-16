@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { FILE_TYPE, getS3BucketUtil, type UploadedS3File } from '../shared';
 import logger from '../logger';
-import { extname } from 'path';
+import { extname } from 'pathe';
 
 export const getFileInfoCtrl = async (req: Request, res: Response, next: NextFunction) => {
     const s3BucketUtil = getS3BucketUtil();
@@ -122,7 +122,8 @@ export const uploadSingleFileCtrl = (req: Request & { s3File?: UploadedS3File },
         return res.status(400).json({ error: 'Directory header is required' });
     }
 
-    const directory = decodeURIComponent(encodedDirectory);
+    let directory = decodeURIComponent(encodedDirectory);
+    directory = directory === '/' ? '' : directory;
     const filename = encodedFilename ? decodeURIComponent(encodedFilename) : undefined;
 
     logger.info(req.id, 'uploading single file', { filename, directory });
@@ -146,6 +147,7 @@ export const uploadSingleFileCtrl = (req: Request & { s3File?: UploadedS3File },
                 location: s3File.location,
                 bucket: s3File.bucket,
                 etag: s3File.etag,
+                // @ts-ignore
                 size: s3File.size,
             };
 
@@ -172,13 +174,13 @@ export const uploadMultiFilesCtrl = (
 
     const fileType = req.params?.fileType as FILE_TYPE;
 
-    const encodedDirectory = (req.headers['x-upload-directory'] as string) || '';
-
+    const encodedDirectory = (req.headers['x-upload-directory'] as string) || '/';
     if (!encodedDirectory) {
         return res.status(400).json({ error: 'Directory header is required' });
     }
 
-    const directory = decodeURIComponent(encodedDirectory);
+    let directory = decodeURIComponent(encodedDirectory);
+    directory = directory === '/' ? '' : directory;
 
     logger.info(req.id, 'uploading multiple files', { directory });
 
@@ -197,6 +199,7 @@ export const uploadMultiFilesCtrl = (
                 location: s3File.location,
                 bucket: s3File.bucket,
                 etag: s3File.etag,
+                // @ts-ignore
                 size: s3File.size,
             }));
 
