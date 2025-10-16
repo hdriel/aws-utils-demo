@@ -208,38 +208,42 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
         const node = findNodeById(treeData, nodeId) as TreeNodeItem;
         if (node?.directory) {
             try {
+                const paths = node.children.map((n) => n.path);
                 const result = await s3Service.listObjects(node.path, page);
                 const nodeData = buildTreeFromFiles(result, node.path);
 
-                const children = nodeData.children.map((currNode, index, arr) => {
-                    const currNodePath =
-                        currNode.type === 'file' ? currNode.path : `${node.path ?? ''}/${currNode.path}`;
+                const children = nodeData.children
+                    .filter((n) => !paths.includes(n.path))
+                    .map((currNode, index, arr) => {
+                        const currNodePath =
+                            currNode.type === 'file' ? currNode.path : `${node.path ?? ''}/${currNode.path}`;
 
-                    const currNodeId = currNodePath;
-                    const label = buildNodeLabel(currNode, nodeId, currNodePath, node.id);
+                        const currNodeId = currNodePath;
+                        const label = buildNodeLabel(currNode, nodeId, currNodePath, node.id);
 
-                    return {
-                        id: currNodeId,
-                        parentId: node.id,
-                        level: node.level + 1,
-                        path: currNodePath,
-                        name: currNode.name,
-                        label,
-                        size: currNode.size,
-                        directory: currNode.type === 'directory',
-                        children: [],
-                        sx: {
-                            ...((currNode.type === 'file' || !currNode.name) && {
-                                '& .MuiTreeItem-label': { marginLeft: '-5px' },
-                                '& .MuiTreeItem-iconContainer': { display: 'none' },
-                            }),
-                        },
-                        index,
-                        isLast: index === arr.length - 1,
-                    } as TreeNodeItem;
-                });
+                        return {
+                            id: currNodeId,
+                            parentId: node.id,
+                            level: node.level + 1,
+                            path: currNodePath,
+                            name: currNode.name,
+                            label,
+                            size: currNode.size,
+                            directory: currNode.type === 'directory',
+                            children: [],
+                            sx: {
+                                ...((currNode.type === 'file' || !currNode.name) && {
+                                    '& .MuiTreeItem-label': { marginLeft: '-5px' },
+                                    '& .MuiTreeItem-iconContainer': { display: 'none' },
+                                }),
+                            },
+                            index,
+                            isLast: index === arr.length - 1,
+                        } as TreeNodeItem;
+                    });
 
                 const newChildren = page ? [...node.children, ...children] : children;
+
                 updateNodeChildren(
                     nodeId,
                     newChildren
