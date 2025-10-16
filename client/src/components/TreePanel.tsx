@@ -96,7 +96,9 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
         const label = (
             <Box className="item-icon" style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
                 {isDirectory ? null : <SVGIcon muiIconName={getFileIcon(isDirectory ? '' : node.name)} size={'18px'} />}
-                <Typography className="item-name">{node.name}</Typography>
+                <Typography className="item-name">
+                    {node.name} ({node.children.length})
+                </Typography>
                 <Box sx={{ marginInlineStart: 'auto' }}>
                     {!isDirectory && node.size !== undefined && (
                         <Typography className="item-size">{formatFileSize(node.size)}</Typography>
@@ -213,14 +215,16 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
 
     const loadNodeFiles = async (nodeId: string, page: number = 0) => {
         const node = findNodeById(treeData, nodeId) as TreeNodeItem;
-        if (node && node.directory && (!node.children || node.children.length === 0)) {
+        if (node?.directory) {
             try {
-                const result = await s3Service.listObjects(node.path, page);
+                const result = await s3Service.listObjects(!node.path || node.path === '/' ? '' : node.path, page);
                 console.log(result);
                 const nodeData = buildTreeFromFiles(result, node.path);
+
                 const children = nodeData.children.map((currNode, index, arr) => {
                     const currNodePath =
                         currNode.type === 'file' ? currNode.path : `${node.path ?? ''}/${currNode.path}`;
+
                     const currNodeId = currNodePath;
                     const label = buildNodeLabel(currNode, nodeId, currNodePath, node.id);
 
@@ -245,7 +249,8 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                     } as TreeNodeItem;
                 });
 
-                updateNodeChildren(nodeId, children);
+                const newChildren = page ? [...node.children, ...children] : children;
+                updateNodeChildren(nodeId, newChildren);
             } catch (error) {
                 console.error('Failed to load folder contents:', error);
             }
@@ -279,7 +284,17 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
 
         if (treeData) {
             const result = updateNodes([treeData]);
-            setTreeData(result[0]);
+            const root = result[0] as TreeNodeItem;
+            const label = buildNodeLabel(
+                { children: root.children, type: 'directory', name: 'root', path: '/' } as any,
+                nodeId,
+                root.path,
+                'root',
+                { paddingDeleteAction: '-1px' }
+            );
+            result[0].label = label;
+
+            setTreeData({ ...result[0] });
         }
     };
 
@@ -357,11 +372,11 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
         directory: selectedNode?.path as string,
         listItemSelector: `li.MuiTreeItem-root[role="treeitem"][parentid="${!selectedNode?.parentId || selectedNode?.parentId === '/' ? 'root' : selectedNode?.parentId}"]`,
         isListEmpty: !selectedNode?.children?.length || !expanded.includes(selectedNode?.id as string),
+        timeout: 1,
         cb: async (page) => {
-            if (selectedNode?.id) {
-                return loadNodeFiles(selectedNode.id, page);
-            }
+            if (selectedNode?.id) return loadNodeFiles(selectedNode.id, page);
         },
+        deps: [treeData],
     });
 
     return (

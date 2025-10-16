@@ -135,13 +135,11 @@ const MainScreen: React.FC<MainScreenProps> = ({ bucketName, bucketAccess, onLog
                         minSize={mobileLayout ? 35 : 50}
                         style={{ width: '100%', height: '100%', borderRadius: '20px' }}
                     >
-                        {false && (
-                            <FilePanel
-                                currentPath={currentPath}
-                                onRefresh={handleRefresh}
-                                isPublicBucket={isPublicAccess}
-                            />
-                        )}
+                        <FilePanel
+                            currentPath={currentPath}
+                            onRefresh={handleRefresh}
+                            isPublicBucket={isPublicAccess}
+                        />
                     </Panel>
                 </PanelGroup>
             </Box>
