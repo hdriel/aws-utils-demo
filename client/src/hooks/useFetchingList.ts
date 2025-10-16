@@ -6,19 +6,16 @@ interface UseFetchingListProps {
     cb: (page: number) => Promise<void>;
     isListEmpty: boolean;
     timeout?: number;
-    deps: any[];
 }
 
-export const useFetchingList = ({
-    listItemSelector,
-    cb,
-    directory,
-    isListEmpty,
-    timeout,
-    deps = [],
-}: UseFetchingListProps) => {
+export const useFetchingList = ({ listItemSelector, cb, directory, isListEmpty, timeout }: UseFetchingListProps) => {
     const pageNumberRef = useRef(1);
+    const cbRef = useRef(cb);
     const selector = `${listItemSelector}:last-child`;
+
+    useEffect(() => {
+        cbRef.current = cb;
+    }, [cb]);
 
     // Separate effect: set up IntersectionObserver ONLY after lastItem is detected
     useEffect(() => {
@@ -29,7 +26,7 @@ export const useFetchingList = ({
             const entry = entries[0];
 
             if (entry.isIntersecting) {
-                await cb(pageNumberRef.current++);
+                await cbRef.current(pageNumberRef.current++);
                 observer.unobserve(entries[0].target);
 
                 const effect = () => {
@@ -62,11 +59,6 @@ export const useFetchingList = ({
 
         return () => {
             observer.disconnect();
-        };
-    }, [directory, listItemSelector, isListEmpty, selector, ...deps]);
-
-    useEffect(() => {
-        return () => {
             pageNumberRef.current = 1;
         };
     }, [directory, listItemSelector, isListEmpty, selector]);

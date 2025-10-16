@@ -303,6 +303,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
             const path = selectedNode.directory
                 ? selectedNode.path
                 : selectedNode.path.split('/').slice(0, -1).join('/');
+
             onFolderSelect(path);
         } else {
             onFolderSelect('');
@@ -372,11 +373,10 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
         directory: selectedNode?.path as string,
         listItemSelector: `li.MuiTreeItem-root[role="treeitem"][parentid="${!selectedNode?.parentId || selectedNode?.parentId === '/' ? 'root' : selectedNode?.parentId}"]`,
         isListEmpty: !selectedNode?.children?.length || !expanded.includes(selectedNode?.id as string),
-        timeout: 1,
+        timeout: 500,
         cb: async (page) => {
             if (selectedNode?.id) return loadNodeFiles(selectedNode.id, page);
         },
-        deps: [treeData],
     });
 
     return (
