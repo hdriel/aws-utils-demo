@@ -3,11 +3,13 @@ logs
 *.log
 npm-debug.log*
 
-docker-data
+docker-data/aws-localstack
 node_modules
 dist
 client/.yalc
 client/yalc.lock
+server/.yalc
+server/yalc.lock
 
 # Editor directories and files
 .vscode/*

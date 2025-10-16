@@ -34,10 +34,12 @@ const initializeCredentials = {
     region: getProjectEnvVariables().VITE_LOCALSTACK_AWS_REGION ?? defaultOptionValue,
 };
 
-console.debug('initialize credentials', initializeCredentials);
-
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
-    const [credentials, setCredentials] = useState<AWSCredentials>({ ...initializeCredentials });
+    const [credentials, setCredentials] = useState<AWSCredentials>({
+        accessKeyId: sessionStorage.getItem('accessKeyId') ?? initializeCredentials.accessKeyId,
+        secretAccessKey: sessionStorage.getItem('secretAccessKey') ?? initializeCredentials.secretAccessKey,
+        region: sessionStorage.getItem('region') ?? initializeCredentials.region,
+    });
     const [localstackBuckets, setLocalstackBuckets] = useState<
         Array<{
             id: string;
@@ -47,7 +49,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
             public: boolean;
         }>
     >([]);
-    const [bucketName, setBucketName] = useState('demo');
+    const [bucketName, setBucketName] = useState(
+        sessionStorage.getItem('bucketName') ?? getProjectEnvVariables().VITE_LOCALSTACK_AWS_BUCKET ?? 'demo'
+    );
     const [isPublicAccess, setIsPublicAccess] = useState(false);
     const [isLocalstack, setIsLocalstack] = useState(true);
     const [loading, setLoading] = useState(false);
@@ -92,6 +96,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
             if (bucketInfo) {
                 localStorage.setItem('localstack', isLocalstack ? '1' : '0');
                 setSuccess(true);
+                sessionStorage.setItem('bucketName', bucketName);
+                sessionStorage.setItem('accessKeyId', credentials.accessKeyId);
+                sessionStorage.setItem('secretAccessKey', credentials.secretAccessKey);
+                sessionStorage.setItem('region', credentials.region);
+                sessionStorage.setItem('bucketName', bucketInfo.name);
+
                 setTimeout(() => {
                     onLoginSuccess(bucketInfo, isLocalstack);
                 }, 500);

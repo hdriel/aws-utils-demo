@@ -23,6 +23,7 @@ export default defineConfig(({ mode }) => {
             VITE_LOCALSTACK_ACCESS_KEY_ID: JSON.stringify(env.VITE_LOCALSTACK_ACCESS_KEY_ID),
             VITE_LOCALSTACK_SECRET_ACCESS_KEY: JSON.stringify(env.VITE_LOCALSTACK_SECRET_ACCESS_KEY),
             VITE_LOCALSTACK_AWS_REGION: JSON.stringify(env.VITE_LOCALSTACK_AWS_REGION),
+            VITE_LOCALSTACK_AWS_BUCKET: JSON.stringify(env.VITE_LOCALSTACK_AWS_BUCKET),
         },
     };
 });

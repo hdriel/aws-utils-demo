@@ -18,6 +18,7 @@ services:
         - VITE_LOCALSTACK_ACCESS_KEY_ID=${LOCALSTACK_ACCESS_KEY_ID:-zzzzzzzzz}
         - VITE_LOCALSTACK_SECRET_ACCESS_KEY=${LOCALSTACK_SECRET_ACCESS_KEY:-zzzzzzzzzzzzzzzzzzzzz}
         - VITE_LOCALSTACK_AWS_REGION=${LOCALSTACK_REGION:-us-east-1}
+        - VITE_LOCALSTACK_AWS_BUCKET=${LOCALSTACK_BUCKET:-demo}
     ports:
         - "80:80"
     volumes:
