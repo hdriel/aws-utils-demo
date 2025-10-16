@@ -3,6 +3,7 @@ import { TreeViewNodeProps } from 'mui-simple';
 export type FILE_TYPE = 'image' | 'video' | 'application' | 'text' | 'audio';
 
 export interface AwsTreeItem {
+    id?: string;
     name: string;
     path: string;
     size: number;

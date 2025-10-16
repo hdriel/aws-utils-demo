@@ -15,6 +15,7 @@ import '../styles/treeView.scss';
 import { AwsTreeItem, TreeNodeItem } from '../types/ui';
 import { formatFileSize, getFileIcon } from '../utils/fileUtils.ts';
 import { ListObjectsOutput, S3ResponseFile } from '../types/aws.ts';
+import { useFetchingList } from '../hooks/useFetchingList.ts';
 
 interface TreePanelProps {
     onFolderSelect: (path: string) => void;
@@ -60,7 +61,7 @@ const buildTreeFromFiles = (result: ListObjectsOutput, basePath: string = ''): A
         path: basePath || '/',
         type: 'directory',
         size: 0,
-        children: !basePath || children.length ? children : [{ id: '.', name: '', path: '' } as any],
+        children: !basePath || children.length ? children : ([{ id: '.', name: '', path: '' }] as AwsTreeItem[]),
     };
 };
 
@@ -128,7 +129,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                     />
                 )}
             </Box>
-        ) as any;
+        ) as unknown as string;
 
         return label;
     };
@@ -210,12 +211,12 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
         return selected ? findNodeById(treeData, selected) : null;
     }, [selected]);
 
-    const loadNodeFiles = async (nodeId: string) => {
+    const loadNodeFiles = async (nodeId: string, page: number = 0) => {
         const node = findNodeById(treeData, nodeId) as TreeNodeItem;
         if (node && node.directory && (!node.children || node.children.length === 0)) {
             try {
-                const result = await s3Service.listObjects(node.path);
-
+                const result = await s3Service.listObjects(node.path, page);
+                console.log(result);
                 const nodeData = buildTreeFromFiles(result, node.path);
                 const children = nodeData.children.map((currNode, index, arr) => {
                     const currNodePath =
@@ -350,6 +351,18 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
             setLoading(false);
         }
     };
+
+    console.log('selectedNode', selectedNode);
+    useFetchingList({
+        directory: selectedNode?.path as string,
+        listItemSelector: `li.MuiTreeItem-root[role="treeitem"][parentid="${!selectedNode?.parentId || selectedNode?.parentId === '/' ? 'root' : selectedNode?.parentId}"]`,
+        isListEmpty: !selectedNode?.children?.length || !expanded.includes(selectedNode?.id as string),
+        cb: async (page) => {
+            if (selectedNode?.id) {
+                return loadNodeFiles(selectedNode.id, page);
+            }
+        },
+    });
 
     return (
         <div className="tree-panel">

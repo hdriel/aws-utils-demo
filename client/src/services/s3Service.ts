@@ -81,7 +81,7 @@ class S3Service {
 
     async listFileObjects(directory: string = '', page: number = 0): Promise<S3ResponseFile[]> {
         try {
-            const query = qs.stringify({ directory: encodeURIComponent(directory), page });
+            const query = qs.stringify({ directory: encodeURIComponent(directory), page, size: 10 });
             const { data: response } = await this.api.get(`/directories/files?${query}`);
 
             return response;
@@ -93,7 +93,11 @@ class S3Service {
 
     async listObjects(directory: string = '', page: number = 0): Promise<ListObjectsOutput> {
         try {
-            const query = qs.stringify({ ...(directory && { directory: encodeURIComponent(directory) }), page });
+            const query = qs.stringify({
+                ...(directory && { directory: encodeURIComponent(directory) }),
+                page,
+                size: 10,
+            });
             const { data: response } = await this.api.get(`/directories?${query}`);
 
             return response;

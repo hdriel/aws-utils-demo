@@ -21,6 +21,7 @@ import '../styles/filePanel.scss';
 import { FILE_TYPE } from '../types/ui.ts';
 import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
 import { EmptyStatement } from './EmptyStatement.tsx';
+import { useFetchingList } from '../hooks/useFetchingList.ts';
 
 interface FilePanelProps {
     isPublicBucket: boolean;
@@ -55,16 +56,23 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
     const videoInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        loadFiles();
+        loadFiles(0);
     }, [currentPath]);
+
+    useFetchingList({
+        directory: currentPath,
+        listItemSelector: '.file-item',
+        cb: async (page) => loadFiles(page),
+        isListEmpty: !files.length,
+    });
 
     useEffect(() => {
         setFlatPanels(mobileLayout);
     }, [mobileLayout]);
 
-    const loadFiles = async () => {
+    const loadFiles = async (page: number = 0) => {
         try {
-            const files = await s3Service.listFileObjects(currentPath);
+            const files = await s3Service.listFileObjects(currentPath, page);
 
             const loadedFiles: S3File[] = files.map((file) => ({
                 id: uuid(),
@@ -75,7 +83,8 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
                 lastModified: new Date(file.LastModified),
                 type: 'file',
             }));
-            setFiles(loadedFiles);
+            setFiles((prevFiles) => (page ? [...prevFiles, ...loadedFiles] : loadedFiles));
+
             if (selectedFiles.size !== 0) {
                 setSelectedFiles(new Set());
             }
