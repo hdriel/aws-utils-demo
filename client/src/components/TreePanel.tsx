@@ -270,7 +270,13 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
             return nodes.map((node) => {
                 if (node.id === nodeId) {
                     const label = buildNodeLabel(
-                        { children: children, type: 'directory', name: 'root', path: '/' } as any,
+                        {
+                            children: children as unknown as AwsTreeItem[],
+                            type: node.directory ? 'directory' : 'file',
+                            name: node.name,
+                            path: node.path,
+                            size: 0,
+                        } as AwsTreeItem,
                         nodeId,
                         node.path,
                         'root',
