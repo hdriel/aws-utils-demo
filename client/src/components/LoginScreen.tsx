@@ -54,7 +54,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
         sessionStorage.getItem('bucketName') ?? getProjectEnvVariables().VITE_LOCALSTACK_AWS_BUCKET ?? 'demo'
     );
     const [isPublicAccess, setIsPublicAccess] = useState(false);
-    const [isLocalstack, setIsLocalstack] = useState(true);
+    const [isLocalstack, setIsLocalstack] = useState(!!+(sessionStorage.getItem('localstack') ?? '0'));
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string[]>([]);
     const [success, setSuccess] = useState(false);
@@ -165,7 +165,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
             .localstackAlive()
             .then((isAlive) => {
                 setShowLocalstack(isAlive);
-                setIsLocalstack(isAlive);
                 if (!isAlive) {
                     setCredentials({
                         accessKeyId: sessionStorage.getItem('accessKeyId') ?? '',
