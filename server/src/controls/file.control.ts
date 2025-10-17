@@ -230,14 +230,32 @@ export const viewImageFileCtrl = async (req: Request, res: Response, _next: Next
         return;
     }
 
-    const imageBuffer = await s3BucketUtil.fileContent(fileKey, 'buffer');
-    const ext = extname(fileKey).slice(1).toLowerCase(); // cut the first dot, '.png' => 'png'
+    try {
+        const imageBuffer = await s3BucketUtil.fileContent(fileKey, 'buffer');
+        const ext = extname(fileKey).slice(1).toLowerCase();
 
-    const contentType = `image/${ext === 'jpg' ? 'jpeg' : ext}`;
-    res.setHeader('Content-Type', contentType);
-    res.setHeader('Cache-Control', 'public, max-age=31536000'); // Optional: cache for 1 year
+        // Map extensions to proper MIME types
+        const mimeTypeMap: Record<string, string> = {
+            jpg: 'image/jpeg',
+            jpeg: 'image/jpeg',
+            png: 'image/png',
+            gif: 'image/gif',
+            webp: 'image/webp',
+            svg: 'image/svg+xml',
+            ico: 'image/x-icon',
+        };
 
-    res.status(200).send(imageBuffer);
+        const contentType = mimeTypeMap[ext] || 'application/octet-stream';
+
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Cache-Control', 'public, max-age=31536000');
+        res.setHeader('Content-Length', imageBuffer.length); // Optional: helps with streaming
+
+        res.status(200).send(imageBuffer);
+    } catch (error) {
+        console.error('Error retrieving file:', error);
+        res.status(500).json({ error: 'Failed to retrieve file' });
+    }
 };
 
 export const uploadFileDataCtrl = async (req: Request, res: Response, _next: NextFunction) => {
