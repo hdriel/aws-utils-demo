@@ -136,6 +136,10 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
         s3Service.abortDownloadFiles();
     };
 
+    const handleAbortUpload = () => {
+        s3Service.abortUploadFiles();
+    };
+
     const handleDownloadViaSignedLink = async (openInNewTab: boolean = false) => {
         if (selectedFiles.size !== 1) return;
 
@@ -317,6 +321,11 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
                     disabled={uploading}
                     label={'Upload Video' + (allowedMultipleFiles ? 's' : '')}
                 />
+                {uploading && (
+                    <Button startIcon="Block" variant="outlined" color="error" onClick={handleAbortUpload}>
+                        Abort
+                    </Button>
+                )}
             </Box>
 
             <input

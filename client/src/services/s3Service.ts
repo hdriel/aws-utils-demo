@@ -7,6 +7,7 @@ import { getProjectEnvVariables } from '../projectEnvVariables.ts';
 class S3Service {
     private api: Axios;
     private downloadAbortController: AbortController | null = null;
+    private uploadAbortController: AbortController | null = null;
 
     constructor() {
         this.api = axios.create({
@@ -176,13 +177,25 @@ class S3Service {
     ): Promise<void> {
         try {
             if (!file) return;
+
+            if (this.uploadAbortController) {
+                this.uploadAbortController.abort();
+            }
+
+            this.uploadAbortController = new AbortController();
+
             if (file.size === 0) {
                 const { data: response } = await this.api.post('/files/content', {
                     path: directoryPath + file.name,
                     data: '',
+                    signal: this.uploadAbortController.signal,
                 });
                 return response;
             }
+
+            this.uploadAbortController.abort();
+            this.uploadAbortController = null;
+            this.uploadAbortController = new AbortController();
 
             const formData = new FormData();
             formData.append('file', file);
@@ -198,6 +211,7 @@ class S3Service {
                     'X-Upload-Filename': encodedFilename,
                 },
                 timeout: 1_000_000,
+                signal: this.uploadAbortController.signal,
                 onUploadProgress: onProgress
                     ? (progressEvent: AxiosProgressEvent) => {
                           const percentage = progressEvent.total
@@ -208,8 +222,11 @@ class S3Service {
                     : undefined,
             });
 
+            this.uploadAbortController = null;
             return response;
         } catch (error) {
+            this.uploadAbortController = null;
+
             console.error('Failed to upload file:', error);
             throw error;
         }
@@ -223,6 +240,12 @@ class S3Service {
     ): Promise<void> {
         try {
             if (!files) return;
+
+            if (this.uploadAbortController) {
+                this.uploadAbortController.abort();
+            }
+
+            this.uploadAbortController = new AbortController();
 
             await Promise.allSettled(
                 files
@@ -252,6 +275,7 @@ class S3Service {
                     'X-Upload-Directory': encodedDirectory,
                 },
                 timeout: 1_000_000,
+                signal: this.uploadAbortController.signal,
                 onUploadProgress: onProgress
                     ? (progressEvent: AxiosProgressEvent) => {
                           const percentage = progressEvent.total
@@ -262,8 +286,11 @@ class S3Service {
                     : undefined,
             });
 
+            this.uploadAbortController = null;
+
             return response;
         } catch (error) {
+            this.uploadAbortController = null;
             console.error('Failed to upload file:', error);
             throw error;
         }
@@ -412,6 +439,14 @@ class S3Service {
             this.downloadAbortController.abort();
             this.downloadAbortController = null;
             console.log('Download canceled by user');
+        }
+    }
+
+    abortUploadFiles() {
+        if (this.uploadAbortController) {
+            this.uploadAbortController.abort();
+            this.uploadAbortController = null;
+            console.log('Upload canceled by user');
         }
     }
 
