@@ -27,7 +27,7 @@ export const getBucketListCtrl = async (req: Request, res: Response, _next: Next
         return;
     }
 
-    const result = await bucketUtil.getBucketList();
+    const result = await bucketUtil.getBucketList({}, true);
 
     res.json(result);
 };
