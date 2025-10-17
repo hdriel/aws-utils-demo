@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { FILE_TYPE, getS3BucketUtil, type UploadedS3File } from '../shared';
 import logger from '../logger';
-import { extname } from 'pathe';
+import { extname, basename } from 'pathe';
 
 export const getFileInfoCtrl = async (req: Request, res: Response, next: NextFunction) => {
     const s3BucketUtil = getS3BucketUtil();
@@ -254,6 +254,48 @@ export const viewImageFileCtrl = async (req: Request, res: Response, _next: Next
         res.status(200).send(imageBuffer);
     } catch (error) {
         console.error('Error retrieving file:', error);
+        res.status(500).json({ error: 'Failed to retrieve file' });
+    }
+};
+
+export const viewFileContentCtrl = async (req: Request, res: Response, _next: NextFunction) => {
+    const s3BucketUtil = getS3BucketUtil();
+    if (!s3BucketUtil) {
+        res.status(403).json({ error: 'credentials not found' });
+        return;
+    }
+
+    const fileKey = req.query?.file ? decodeURIComponent(req.query?.file as string) : undefined;
+    if (!fileKey) {
+        res.status(404).json({ error: 'file key is required' });
+        return;
+    }
+
+    try {
+        const fileBuffer = await s3BucketUtil.fileContent(fileKey, 'buffer');
+        const ext = extname(fileKey).slice(1).toLowerCase();
+
+        const mimeTypeMap: Record<string, string> = {
+            pdf: 'application/pdf',
+            txt: 'text/plain',
+            doc: 'application/msword',
+            docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            xls: 'application/vnd.ms-excel',
+            xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ppt: 'application/vnd.ms-powerpoint',
+            pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        };
+
+        const contentType = mimeTypeMap[ext] || 'application/octet-stream';
+
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Disposition', `inline; filename="${basename(fileKey)}"`);
+        res.setHeader('Cache-Control', 'public, max-age=31536000');
+        res.setHeader('Content-Length', fileBuffer.length);
+
+        res.status(200).send(fileBuffer);
+    } catch (error: any) {
+        logger.error(req.id, 'Error retrieving file:', { error, errMsg: error.message });
         res.status(500).json({ error: 'Failed to retrieve file' });
     }
 };

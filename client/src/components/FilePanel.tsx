@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuid } from 'uuid';
-import { Box, DialogTitle, DialogContent, useMediaQuery } from '@mui/material';
+import { Box, DialogTitle, DialogContent, useMediaQuery, Stack } from '@mui/material';
 import {
     Typography,
     Button,
@@ -39,6 +39,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
     const [files, setFiles] = useState<S3File[]>([]);
     const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
     const [allowedMultipleFiles, setAllowedMultipleFiles] = useState(false);
+    const [allowedMultipleFilesSelected, setAllowedMultipleFilesSelected] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
@@ -90,14 +91,19 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
     };
 
     const handleFileSelect = (fileKey: string) => {
-        const newSelected = new Set(selectedFiles);
-        if (newSelected.has(fileKey)) {
-            newSelected.delete(fileKey);
-        } else {
-            newSelected.add(fileKey);
-        }
+        if (allowedMultipleFilesSelected) {
+            const newSelected = new Set(selectedFiles);
+            if (newSelected.has(fileKey)) {
+                newSelected.delete(fileKey);
+            } else {
+                newSelected.add(fileKey);
+            }
 
-        setSelectedFiles(newSelected);
+            setSelectedFiles(newSelected);
+        } else {
+            const newSelected = new Set(selectedFiles.has(fileKey) ? [] : [fileKey]);
+            setSelectedFiles(newSelected);
+        }
     };
 
     const handleFileUpload = (type?: FILE_TYPE) => {
@@ -280,7 +286,11 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
             : null;
 
     const showImagePreview = fileKey && isImageFile(fileKey) && selectedFiles.size === 1;
-    const showPreviewFile = videoPrivateUrl || showImagePreview;
+    const showReadPreview =
+        selectedFiles.size === 1 &&
+        (fileKey?.toLowerCase().endsWith('.pdf') || fileKey?.toLowerCase().endsWith('.txt'));
+
+    const showPreviewFile = showReadPreview || videoPrivateUrl || showImagePreview;
 
     const uploadSectionCmp = (
         <Box className="upload-section">
@@ -366,9 +376,17 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
     const fileListSectionCmp = (
         <Box className="file-list">
             <Box className="file-list-header" sx={{ position: pinnedActions && !flatPanels ? 'sticky' : 'relative' }}>
-                <Typography variant="subtitle1" component="h3">
-                    {files.length} - Files in Current Folder View
-                </Typography>
+                <Stack direction="row" spacing={1}>
+                    <Typography variant="subtitle1" component="h3">
+                        {files.length} - Files in Current Folder View
+                    </Typography>
+                    <Button
+                        icon={<SVGIcon muiIconName="LibraryAdd" size={20} sx={{ marginTop: '-5px' }} />}
+                        color={allowedMultipleFilesSelected ? 'primary' : undefined}
+                        onClick={() => setAllowedMultipleFilesSelected((v) => !v)}
+                        tooltipProps={{ title: 'Allow select multiple files', placement: 'right' }}
+                    />
+                </Stack>
                 {selectedFiles.size > 0 && (
                     <Typography className="selection-info">
                         {selectedFiles.size} file{selectedFiles.size > 1 ? 's' : ''} selected
@@ -553,7 +571,17 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
 
             {showImagePreview && (
                 <Box className="video-preview">
-                    <img src={`${s3Service.baseURL}/files/image?file=${fileKey}`} alt={fileKey} />
+                    <img src={`${s3Service.baseURL}/files/image?file=${encodeURIComponent(fileKey)}`} alt={fileKey} />
+                </Box>
+            )}
+
+            {showReadPreview && (
+                <Box className="video-preview">
+                    <iframe
+                        src={`${s3Service.baseURL}/files/content?file=${encodeURIComponent(fileKey)}`}
+                        style={{ width: '100%', height: '600px', border: 'none' }}
+                        title="PDF Preview"
+                    />
                 </Box>
             )}
         </Box>
