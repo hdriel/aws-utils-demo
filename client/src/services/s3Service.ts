@@ -111,7 +111,7 @@ class S3Service {
             const query = qs.stringify({
                 ...(directory && directory !== '/' && { directory: encodeURIComponent(directory) }),
                 page,
-                size: directory === '/' ? 10 : 10_000,
+                size: !directory || directory === '/' ? 10 : 10_000,
             });
             const { data: response } = await this.api.get(`/directories?${query}`);
 

@@ -96,7 +96,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
             <Box className="item-icon" style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
                 {isDirectory ? null : <SVGIcon muiIconName={getFileIcon(isDirectory ? '' : node.name)} size={'18px'} />}
                 <Typography className="item-name">
-                    {node.name} ({node.children.length})
+                    {node.name} {node.children.length ? `(${node.children.length})` : ''}
                 </Typography>
                 <Box sx={{ marginInlineStart: 'auto' }}>
                     {!isDirectory && node.size !== undefined && (
@@ -269,7 +269,14 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
         const updateNodes = (nodes: TreeNodeItem[]): TreeNodeItem[] => {
             return nodes.map((node) => {
                 if (node.id === nodeId) {
-                    return { ...node, children };
+                    const label = buildNodeLabel(
+                        { children: children, type: 'directory', name: 'root', path: '/' } as any,
+                        nodeId,
+                        node.path,
+                        'root',
+                        { paddingDeleteAction: '-1px' }
+                    );
+                    return { ...node, label, children };
                 }
                 if (node.children) {
                     return { ...node, children: updateNodes(node.children) };
@@ -280,15 +287,6 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
 
         if (treeData) {
             const result = updateNodes([treeData]);
-            const root = result[0] as TreeNodeItem;
-            const label = buildNodeLabel(
-                { children: root.children, type: 'directory', name: 'root', path: '/' } as any,
-                nodeId,
-                root.path,
-                'root',
-                { paddingDeleteAction: '-1px' }
-            );
-            result[0].label = label;
 
             setTreeData({ ...result[0] });
         }
