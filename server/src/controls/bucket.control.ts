@@ -1,15 +1,33 @@
 import { NextFunction, Request, Response } from 'express';
 import { changeS3BucketUtil, getS3BucketUtil } from '../shared';
 import { getLocalstackS3BucketUtil } from '../shared/s3BucketUtil.shared';
+import logger from '../logger';
+import { S3BucketUtil } from '@hdriel/aws-utils';
 
-export const getBucketListCtrl = async (_req: Request, res: Response, _next: NextFunction) => {
-    const s3BucketUtil = getS3BucketUtil();
-    if (!s3BucketUtil) {
+export const getBucketListCtrl = async (req: Request, res: Response, _next: NextFunction) => {
+    const region = req.query.region as string;
+    const secretAccessKey = req.query.secretAccessKey as string;
+    const accessKeyId = req.query.accessKeyId as string;
+    if (!region || !secretAccessKey || !accessKeyId) {
         res.status(403).json({ error: 'credentials not found' });
         return;
     }
 
-    const result = await s3BucketUtil.getBucketList();
+    const options = {
+        accessKeyId,
+        secretAccessKey,
+        region,
+        bucket: 'demo',
+        logger,
+    };
+    const bucketUtil = new S3BucketUtil(options);
+
+    if (!bucketUtil) {
+        res.status(403).json({ error: 'credentials not found' });
+        return;
+    }
+
+    const result = await bucketUtil.getBucketList();
 
     res.json(result);
 };

@@ -48,10 +48,24 @@ class S3Service {
         }
     }
 
-    async listBuckets(): Promise<string[]> {
+    async listBuckets(credentials: { accessKeyId: string; secretAccessKey: string; region: string }): Promise<
+        Array<{
+            BucketRegion: string;
+            CreationDate: string;
+            Name: string;
+            PublicAccessBlockConfiguration: {
+                BlockPublicAcls?: boolean | undefined;
+                IgnorePublicAcls?: boolean | undefined;
+                BlockPublicPolicy?: boolean | undefined;
+                RestrictPublicBuckets?: boolean | undefined;
+            };
+        }>
+    > {
         try {
-            const { data: response } = await this.api.get('/listBuckets');
-            return response.Buckets?.map((bucket: { Name: string }) => bucket.Name || '') || [];
+            const query = qs.stringify(credentials);
+            const { data: response } = await this.api.get(`/buckets?${query}`);
+            // return response.Buckets?.map((bucket: { Name: string }) => bucket.Name || '') || [];
+            return response;
         } catch (error) {
             console.error('Failed to list buckets:', error);
             throw error;
