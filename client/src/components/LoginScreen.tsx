@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Paper, Box, ListItem, ListItemAvatar, ListItemText, ListItemSecondaryAction, Stack } from '@mui/material';
+import { Paper, Box, ListItem, ListItemText, ListItemSecondaryAction, Stack } from '@mui/material';
 import {
     Checkbox,
     InputText,
@@ -11,7 +11,6 @@ import {
     Tooltip,
     Alert,
     InputAutocomplete,
-    Avatar,
     SVGIcon,
     Text,
 } from 'mui-simple';
