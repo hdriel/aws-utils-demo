@@ -110,7 +110,7 @@ class S3Service {
             const query = qs.stringify({
                 ...(directory && directory !== '/' && { directory: encodeURIComponent(directory) }),
                 page,
-                size: 10,
+                size: directory === '/' ? 10 : 10_000,
             });
             const { data: response } = await this.api.get(`/directories?${query}`);
 
@@ -197,6 +197,7 @@ class S3Service {
                     'X-Upload-Directory': encodedDirectory,
                     'X-Upload-Filename': encodedFilename,
                 },
+                timeout: 1_000_000,
                 onUploadProgress: onProgress
                     ? (progressEvent: AxiosProgressEvent) => {
                           const percentage = progressEvent.total
@@ -250,6 +251,7 @@ class S3Service {
                     'Content-Type': 'multipart/form-data',
                     'X-Upload-Directory': encodedDirectory,
                 },
+                timeout: 1_000_000,
                 onUploadProgress: onProgress
                     ? (progressEvent: AxiosProgressEvent) => {
                           const percentage = progressEvent.total
