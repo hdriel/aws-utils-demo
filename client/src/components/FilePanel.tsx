@@ -13,6 +13,7 @@ import { useFetchingList } from '../hooks/useFetchingList.ts';
 import { DeleteSelectedFilesDialog } from '../dialogs/DeleteSelectedFilesDialog.tsx';
 import { TaggingFileDialog } from '../dialogs/TaggingFileDialog.tsx';
 import { FileUrlDialog } from '../dialogs/FileUrlDialog.tsx';
+import { FilePreview } from './FilePreview.tsx';
 
 interface FilePanelProps {
     isPublicBucket: boolean;
@@ -205,17 +206,6 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
     });
 
     const fileLink = file?.link as string;
-    const videoPrivateUrl =
-        selectedFiles.size === 1 && file && isVideoFile(file.name)
-            ? `${s3Service.baseURL}/files/stream?file=${encodeURIComponent(file.key)}`
-            : null;
-
-    const showImagePreview = fileKey && isImageFile(fileKey) && selectedFiles.size === 1;
-    const showReadPreview =
-        selectedFiles.size === 1 &&
-        (fileKey?.toLowerCase().endsWith('.pdf') || fileKey?.toLowerCase().endsWith('.txt'));
-
-    const showPreviewFile = showReadPreview || videoPrivateUrl || showImagePreview;
 
     const uploadSectionCmp = (
         <Box className="upload-section">
@@ -480,36 +470,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
                 </Box>
             )}
 
-            {!showPreviewFile && (
-                <EmptyStatement
-                    icon="Image"
-                    title="File Preview"
-                    subtitle={`Select single image / video to preview ${isPublicBucket ? 'public' : 'private'} bucket content`}
-                />
-            )}
-            {videoPrivateUrl && (
-                <Box className="video-preview">
-                    <video controls src={videoPrivateUrl}>
-                        Your browser does not support the video tag.
-                    </video>
-                </Box>
-            )}
-
-            {showImagePreview && (
-                <Box className="video-preview">
-                    <img src={`${s3Service.baseURL}/files/image?file=${encodeURIComponent(fileKey)}`} alt={fileKey} />
-                </Box>
-            )}
-
-            {showReadPreview && (
-                <Box className="video-preview">
-                    <iframe
-                        src={`${s3Service.baseURL}/files/content?file=${encodeURIComponent(fileKey)}`}
-                        style={{ width: '100%', height: '600px', border: 'none' }}
-                        title="PDF Preview"
-                    />
-                </Box>
-            )}
+            <FilePreview isPublicBucket={isPublicBucket} show={selectedFiles.size === 1} file={file} />
         </Box>
     );
 
