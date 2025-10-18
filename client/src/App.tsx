@@ -33,7 +33,7 @@ function App() {
     const handleLogout = () => {
         setIsAuthenticated(false);
         setBucketName('');
-        s3Service.disconnect();
+        return s3Service.disconnect();
     };
 
     useEffect(() => {
