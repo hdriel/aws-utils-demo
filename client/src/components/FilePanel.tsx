@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
-import { Box, useMediaQuery, Stack } from '@mui/material';
-import { Typography, Button, Checkbox, SVGIcon } from 'mui-simple';
+import { useMediaQuery } from '@mui/material';
+import { Typography } from 'mui-simple';
 import { s3Service } from '../services/s3Service.ts';
-import { formatFileSize, getFileIcon } from '../utils/fileUtils.ts';
 import { S3File } from '../types/aws.ts';
 import '../styles/filePanel.scss';
 import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
@@ -11,6 +10,7 @@ import { EmptyStatement } from './EmptyStatement.tsx';
 import { useFetchingList } from '../hooks/useFetchingList.ts';
 import { UploadFilesSection } from './UploadFilesSection.tsx';
 import { FileActionsSection } from './FileActionsSection.tsx';
+import { FileListSelectionSection } from './FileListSelectionSection.tsx';
 
 interface FilePanelProps {
     isPublicBucket: boolean;
@@ -26,7 +26,6 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
     const [pinnedActions, setPinnedActions] = useState(largeLayout);
     const [files, setFiles] = useState<S3File[]>([]);
     const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
-    const [allowedMultipleFilesSelected, setAllowedMultipleFilesSelected] = useState(false);
 
     useEffect(() => {
         loadFiles();
@@ -59,22 +58,6 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
         }
     };
 
-    const handleFileSelect = (fileKey: string) => {
-        if (allowedMultipleFilesSelected) {
-            const newSelected = new Set(selectedFiles);
-            if (newSelected.has(fileKey)) {
-                newSelected.delete(fileKey);
-            } else {
-                newSelected.add(fileKey);
-            }
-
-            setSelectedFiles(newSelected);
-        } else {
-            const newSelected = new Set(selectedFiles.has(fileKey) ? [] : [fileKey]);
-            setSelectedFiles(newSelected);
-        }
-    };
-
     useFetchingList({
         directory: currentPath === '/' ? '' : currentPath,
         listItemSelector: '.file-item',
@@ -94,55 +77,13 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
     );
 
     const fileListSectionCmp = (
-        <Box className="file-list">
-            <Box className="file-list-header" sx={{ position: pinnedActions && !flatPanels ? 'sticky' : 'relative' }}>
-                <Stack direction="row" spacing={1}>
-                    <Typography variant="subtitle1" component="h3">
-                        {files.length} - Files in Current Folder View
-                    </Typography>
-                    <Button
-                        icon={<SVGIcon muiIconName="LibraryAddCheck" size={20} sx={{ marginTop: '-5px' }} />}
-                        color={allowedMultipleFilesSelected ? 'primary' : undefined}
-                        onClick={() => setAllowedMultipleFilesSelected((v) => !v)}
-                        tooltipProps={{ title: 'Allow select multiple files', placement: 'right' }}
-                    />
-                </Stack>
-                {selectedFiles.size > 0 && (
-                    <Typography className="selection-info">
-                        {selectedFiles.size} file{selectedFiles.size > 1 ? 's' : ''} selected
-                    </Typography>
-                )}
-            </Box>
-
-            <Box className="file-items">
-                {files.map((file) => (
-                    <Box
-                        key={file.id}
-                        className={`file-item ${selectedFiles.has(file.key) ? 'selected' : ''}`}
-                        onClick={() => handleFileSelect(file.key)}
-                    >
-                        <Box className="file-info">
-                            <Checkbox
-                                checked={selectedFiles.has(file.key)}
-                                onClick={(e: Event) => {
-                                    e.stopPropagation();
-                                    handleFileSelect(file.key);
-                                }}
-                            />
-                            <Box className="file-icon">
-                                <SVGIcon muiIconName={getFileIcon(file.name)} />
-                            </Box>
-                            <Box className="file-details">
-                                <Typography className="file-name">{file.name}</Typography>
-                                <Typography className="file-meta">
-                                    {formatFileSize(file.size)} • {file.lastModified.toLocaleString()}
-                                </Typography>
-                            </Box>
-                        </Box>
-                    </Box>
-                ))}
-            </Box>
-        </Box>
+        <FileListSelectionSection
+            flatPanels={flatPanels}
+            pinnedActions={pinnedActions}
+            selectedFiles={selectedFiles}
+            setSelectedFiles={setSelectedFiles}
+            files={files}
+        />
     );
 
     const fileActionsSectionCmp = (
@@ -267,6 +208,6 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
     );
 };
 
-FilePanel.whyDidYouRender = true;
+// FilePanel.whyDidYouRender = true;
 
 export default FilePanel;
