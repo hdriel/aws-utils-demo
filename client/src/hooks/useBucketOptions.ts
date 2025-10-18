@@ -78,7 +78,5 @@ export const useBucketOptions = ({ bucketName, isLocalstack, credentials, locals
 
     const selectedOption = bucketOptions.find((b) => b.id === bucketName);
 
-    console.log('selectedOption', selectedOption);
-
     return { selectedOption, bucketOptions, loadBucketList, loadLocalstackBucketList };
 };
