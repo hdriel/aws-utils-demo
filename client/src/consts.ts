@@ -36,3 +36,5 @@ export const AWS_REGIONS = [
     { value: 'us-gov-east-1', label: 'AWS GovCloud (US-East)' },
     { value: 'us-gov-west-1', label: 'AWS GovCloud (US-West)' },
 ];
+
+export const DEFAULT_REGIONS_OPTION_VALUE = AWS_REGIONS.find((v) => v.default)?.value as string;

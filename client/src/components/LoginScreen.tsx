@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Paper, Box, ListItem, ListItemText, ListItemSecondaryAction, Stack } from '@mui/material';
 import {
     Checkbox,
@@ -17,20 +17,19 @@ import {
 import { s3Service } from '../services/s3Service.ts';
 import { AWSCredentials, BucketInfo } from '../types/aws.ts';
 import '../styles/login.scss';
-import { AWS_REGIONS } from '../consts.ts';
+import { AWS_REGIONS, DEFAULT_REGIONS_OPTION_VALUE } from '../consts.ts';
 import { AxiosError } from 'axios';
 import { getProjectEnvVariables } from '../projectEnvVariables.ts';
+import { useBucketOptions } from '../hooks/useBucketOptions.ts';
 
 interface LoginScreenProps {
     onLoginSuccess: (bucketInfo: BucketInfo, localstack: boolean) => void;
 }
 
-const defaultOptionValue = AWS_REGIONS.find((v) => v.default)?.value as string;
-
 const initializeCredentials = {
     accessKeyId: getProjectEnvVariables().VITE_LOCALSTACK_ACCESS_KEY_ID ?? '',
     secretAccessKey: getProjectEnvVariables().VITE_LOCALSTACK_SECRET_ACCESS_KEY ?? '',
-    region: getProjectEnvVariables().VITE_LOCALSTACK_AWS_REGION ?? defaultOptionValue,
+    region: getProjectEnvVariables().VITE_LOCALSTACK_AWS_REGION ?? DEFAULT_REGIONS_OPTION_VALUE,
 };
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
@@ -40,34 +39,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
         secretAccessKey: sessionStorage.getItem('secretAccessKey') ?? initializeCredentials.secretAccessKey,
         region: sessionStorage.getItem('region') ?? initializeCredentials.region,
     });
-    const [localstackBuckets, setLocalstackBuckets] = useState<
-        Array<{
-            id: string;
-            label: string;
-            region: string;
-            date: Date;
-            public: boolean;
-        }>
-    >([]);
-    const [awsBuckets, setAwsBuckets] = useState<
-        Array<{
-            id: string;
-            label: string;
-            region: string;
-            date: Date;
-            public: boolean;
-        }>
-    >([]);
-    const [bucketOptions, setBucketOptions] = useState<
-        Array<{
-            id: string;
-            label: string;
-            region: string;
-            date: Date;
-            public: boolean;
-        }>
-    >([]);
-
     const [bucketName, setBucketName] = useState(
         sessionStorage.getItem('bucketName') ?? getProjectEnvVariables().VITE_LOCALSTACK_AWS_BUCKET ?? 'demo'
     );
@@ -80,6 +51,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string[]>([]);
     const [success, setSuccess] = useState(false);
+
+    const { selectedOption, bucketOptions, loadLocalstackBucketList, loadBucketList } = useBucketOptions({
+        bucketName,
+        isLocalstack,
+        credentials,
+        setShowLocalstack,
+        setCredentials,
+    });
 
     const handleChange = (field: keyof AWSCredentials) => (event: React.ChangeEvent<HTMLInputElement>) => {
         setCredentials({ ...credentials, [field]: event.target.value });
@@ -158,76 +137,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
             return handleConnect();
         }
     };
-
-    const loadLocalstackBucketList = async () => {
-        return s3Service
-            .localstackBucketsList()
-            .then((buckets) => {
-                const options = buckets.map(({ Name, BucketRegion, CreationDate, PublicAccessBlockConfiguration }) => ({
-                    id: Name,
-                    label: Name,
-                    region: BucketRegion,
-                    date: new Date(CreationDate),
-                    public: !PublicAccessBlockConfiguration.BlockPublicPolicy,
-                }));
-                setBucketOptions(options);
-                setLocalstackBuckets(options);
-            })
-            .catch(console.error);
-    };
-
-    const loadBucketList = async () => {
-        return s3Service
-            .listBuckets(credentials)
-            .then((buckets) => {
-                const options = buckets.map(({ Name, BucketRegion, CreationDate, PublicAccessBlockConfiguration }) => ({
-                    id: Name,
-                    label: Name,
-                    region: BucketRegion,
-                    date: new Date(CreationDate),
-                    public: !PublicAccessBlockConfiguration.BlockPublicPolicy,
-                }));
-                setAwsBuckets(options);
-                setBucketOptions(options);
-            })
-            .catch(console.error);
-    };
-
-    const isLocalstackAvailable = async (): Promise<boolean> => {
-        return s3Service
-            .localstackAlive()
-            .then((isAlive) => {
-                setShowLocalstack(isAlive);
-                if (!isAlive) {
-                    setCredentials({
-                        accessKeyId: sessionStorage.getItem('accessKeyId') ?? '',
-                        secretAccessKey: sessionStorage.getItem('secretAccessKey') ?? '',
-                        region: sessionStorage.getItem('region') ?? defaultOptionValue,
-                    });
-                }
-                return isAlive;
-            })
-            .catch((error) => {
-                console.error(error);
-                return false;
-            });
-    };
-
-    useEffect(() => {
-        isLocalstackAvailable()
-            .then((isAlive) => {
-                if (isAlive) return loadLocalstackBucketList();
-            })
-            .then(() => loadBucketList())
-            .catch(console.error);
-    }, []);
-
-    useEffect(() => {
-        setBucketOptions(isLocalstack ? localstackBuckets : awsBuckets);
-    }, [isLocalstack]);
-
-    const selectedOption = bucketOptions.find((b) => b.id === bucketName);
-    console.log(bucketOptions);
 
     return (
         <div className="login-container">
@@ -324,7 +233,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                                             option.date ? `Created at: ${option.date?.toLocaleString()}` : undefined
                                         }
                                     />
-                                    {option.date && (
+                                    {option.date && isLocalstack && (
                                         <ListItemSecondaryAction>
                                             <Button
                                                 icon="DeleteForever"
