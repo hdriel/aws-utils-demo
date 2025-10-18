@@ -4,6 +4,8 @@ import logger from '../logger';
 
 let s3BucketUtil: null | S3BucketUtil;
 let localstackS3BucketUtil: S3BucketUtil;
+// probably in your project you will initialize this instance immediately from your env variable
+// here in this project I simulate connections from multiple credentials
 
 export const getS3BucketUtil = () => {
     return s3BucketUtil;
