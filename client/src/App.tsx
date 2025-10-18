@@ -64,7 +64,7 @@ function App() {
             {isAuthenticated ? (
                 <MainScreen
                     bucketName={bucketName}
-                    isPublicBucketAccess={bucketAccess === 'public'}
+                    isPublicBucket={bucketAccess === 'public'}
                     localstack={isLocalstack}
                     onLogout={handleLogout}
                 />
