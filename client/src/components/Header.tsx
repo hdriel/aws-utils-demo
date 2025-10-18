@@ -16,8 +16,9 @@ const Header: React.FC<HeaderProps> = ({ bucketName, isPublicBucket, onLogout, l
     const mobileLayout = useMediaQuery((theme) => theme.breakpoints.down('md'));
     const deleteDialogRef = useRef<{ open: () => void }>(null);
 
-    const handleLogout = () => {
-        return s3Service.disconnect().then(() => onLogout());
+    const handleLogout = async () => {
+        await s3Service.disconnect();
+        return onLogout();
     };
 
     return (
