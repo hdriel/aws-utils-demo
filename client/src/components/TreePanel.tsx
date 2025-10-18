@@ -16,10 +16,7 @@ interface TreePanelProps {
 }
 
 const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refreshTrigger }) => {
-    const deleteDialogRef = useRef<{
-        open: (node?: TreeNodeItem) => void;
-        handler: (node?: TreeNodeItem | null | undefined) => void;
-    }>(null);
+    const deleteDialogRef = useRef<{ open: (node?: TreeNodeItem) => void }>(null);
     const createDialogRef = useRef<{ open: () => void }>(null);
     const [loading, setLoading] = useState(false);
 

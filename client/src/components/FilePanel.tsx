@@ -9,8 +9,6 @@ import {
     LinearProgress,
     InputText,
     Dialog,
-    List,
-    type ListItemProps,
     Text,
     CircularProgress,
 } from 'mui-simple';
@@ -22,6 +20,7 @@ import { FILE_TYPE } from '../types/ui.ts';
 import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
 import { EmptyStatement } from './EmptyStatement.tsx';
 import { useFetchingList } from '../hooks/useFetchingList.ts';
+import { DeleteSelectedFilesDialog } from '../dialogs/DeleteSelectedFilesDialog.tsx';
 
 interface FilePanelProps {
     isPublicBucket: boolean;
@@ -34,6 +33,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
     const smallLayout = useMediaQuery((theme) => theme.breakpoints.down('xl'));
     const mobileLayout = useMediaQuery((theme) => theme.breakpoints.down('lg'));
 
+    const deleteDialogRef = useRef<{ open: (keys: string[]) => void }>(null);
     const [flatPanels, setFlatPanels] = useState(mobileLayout);
     const [pinnedActions, setPinnedActions] = useState(largeLayout);
     const [files, setFiles] = useState<S3File[]>([]);
@@ -45,7 +45,6 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
     const [uploadProgress, setUploadProgress] = useState(0);
     const [downloadProgress, setDownloadProgress] = useState(0);
     const [uploadingFileName, setUploadingFileName] = useState('');
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [tagDialogOpen, setTagDialogOpen] = useState(false);
     const [versionTag, setVersionTag] = useState('');
     const [tempLink, setTempLink] = useState('');
@@ -202,25 +201,6 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
         );
 
         return downloadFile(url, filename);
-    };
-
-    const handleDelete = async () => {
-        if (selectedFiles.size === 0) return;
-
-        try {
-            for (const fileKey of Array.from(selectedFiles)) {
-                await s3Service.deleteObject(fileKey);
-            }
-
-            setDeleteDialogOpen(false);
-            if (selectedFiles.size !== 0) {
-                setSelectedFiles(new Set());
-            }
-            await loadFiles();
-            onRefresh();
-        } catch (error) {
-            console.error('Failed to delete files:', error);
-        }
     };
 
     const handleTagVersion = async () => {
@@ -381,7 +361,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
                         {files.length} - Files in Current Folder View
                     </Typography>
                     <Button
-                        icon={<SVGIcon muiIconName="LibraryAdd" size={20} sx={{ marginTop: '-5px' }} />}
+                        icon={<SVGIcon muiIconName="LibraryAddCheck" size={20} sx={{ marginTop: '-5px' }} />}
                         color={allowedMultipleFilesSelected ? 'primary' : undefined}
                         onClick={() => setAllowedMultipleFilesSelected((v) => !v)}
                         tooltipProps={{ title: 'Allow select multiple files', placement: 'right' }}
@@ -548,7 +528,8 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
                         fullWidth
                         color="error"
                         startIcon="Delete"
-                        onClick={() => setDeleteDialogOpen(true)}
+                        disabled={!selectedFiles.size}
+                        onClick={() => deleteDialogRef.current?.open(Array.from(selectedFiles))}
                         label="Delete Selected"
                     />
                 </Box>
@@ -690,27 +671,14 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
                 </div>
             )}
 
-            <Dialog
-                open={deleteDialogOpen}
-                onClose={() => setDeleteDialogOpen(false)}
-                title="Confirm Delete"
-                actions={[
-                    { onClick: () => setDeleteDialogOpen(false), label: 'Cancel' },
-                    { onClick: handleDelete, variant: 'contained', color: 'error', label: 'Delete' },
-                ]}
-            >
-                <DialogTitle>Confirm Delete</DialogTitle>
-                <Typography>
-                    Are you sure you want to delete {selectedFiles.size} file{selectedFiles.size > 1 ? 's' : ''}?
-                </Typography>
-                <Typography>This action cannot be undone.</Typography>
-                <List
-                    buttonItems={false}
-                    items={[...selectedFiles].map(
-                        (file) => ({ title: file, style: { color: 'red' } }) as ListItemProps
-                    )}
-                />
-            </Dialog>
+            <DeleteSelectedFilesDialog
+                ref={deleteDialogRef}
+                onDeleteCB={async () => {
+                    if (selectedFiles.size !== 0) setSelectedFiles(new Set());
+                    await loadFiles();
+                    onRefresh();
+                }}
+            />
 
             <Dialog
                 open={tagDialogOpen}
