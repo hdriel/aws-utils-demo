@@ -1,26 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
 import { Box, useMediaQuery, Stack } from '@mui/material';
-import { Typography, Button, Checkbox, SVGIcon, LinearProgress, Text, CircularProgress } from 'mui-simple';
+import { Typography, Button, Checkbox, SVGIcon } from 'mui-simple';
 import { s3Service } from '../services/s3Service.ts';
-import {
-    formatFileSize,
-    isVideoFile,
-    downloadFile,
-    getFileIcon,
-    isImageFile,
-    copyToClipboard,
-} from '../utils/fileUtils.ts';
+import { formatFileSize, getFileIcon } from '../utils/fileUtils.ts';
 import { S3File } from '../types/aws.ts';
 import '../styles/filePanel.scss';
-import { FILE_TYPE } from '../types/ui.ts';
 import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
 import { EmptyStatement } from './EmptyStatement.tsx';
 import { useFetchingList } from '../hooks/useFetchingList.ts';
-import { DeleteSelectedFilesDialog } from '../dialogs/DeleteSelectedFilesDialog.tsx';
-import { TaggingFileDialog } from '../dialogs/TaggingFileDialog.tsx';
-import { FileUrlDialog } from '../dialogs/FileUrlDialog.tsx';
-import { FilePreview } from './FilePreview.tsx';
+import { UploadFilesSection } from './UploadFilesSection.tsx';
+import { FileActionsSection } from './FileActionsSection.tsx';
 
 interface FilePanelProps {
     isPublicBucket: boolean;
@@ -30,30 +20,13 @@ interface FilePanelProps {
 
 const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicBucket }) => {
     const largeLayout = useMediaQuery((theme) => theme.breakpoints.up('xl'));
-    const smallLayout = useMediaQuery((theme) => theme.breakpoints.down('xl'));
     const mobileLayout = useMediaQuery((theme) => theme.breakpoints.down('lg'));
 
     const [flatPanels, setFlatPanels] = useState(mobileLayout);
     const [pinnedActions, setPinnedActions] = useState(largeLayout);
     const [files, setFiles] = useState<S3File[]>([]);
     const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
-    const [allowedMultipleFiles, setAllowedMultipleFiles] = useState(false);
     const [allowedMultipleFilesSelected, setAllowedMultipleFilesSelected] = useState(false);
-    const [uploading, setUploading] = useState(false);
-    const [isDownloading, setIsDownloading] = useState(false);
-    const [uploadProgress, setUploadProgress] = useState(0);
-    const [downloadProgress, setDownloadProgress] = useState(0);
-    const [uploadingFileName, setUploadingFileName] = useState('');
-
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const imageInputRef = useRef<HTMLInputElement>(null);
-    const videoInputRef = useRef<HTMLInputElement>(null);
-    const deleteDialogRef = useRef<{ open: (keys: string[]) => void }>(null);
-    const tagDialogRef = useRef<{ open: (key: string) => void }>(null);
-    const fileUrlDialogRef = useRef<{ open: (file: S3File | null | undefined) => void }>(null);
-
-    const fileKey = Array.from(selectedFiles)[0] || '';
-    const file = fileKey ? files?.find((f) => f.key === fileKey) : null;
 
     useEffect(() => {
         loadFiles();
@@ -102,104 +75,6 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
         }
     };
 
-    const handleFileUpload = (type?: FILE_TYPE) => {
-        return async (event: React.ChangeEvent<HTMLInputElement>) => {
-            const files = event.target.files && [...event.target.files];
-            if (!files?.length) return;
-
-            setUploading(true);
-            setUploadProgress(0);
-            setUploadingFileName(files.map((file) => file.name).join(', '));
-
-            try {
-                const filePath = currentPath || '/';
-                if (allowedMultipleFiles) {
-                    await s3Service.uploadFiles(files, filePath, type, (progress) => setUploadProgress(progress));
-                } else {
-                    await s3Service.uploadFile(files[0], filePath, type, (progress) => setUploadProgress(progress));
-                }
-
-                await loadFiles();
-                onRefresh();
-            } catch (error) {
-                console.error('Failed to upload file:', error);
-            } finally {
-                setUploading(false);
-                setUploadProgress(0);
-                setUploadingFileName('');
-                if (event.target) {
-                    event.target.value = '';
-                }
-            }
-        };
-    };
-
-    const handleAbortDownload = () => {
-        s3Service.abortDownloadFiles();
-    };
-
-    const handleAbortUpload = () => {
-        s3Service.abortUploadFiles();
-    };
-
-    const handleDownloadViaSignedLink = async (openInNewTab: boolean = false) => {
-        if (selectedFiles.size !== 1) return;
-
-        const fileKey = Array.from(selectedFiles)[0];
-        const url = await s3Service.getSignedUrl(fileKey, 5);
-        const fileName = files.find((f) => f.key === fileKey)?.name || 'download';
-        const _openInNewTab = openInNewTab || isVideoFile(fileKey) || isImageFile(fileKey);
-
-        if (_openInNewTab) {
-            // Open in new tab - browser will display video player
-            window.open(url, '_blank');
-
-            // Clean up after some delay (give browser time to load)
-            setTimeout(() => {
-                window.URL.revokeObjectURL(url);
-            }, 1000);
-        } else {
-            await downloadFile(url, fileName);
-        }
-    };
-
-    const handleDownload = async () => {
-        if (selectedFiles.size === 0) return;
-
-        setDownloadProgress(0);
-        try {
-            if (selectedFiles.size === 1) {
-                await downloadSingleFile();
-            } else {
-                await downloadMultipleAsZip();
-            }
-        } catch (error) {
-            console.error('Failed to download:', error);
-        } finally {
-            setDownloadProgress(0);
-        }
-    };
-
-    const downloadMultipleAsZip = async () => {
-        const filePath: string[] = Array.from(selectedFiles).filter((fileKey) => files.find((f) => f.key === fileKey));
-        const [url, filename] = await s3Service.downloadFilesAsZip(filePath, 'download.zip', (progress) =>
-            setDownloadProgress(progress)
-        );
-
-        return downloadFile(url, filename);
-    };
-
-    const downloadSingleFile = async () => {
-        const [filePath]: string[] = Array.from(selectedFiles).filter((fileKey) =>
-            files.find((f) => f.key === fileKey)
-        );
-        const [url, filename] = await s3Service.downloadSingleFile(filePath, (progress) =>
-            setDownloadProgress(progress)
-        );
-
-        return downloadFile(url, filename);
-    };
-
     useFetchingList({
         directory: currentPath === '/' ? '' : currentPath,
         listItemSelector: '.file-item',
@@ -208,87 +83,14 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
         isListEmpty: !files.length,
     });
 
-    const fileLink = file?.link as string;
-
     const uploadSectionCmp = (
-        <Box className="upload-section">
-            <Text
-                variant="subtitle1"
-                component="h3"
-                sx={{ display: 'flex', alignItems: 'center' }}
-                color={allowedMultipleFiles ? 'primary' : undefined}
-            >
-                Upload Files
-                <Button
-                    icon={<SVGIcon muiIconName="LibraryAdd" size={20} sx={{ marginTop: '-5px' }} />}
-                    color={allowedMultipleFiles ? 'primary' : undefined}
-                    onClick={() => setAllowedMultipleFiles((v) => !v)}
-                    tooltipProps={{ title: 'Allow upload multiple files', placement: 'right' }}
-                />
-            </Text>
-            <Box className="upload-buttons">
-                <Button
-                    variant="contained"
-                    startIcon="CloudUpload"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploading}
-                    label={'Upload File' + (allowedMultipleFiles ? 's' : '')}
-                />
-                <Button
-                    variant="outlined"
-                    startIcon={allowedMultipleFiles ? 'PermMedia' : 'Image'}
-                    onClick={() => imageInputRef.current?.click()}
-                    disabled={uploading}
-                    label={'Upload Image' + (allowedMultipleFiles ? 's' : '')}
-                />
-
-                <Button
-                    variant="outlined"
-                    startIcon={allowedMultipleFiles ? 'VideoLibrary' : 'Slideshow'}
-                    onClick={() => videoInputRef.current?.click()}
-                    disabled={uploading}
-                    label={'Upload Video' + (allowedMultipleFiles ? 's' : '')}
-                />
-                {uploading && (
-                    <Button startIcon="Block" variant="outlined" color="error" onClick={handleAbortUpload}>
-                        Abort
-                    </Button>
-                )}
-            </Box>
-
-            <input
-                ref={fileInputRef}
-                type="file"
-                style={{ display: 'none' }}
-                multiple={allowedMultipleFiles}
-                onChange={handleFileUpload()}
-            />
-            <input
-                ref={imageInputRef}
-                type="file"
-                accept="image/*"
-                style={{ display: 'none' }}
-                multiple={allowedMultipleFiles}
-                onChange={handleFileUpload('image' as FILE_TYPE)}
-            />
-            <input
-                ref={videoInputRef}
-                type="file"
-                accept="video/*"
-                style={{ display: 'none' }}
-                multiple={allowedMultipleFiles}
-                onChange={handleFileUpload('video' as FILE_TYPE)}
-            />
-
-            {uploading && (
-                <Box className="upload-progress">
-                    <Box className="progress-info">
-                        <Typography variant="body2">Uploading: {uploadingFileName}</Typography>
-                    </Box>
-                    <LinearProgress variant="determinate" value={uploadProgress} />
-                </Box>
-            )}
-        </Box>
+        <UploadFilesSection
+            currentPath={currentPath}
+            onUploadCB={async () => {
+                await loadFiles();
+                onRefresh();
+            }}
+        />
     );
 
     const fileListSectionCmp = (
@@ -342,139 +144,21 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
             </Box>
         </Box>
     );
+
     const fileActionsSectionCmp = (
-        <Box
-            className="file-actions"
-            height="100%"
-            mt={flatPanels ? 2 : 0}
-            sx={{ ...(flatPanels && { display: 'block !important' }) }}
-        >
-            <Box
-                sx={{
-                    position: pinnedActions && !flatPanels ? 'sticky' : 'relative',
-                    top: 0,
-                    background: 'white',
-                    zIndex: 1,
-                    height: '25px',
-                }}
-            >
-                <Text variant="subtitle1" component="h3" fullWidth>
-                    Actions
-                    {!smallLayout && (
-                        <Button
-                            color="primary"
-                            tooltipProps={{
-                                title: pinnedActions ? 'Move Panel Down' : 'Move Panel Right',
-                            }}
-                            icon={pinnedActions ? 'PictureInPictureAlt' : 'PictureInPicture'}
-                            onClick={() => setPinnedActions((v) => !v)}
-                            sx={{ position: 'absolute', top: '-7px', right: '-5px' }}
-                        />
-                    )}
-                </Text>
-            </Box>
-
-            {selectedFiles.size > 0 && (
-                <Box className="actions-grid">
-                    <Button
-                        variant="outlined"
-                        startIcon="Download"
-                        onClick={() => {
-                            if (isDownloading) {
-                                handleAbortDownload();
-                            } else {
-                                setIsDownloading(true);
-                                handleDownload()
-                                    .then(() => {
-                                        console.log(`download ${selectedFiles.size > 1 ? 'as zip' : 'file'} done!`);
-                                    })
-                                    .finally(() => {
-                                        setIsDownloading(false);
-                                    });
-                            }
-                        }}
-                        fullWidth
-                        label={isDownloading ? 'Downloading...' : `Download ${selectedFiles.size > 1 ? 'as ZIP' : ''}`}
-                        color={isDownloading ? 'info' : 'primary'}
-                        endIcon={
-                            isDownloading ? (
-                                <Box
-                                    sx={{
-                                        position: 'absolute',
-                                        right: '12px',
-                                        top: '5px',
-                                        bottom: 0,
-                                    }}
-                                >
-                                    <CircularProgress color="info" size={15} value={downloadProgress} />
-                                </Box>
-                            ) : selectedFiles.size === 1 ? (
-                                <Button
-                                    sx={{ position: 'absolute', right: 0, top: 0 }}
-                                    icon={<SVGIcon muiIconName="OpenInNew" size={22} color="info" />}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-
-                                        if (isDownloading) {
-                                            handleAbortDownload();
-                                        } else {
-                                            setIsDownloading(true);
-                                            handleDownloadViaSignedLink()
-                                                .then(() => {
-                                                    console.log('download via link done!');
-                                                })
-                                                .finally(() => {
-                                                    setIsDownloading(false);
-                                                });
-                                        }
-                                    }}
-                                    color={isDownloading ? 'info' : 'primary'}
-                                    tooltipProps={{ title: 'Download via sign open link.', placement: 'top' }}
-                                />
-                            ) : null
-                        }
-                    />
-
-                    {selectedFiles.size === 1 && (
-                        <>
-                            <Button
-                                variant="outlined"
-                                fullWidth
-                                startIcon="ContentCopy"
-                                onClick={() => copyToClipboard(fileLink ?? '')}
-                                label="Copy File Key"
-                            />
-                            <Button
-                                variant="outlined"
-                                fullWidth
-                                startIcon="Label"
-                                onClick={() => tagDialogRef.current?.open(Array.from(selectedFiles)?.[0])}
-                                label="Tag Version"
-                            />
-                            <Button
-                                variant="outlined"
-                                fullWidth
-                                startIcon="Link"
-                                onClick={() => fileUrlDialogRef.current?.open(file)}
-                                label="Generate Link"
-                            />
-                        </>
-                    )}
-
-                    <Button
-                        variant="outlined"
-                        fullWidth
-                        color="error"
-                        startIcon="Delete"
-                        disabled={!selectedFiles.size}
-                        onClick={() => deleteDialogRef.current?.open(Array.from(selectedFiles))}
-                        label="Delete Selected"
-                    />
-                </Box>
-            )}
-
-            <FilePreview isPublicBucket={isPublicBucket} show={selectedFiles.size === 1} file={file} />
-        </Box>
+        <FileActionsSection
+            pinnedActions={pinnedActions}
+            selectedFiles={selectedFiles}
+            setPinnedActions={setPinnedActions}
+            flatPanels={flatPanels}
+            isPublicBucket={isPublicBucket}
+            files={files}
+            onDeleteCB={async () => {
+                if (selectedFiles.size !== 0) setSelectedFiles(new Set());
+                await loadFiles();
+                onRefresh();
+            }}
+        />
     );
 
     return (
@@ -579,19 +263,6 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
                     )}
                 </div>
             )}
-
-            <DeleteSelectedFilesDialog
-                ref={deleteDialogRef}
-                onDeleteCB={async () => {
-                    if (selectedFiles.size !== 0) setSelectedFiles(new Set());
-                    await loadFiles();
-                    onRefresh();
-                }}
-            />
-
-            <TaggingFileDialog ref={tagDialogRef} />
-
-            <FileUrlDialog ref={fileUrlDialogRef} />
         </div>
     );
 };
