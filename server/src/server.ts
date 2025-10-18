@@ -29,7 +29,6 @@ app.use((err: any, req: express.Request, res: express.Response, _next: any) => {
     logger.error(req.id, 'request error', {
         errorMsg: err.message,
         errorName: err.name,
-        error: err,
         stackTraceLines: 3,
     });
     res.status(500).json({ message: err.message });
