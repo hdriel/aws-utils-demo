@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Box, Stack, useMediaQuery } from '@mui/material';
 import { Button, Typography, SVGIcon, Chip, Tooltip } from 'mui-simple';
 import { s3Service } from '../services/s3Service';
 import '../styles/mainScreen.scss';
+import { DeleteBucketDialog } from '../dialogs/DeleteBucketDialog.tsx';
 
 interface HeaderProps {
     bucketName: string;
@@ -13,6 +14,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ bucketName, isPublicBucket, onLogout, localstack }) => {
     const mobileLayout = useMediaQuery((theme) => theme.breakpoints.down('md'));
+    const deleteDialogRef = useRef<{ open: () => void }>(null);
 
     const handleLogout = () => {
         return s3Service.disconnect().then(() => onLogout());
@@ -47,18 +49,7 @@ const Header: React.FC<HeaderProps> = ({ bucketName, isPublicBucket, onLogout, l
                                     </Tooltip>
                                 ) : undefined
                             }
-                            onDelete={
-                                localstack
-                                    ? () => {
-                                          return s3Service
-                                              .deleteLocalstackBucket(bucketName)
-                                              .then(() => {
-                                                  handleLogout();
-                                              })
-                                              .catch(() => alert('Failed to delete localstack bucket'));
-                                      }
-                                    : undefined
-                            }
+                            onDelete={localstack ? () => deleteDialogRef.current?.open() : undefined}
                         />
                         {localstack && (
                             <Chip
@@ -89,6 +80,13 @@ const Header: React.FC<HeaderProps> = ({ bucketName, isPublicBucket, onLogout, l
                     label="Logout"
                 />
             )}
+
+            <DeleteBucketDialog
+                ref={deleteDialogRef}
+                bucketName={bucketName}
+                onDeleteCB={() => handleLogout()}
+                localstack={localstack}
+            />
         </Box>
     );
 };
