@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
-import { useMediaQuery } from '@mui/material';
+import { useMediaQuery, useTheme } from '@mui/material';
 import { Typography } from 'mui-simple';
 import { s3Service } from '../services/s3Service.ts';
 import { S3File } from '../types/aws.ts';
@@ -19,6 +19,7 @@ interface FilePanelProps {
 }
 
 const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicBucket }) => {
+    const theme = useTheme();
     const largeLayout = useMediaQuery((theme) => theme.breakpoints.up('xl'));
     const mobileLayout = useMediaQuery((theme) => theme.breakpoints.down('lg'));
 
@@ -165,7 +166,9 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
                                         </Panel>
                                         {!pinnedActions && !flatPanels && (
                                             <>
-                                                <PanelResizeHandle style={{ background: '#757575', width: '3px' }} />
+                                                <PanelResizeHandle
+                                                    style={{ background: theme.palette.primary.main, width: '3px' }}
+                                                />
                                                 <Panel
                                                     minSize={30}
                                                     style={{
@@ -182,7 +185,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
                                 </Panel>
                                 <PanelResizeHandle
                                     style={{
-                                        background: '#757575',
+                                        background: theme.palette.primary.main,
                                         ...(pinnedActions ? { width: '3px' } : { height: '3px' }),
                                     }}
                                 />
