@@ -223,7 +223,7 @@ export const viewImageFileCtrl = async (req: Request, res: Response, next: NextF
         return;
     }
 
-    const mw = s3BucketUtil.getImageFileViewCtrl({ queryField: 'file' });
+    const mw = s3BucketUtil.getImageFileViewCtrl();
     return mw(req, res, next);
 };
 

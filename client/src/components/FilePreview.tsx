@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const FilePreview: React.FC<Props> = ({ show: showPreviewFile, isPublicBucket, file }) => {
-    const encodedFileKey = encodeURIComponent(file?.key ?? '');
+    const encodedFileKey = file?.key ? encodeURIComponent(file.key) : null;
 
     const [showImagePreview, showReadPreview, videoPrivateUrl] = [
         showPreviewFile && file && isImageFile(file.key),
