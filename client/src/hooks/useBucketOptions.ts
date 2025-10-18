@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { s3Service } from '../services/s3Service.ts';
-import { DEFAULT_REGIONS_OPTION_VALUE } from '../consts.ts';
 
-export const useBucketOptions = ({ bucketName, isLocalstack, credentials, setShowLocalstack, setCredentials }: any) => {
+export const useBucketOptions = ({ bucketName, isLocalstack, credentials, localstackExists }: any) => {
     const [localstackBuckets, setLocalstackBuckets] = useState<
         Array<{
             id: string;
@@ -65,38 +64,17 @@ export const useBucketOptions = ({ bucketName, isLocalstack, credentials, setSho
             .catch(console.error);
     };
 
-    const isLocalstackAvailable = async (): Promise<boolean> => {
-        return s3Service
-            .localstackAlive()
-            .then((isAlive) => {
-                setShowLocalstack(isAlive);
-                if (!isAlive) {
-                    setCredentials({
-                        accessKeyId: sessionStorage.getItem('accessKeyId') ?? '',
-                        secretAccessKey: sessionStorage.getItem('secretAccessKey') ?? '',
-                        region: sessionStorage.getItem('region') ?? DEFAULT_REGIONS_OPTION_VALUE,
-                    });
-                }
-                return isAlive;
-            })
-            .catch((error) => {
-                console.error(error);
-                return false;
-            });
-    };
-
     useEffect(() => {
         setBucketOptions(isLocalstack ? localstackBuckets : awsBuckets);
     }, [isLocalstack]);
 
     useEffect(() => {
-        isLocalstackAvailable()
-            .then((isAlive) => {
-                if (isAlive) return loadLocalstackBucketList();
-            })
-            .then(() => loadBucketList())
-            .catch(console.error);
-    }, []);
+        if (localstackExists) {
+            loadLocalstackBucketList();
+        } else {
+            loadBucketList();
+        }
+    }, [localstackExists]);
 
     const selectedOption = bucketOptions.find((b) => b.id === bucketName);
 

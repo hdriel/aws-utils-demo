@@ -1,21 +1,14 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { DialogTitle, Box } from '@mui/material';
-import {
-    TreeView,
-    Button,
-    Typography,
-    InputText,
-    Dialog,
-    SVGIcon,
-    IndentBorderTreeItemIcons,
-    IndentBorderTreeItem,
-} from 'mui-simple';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { Box } from '@mui/material';
+import { TreeView, Button, Typography, SVGIcon, IndentBorderTreeItemIcons, IndentBorderTreeItem } from 'mui-simple';
 import { s3Service } from '../services/s3Service';
 import '../styles/treeView.scss';
 import { AwsTreeItem, TreeNodeItem } from '../types/ui';
 import { formatFileSize, getFileIcon } from '../utils/fileUtils.ts';
 import { ListObjectsOutput, S3ResponseFile } from '../types/aws.ts';
 import { useFetchingList } from '../hooks/useFetchingList.ts';
+import { CreateFolderDialog } from '../dialogs/CreateFolderDialog.tsx';
+import { DeleteFolderOrFileDialog } from '../dialogs/DeleteFolderOrFileDialog.tsx';
 
 interface TreePanelProps {
     onFolderSelect: (path: string) => void;
@@ -65,14 +58,16 @@ const buildTreeFromFiles = (result: ListObjectsOutput, basePath: string = ''): A
 };
 
 const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refreshTrigger }) => {
+    const deleteDialogRef = useRef<{
+        open: (node?: TreeNodeItem) => void;
+        handler: (node?: TreeNodeItem | null | undefined) => void;
+    }>(null);
+    const createDialogRef = useRef<{ open: () => void }>(null);
+
     const [treeData, setTreeData] = useState<TreeNodeItem | null>(null);
     const [expanded, setExpanded] = useState<string[]>([]);
-    // @ts-ignore
-    const [selectedIds, setSelectedIds] = useState<string[]>(['root']);
+    const [, setSelectedIds] = useState<string[]>(['root']);
     const [selected, setSelected] = useState<string>();
-    const [createDialogOpen, setCreateDialogOpen] = useState(false);
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [newFolderName, setNewFolderName] = useState('');
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -84,11 +79,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
         nodeId: string,
         nodePath: string,
         parentId: string,
-        {
-            paddingDeleteAction = '-5px',
-        }: {
-            paddingDeleteAction?: string;
-        } = {}
+        { paddingDeleteAction = '-5px' }: { paddingDeleteAction?: string } = {}
     ) => {
         const isDirectory = node.type === 'directory';
 
@@ -119,7 +110,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                         }}
                         sx={{ ...(!isDirectory && { marginInlineEnd: paddingDeleteAction }) }}
                         onClick={() =>
-                            handleDeleteAction({
+                            deleteDialogRef.current?.open({
                                 id: nodeId,
                                 path: nodePath,
                                 directory: isDirectory,
@@ -310,63 +301,10 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
         }
     }, [selectedNode]);
 
-    const handleCreateFolder = async () => {
-        if (!newFolderName.trim()) return;
-
-        setLoading(true);
-        try {
-            if (!selectedNode) return;
-
-            const basePath = selectedNode?.path === '' ? '' : selectedNode?.path || '';
-            const folderPath = [basePath, newFolderName]
-                .filter((v) => v)
-                .map((p) => p.replace(/\/$/, ''))
-                .join('/');
-
-            await s3Service.createFolder(`${folderPath}/`);
-            setCreateDialogOpen(false);
-            setNewFolderName('');
-            await loadRootFiles();
-
-            onRefresh();
-        } catch (error) {
-            console.error('Failed to create folder:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleDeleteAction = async (node?: TreeNodeItem | null | undefined) => {
-        const nodeAction = node || selectedNode;
-        if (!nodeAction || nodeAction?.id === 'root') return;
-
-        setLoading(true);
-        try {
-            if (nodeAction) {
-                if (nodeAction.directory) {
-                    await s3Service.deleteFolder(nodeAction.path);
-                } else {
-                    await s3Service.deleteObject(nodeAction.path);
-                }
-                setDeleteDialogOpen(false);
-                await loadRootFiles();
-
-                setExpanded(['root']);
-                setSelected('root');
-
-                onRefresh();
-            }
-        } catch (error) {
-            console.error('Failed to delete:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useFetchingList({
         directory: selectedNode?.path as string,
         // todo: need to put in the list some intensifier on the sub list group to pull nested directory by pulling scrollable
-        listItemSelector: `li.MuiTreeItem-root[role="treeitem"][parentid="${!selectedNode?.parentId || selectedNode?.parentId === '/' ? 'root' : selectedNode?.parentId}"]`,
+        listItemSelector: `li.MuiTreeItem-root[role="treeitem"][parentid="${!selectedNode?.parentId || selectedNode?.parentId === '/' ? 'root' : selectedNode.parentId}"]`,
         isListEmpty: !selectedNode?.children?.length || !expanded.includes(selectedNode?.id as string),
         timeout: 1000,
         cb: async (page) => {
@@ -389,7 +327,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                         size="small"
                         icon={<SVGIcon muiIconName="AddCircleOutlined" size="22px" sx={{ marginTop: '-3px' }} />}
                         tooltipProps={{ title: 'New Folder' }}
-                        onClick={() => setCreateDialogOpen(true)}
+                        onClick={() => createDialogRef.current?.open()}
                     />
 
                     <Button
@@ -432,50 +370,32 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                 />
             </div>
 
-            <Dialog
-                title="Create New Folder"
-                open={createDialogOpen}
-                onClose={() => setCreateDialogOpen(false)}
-                actions={[
-                    { onClick: () => setCreateDialogOpen(false), label: 'Cancel' },
-                    { onClick: handleCreateFolder, label: 'Create', variant: 'contained' },
-                ]}
-            >
-                <DialogTitle>Create New Folder</DialogTitle>
-                <InputText
-                    autoFocus
-                    margin="dense"
-                    label="Folder Name"
-                    fullWidth
-                    value={newFolderName}
-                    onChange={(e) => setNewFolderName(e.target.value)}
-                    onKeyUp={(e: KeyboardEvent) => e.key === 'Enter' && handleCreateFolder()}
-                />
-            </Dialog>
+            <CreateFolderDialog
+                ref={createDialogRef}
+                isNodeSelected={!!selectedNode}
+                path={selectedNode?.path ?? ''}
+                setLoading={setLoading}
+                onCreateFolder={async () => {
+                    await loadRootFiles();
+                    onRefresh();
+                }}
+            />
 
-            <Dialog
-                open={deleteDialogOpen}
-                title="Confirm Delete"
-                onClose={() => setDeleteDialogOpen(false)}
-                actions={[
-                    { onClick: () => setDeleteDialogOpen(false), label: 'Cancel' },
-                    {
-                        onClick: handleDeleteAction,
-                        label: 'Delete',
-                        variant: 'contained',
-                        color: 'error',
-                        disabled: loading,
-                    },
-                ]}
-            >
-                <DialogTitle>Confirm Delete</DialogTitle>
-                <Typography>Are you sure you want to delete this item?</Typography>
-                <Typography>This action cannot be undone.</Typography>
-            </Dialog>
+            <DeleteFolderOrFileDialog
+                ref={deleteDialogRef}
+                loading={loading}
+                setLoading={setLoading}
+                onDeleteCB={async () => {
+                    await loadRootFiles();
+                    setExpanded(['root']);
+                    setSelected('root');
+                    onRefresh();
+                }}
+            />
         </div>
     );
 };
 
-TreePanel.whyDidYouRender = true;
+// TreePanel.whyDidYouRender = true;
 
 export default TreePanel;

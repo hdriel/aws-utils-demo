@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Paper, Box, ListItem, ListItemText, ListItemSecondaryAction, Stack } from '@mui/material';
 import {
     Checkbox,
@@ -17,66 +17,57 @@ import {
 import { s3Service } from '../services/s3Service.ts';
 import { AWSCredentials, BucketInfo } from '../types/aws.ts';
 import '../styles/login.scss';
-import { AWS_REGIONS, DEFAULT_REGIONS_OPTION_VALUE } from '../consts.ts';
+import {
+    AWS_REGIONS,
+    DEFAULT_CREDENTIALS,
+    DEFAULT_REGIONS_OPTION_VALUE,
+    LOCALSTACK_CREDENTIALS,
+    DEFAULT_BUCKET_NAME,
+} from '../consts.ts';
 import { AxiosError } from 'axios';
 import { getProjectEnvVariables } from '../projectEnvVariables.ts';
 import { useBucketOptions } from '../hooks/useBucketOptions.ts';
+import { useLocalstack } from '../hooks/useLocalstack.ts';
 
 interface LoginScreenProps {
     onLoginSuccess: (bucketInfo: BucketInfo, localstack: boolean) => void;
 }
 
-const initializeCredentials = {
-    accessKeyId: getProjectEnvVariables().VITE_LOCALSTACK_ACCESS_KEY_ID ?? '',
-    secretAccessKey: getProjectEnvVariables().VITE_LOCALSTACK_SECRET_ACCESS_KEY ?? '',
-    region: getProjectEnvVariables().VITE_LOCALSTACK_AWS_REGION ?? DEFAULT_REGIONS_OPTION_VALUE,
-};
-
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
-    const [showLocalstack, setShowLocalstack] = useState<boolean>(true);
-    const [credentials, setCredentials] = useState<AWSCredentials>({
-        accessKeyId: sessionStorage.getItem('accessKeyId') ?? initializeCredentials.accessKeyId,
-        secretAccessKey: sessionStorage.getItem('secretAccessKey') ?? initializeCredentials.secretAccessKey,
-        region: sessionStorage.getItem('region') ?? initializeCredentials.region,
-    });
-    const [bucketName, setBucketName] = useState(
-        sessionStorage.getItem('bucketName') ?? getProjectEnvVariables().VITE_LOCALSTACK_AWS_BUCKET ?? 'demo'
-    );
     const [isPublicAccess, setIsPublicAccess] = useState(false);
+    const [credentials, setCredentials] = useState<AWSCredentials>(DEFAULT_CREDENTIALS);
+    const [bucketName, setBucketName] = useState(DEFAULT_BUCKET_NAME);
     const [isLocalstack, setIsLocalstack] = useState(
         sessionStorage.getItem('localstack')
             ? !!+(sessionStorage.getItem('localstack') as string)
-            : credentials.accessKeyId === initializeCredentials.accessKeyId
+            : credentials.accessKeyId === LOCALSTACK_CREDENTIALS.accessKeyId
     );
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string[]>([]);
     const [success, setSuccess] = useState(false);
+    const [error, setError] = useState<string[]>([]);
 
+    const showLocalstack = useLocalstack();
     const { selectedOption, bucketOptions, loadLocalstackBucketList, loadBucketList } = useBucketOptions({
         bucketName,
         isLocalstack,
         credentials,
-        setShowLocalstack,
-        setCredentials,
+        localstackExists: showLocalstack,
     });
 
-    const handleChange = (field: keyof AWSCredentials) => (event: React.ChangeEvent<HTMLInputElement>) => {
-        setCredentials({ ...credentials, [field]: event.target.value });
-        setError([]);
-        setSuccess(false);
-    };
-
-    const handleAutocompleteBucketChange = (
-        _event: React.ChangeEvent<HTMLInputElement>,
-        option: string | { id?: string; inputValue?: string }
-    ) => {
-        setBucketName(typeof option === 'string' ? option : ((option.inputValue ?? option.id) as string));
-        setError([]);
-        setSuccess(false);
-    };
+    useEffect(() => {
+        if (showLocalstack) {
+            setCredentials(DEFAULT_CREDENTIALS);
+        } else {
+            setCredentials({
+                accessKeyId: sessionStorage.getItem('accessKeyId') ?? '',
+                secretAccessKey: sessionStorage.getItem('secretAccessKey') ?? '',
+                region: sessionStorage.getItem('region') ?? DEFAULT_REGIONS_OPTION_VALUE,
+            });
+        }
+    }, [showLocalstack]);
 
     const handleConnect = async () => {
-        if (!credentials.accessKeyId || !credentials.secretAccessKey || !bucketName) {
+        if (!credentials.accessKeyId || !credentials.secretAccessKey || !credentials.region || !bucketName) {
             setError(['Please fill in all fields']);
             return;
         }
@@ -93,13 +84,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                 setSuccess(true);
                 sessionStorage.setItem('localstack', isLocalstack ? '1' : '0');
 
-                if (credentials.accessKeyId !== initializeCredentials.accessKeyId) {
+                if (credentials.accessKeyId !== LOCALSTACK_CREDENTIALS.accessKeyId) {
                     sessionStorage.setItem('accessKeyId', credentials.accessKeyId);
                 }
-                if (credentials.secretAccessKey !== initializeCredentials.secretAccessKey) {
+                if (credentials.secretAccessKey !== LOCALSTACK_CREDENTIALS.secretAccessKey) {
                     sessionStorage.setItem('secretAccessKey', credentials.secretAccessKey);
                 }
-                if (credentials.region !== initializeCredentials.region) {
+                if (credentials.region !== LOCALSTACK_CREDENTIALS.region) {
                     sessionStorage.setItem('region', credentials.region);
                 }
                 if (bucketInfo.name !== getProjectEnvVariables().VITE_LOCALSTACK_AWS_BUCKET) {
@@ -130,6 +121,21 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleAutocompleteBucketChange = (
+        _event: React.ChangeEvent<HTMLInputElement>,
+        option: string | { id?: string; inputValue?: string }
+    ) => {
+        setBucketName(typeof option === 'string' ? option : ((option.inputValue ?? option.id) as string));
+        setError([]);
+        setSuccess(false);
+    };
+
+    const handleChange = (field: keyof AWSCredentials) => (event: React.ChangeEvent<HTMLInputElement>) => {
+        setCredentials({ ...credentials, [field]: event.target.value });
+        setError([]);
+        setSuccess(false);
     };
 
     const handleKeyPress = (event: React.KeyboardEvent) => {
@@ -299,7 +305,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                                 const checked = e.target.checked;
                                 setIsLocalstack(checked);
                                 if (checked) {
-                                    setCredentials({ ...initializeCredentials });
+                                    setCredentials({ ...LOCALSTACK_CREDENTIALS });
                                 }
                             }}
                         />

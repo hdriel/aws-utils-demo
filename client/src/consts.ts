@@ -1,3 +1,5 @@
+import { getProjectEnvVariables } from './projectEnvVariables.ts';
+
 export const AWS_REGIONS = [
     { value: 'us-east-2', label: 'US East (Ohio)' },
     { value: 'us-east-1', label: 'US East (N. Virginia)' },
@@ -38,3 +40,18 @@ export const AWS_REGIONS = [
 ];
 
 export const DEFAULT_REGIONS_OPTION_VALUE = AWS_REGIONS.find((v) => v.default)?.value as string;
+
+export const LOCALSTACK_CREDENTIALS = {
+    accessKeyId: getProjectEnvVariables().VITE_LOCALSTACK_ACCESS_KEY_ID ?? '',
+    secretAccessKey: getProjectEnvVariables().VITE_LOCALSTACK_SECRET_ACCESS_KEY ?? '',
+    region: getProjectEnvVariables().VITE_LOCALSTACK_AWS_REGION ?? DEFAULT_REGIONS_OPTION_VALUE,
+};
+
+export const DEFAULT_CREDENTIALS = {
+    accessKeyId: sessionStorage.getItem('accessKeyId') || LOCALSTACK_CREDENTIALS.accessKeyId,
+    secretAccessKey: sessionStorage.getItem('secretAccessKey') || LOCALSTACK_CREDENTIALS.secretAccessKey,
+    region: sessionStorage.getItem('region') || LOCALSTACK_CREDENTIALS.region,
+};
+
+export const DEFAULT_BUCKET_NAME =
+    sessionStorage.getItem('bucketName') ?? getProjectEnvVariables().VITE_LOCALSTACK_AWS_BUCKET ?? 'demo';
