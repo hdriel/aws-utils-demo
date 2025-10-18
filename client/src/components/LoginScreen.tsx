@@ -274,14 +274,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                                         <Text>
                                             {isPublicAccess ? 'Public bucket access' : 'Private bucket access'}
                                             <br />
-                                            {selectedOption
+                                            {selectedOption?.date
                                                 ? ' (Exists localstack bucket - checkbox is in read only mode)'
                                                 : ''}
                                         </Text>
                                     }
                                 >
                                     <Checkbox
-                                        readOnly={!!selectedOption}
+                                        readOnly={!!selectedOption?.date}
                                         icon="PublicOff"
                                         checkedIcon="Public"
                                         color="primary"
