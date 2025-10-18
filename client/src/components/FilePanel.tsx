@@ -1,17 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuid } from 'uuid';
-import { Box, DialogTitle, DialogContent, useMediaQuery, Stack } from '@mui/material';
-import {
-    Typography,
-    Button,
-    Checkbox,
-    SVGIcon,
-    LinearProgress,
-    InputText,
-    Dialog,
-    Text,
-    CircularProgress,
-} from 'mui-simple';
+import { Box, useMediaQuery, Stack } from '@mui/material';
+import { Typography, Button, Checkbox, SVGIcon, LinearProgress, Text, CircularProgress } from 'mui-simple';
 import { s3Service } from '../services/s3Service.ts';
 import { formatFileSize, isVideoFile, downloadFile, getFileIcon, isImageFile } from '../utils/fileUtils.ts';
 import { S3File } from '../types/aws.ts';
@@ -21,6 +11,8 @@ import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
 import { EmptyStatement } from './EmptyStatement.tsx';
 import { useFetchingList } from '../hooks/useFetchingList.ts';
 import { DeleteSelectedFilesDialog } from '../dialogs/DeleteSelectedFilesDialog.tsx';
+import { TaggingFileDialog } from '../dialogs/TaggingFileDialog.tsx';
+import { FileUrlDialog } from '../dialogs/FileUrlDialog.tsx';
 
 interface FilePanelProps {
     isPublicBucket: boolean;
@@ -33,7 +25,6 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
     const smallLayout = useMediaQuery((theme) => theme.breakpoints.down('xl'));
     const mobileLayout = useMediaQuery((theme) => theme.breakpoints.down('lg'));
 
-    const deleteDialogRef = useRef<{ open: (keys: string[]) => void }>(null);
     const [flatPanels, setFlatPanels] = useState(mobileLayout);
     const [pinnedActions, setPinnedActions] = useState(largeLayout);
     const [files, setFiles] = useState<S3File[]>([]);
@@ -45,15 +36,16 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
     const [uploadProgress, setUploadProgress] = useState(0);
     const [downloadProgress, setDownloadProgress] = useState(0);
     const [uploadingFileName, setUploadingFileName] = useState('');
-    const [tagDialogOpen, setTagDialogOpen] = useState(false);
-    const [versionTag, setVersionTag] = useState('');
-    const [tempLink, setTempLink] = useState('');
-    const [linkDialogOpen, setLinkDialogOpen] = useState(false);
-    const [videoPreviewUrl, setVideoPreviewUrl] = useState('');
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const imageInputRef = useRef<HTMLInputElement>(null);
     const videoInputRef = useRef<HTMLInputElement>(null);
+    const deleteDialogRef = useRef<{ open: (keys: string[]) => void }>(null);
+    const tagDialogRef = useRef<{ open: (key: string) => void }>(null);
+    const fileUrlDialogRef = useRef<{ open: (file: S3File | null | undefined) => void }>(null);
+
+    const fileKey = Array.from(selectedFiles)[0] || '';
+    const file = fileKey ? files?.find((f) => f.key === fileKey) : null;
 
     useEffect(() => {
         loadFiles();
@@ -81,9 +73,6 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
             if (selectedFiles.size !== 0) {
                 setSelectedFiles(new Set());
             }
-
-            setVideoPreviewUrl('');
-            setTempLink('');
         } catch (error) {
             console.error('Failed to load files:', error);
         }
@@ -203,48 +192,6 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
         return downloadFile(url, filename);
     };
 
-    const handleTagVersion = async () => {
-        if (selectedFiles.size !== 1 || !versionTag.trim()) return;
-
-        try {
-            const fileKey = Array.from(selectedFiles)[0];
-            await s3Service.tagObject(fileKey, versionTag);
-            setTagDialogOpen(false);
-            setVersionTag('');
-        } catch (error) {
-            console.error('Failed to tag file:', error);
-        }
-    };
-
-    const generatePreview = async (fileKey: string) => {
-        try {
-            const url = await s3Service.getSignedUrl(fileKey, 3600);
-            setVideoPreviewUrl(url);
-        } catch (error) {
-            console.error('Failed to generate preview:', error);
-        }
-    };
-
-    const generateTempLink = async () => {
-        if (selectedFiles.size !== 1) return;
-
-        try {
-            const fileKey = Array.from(selectedFiles)[0];
-            const url = await s3Service.getSignedUrl(fileKey, 3600);
-            setTempLink(url);
-            setLinkDialogOpen(true);
-
-            const file = files.find((f) => f.key === fileKey);
-            if (file && isVideoFile(file.name)) {
-                await generatePreview(fileKey);
-            } else {
-                setVideoPreviewUrl('');
-            }
-        } catch (error) {
-            console.error('Failed to generate link:', error);
-        }
-    };
-
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
     };
@@ -257,8 +204,6 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
         isListEmpty: !files.length,
     });
 
-    const fileKey = Array.from(selectedFiles)[0] || '';
-    const file = fileKey && files?.find((f) => f.key === fileKey);
     const fileLink = file?.link as string;
     const videoPrivateUrl =
         selectedFiles.size === 1 && file && isVideoFile(file.name)
@@ -510,14 +455,14 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
                                 variant="outlined"
                                 fullWidth
                                 startIcon="Label"
-                                onClick={() => setTagDialogOpen(true)}
+                                onClick={() => tagDialogRef.current?.open(Array.from(selectedFiles)?.[0])}
                                 label="Tag Version"
                             />
                             <Button
                                 variant="outlined"
                                 fullWidth
                                 startIcon="Link"
-                                onClick={generateTempLink}
+                                onClick={() => fileUrlDialogRef.current?.open(file)}
                                 label="Generate Link"
                             />
                         </>
@@ -680,75 +625,9 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
                 }}
             />
 
-            <Dialog
-                open={tagDialogOpen}
-                title="Tag File Version"
-                onClose={() => setTagDialogOpen(false)}
-                actions={[
-                    { onClick: () => setTagDialogOpen(false), label: 'Cancel' },
-                    { onClick: handleTagVersion, variant: 'contained', label: 'Apply Tag' },
-                ]}
-            >
-                <DialogTitle>Tag File Version</DialogTitle>
-                <InputText
-                    autoFocus
-                    margin="dense"
-                    label="Version"
-                    fullWidth
-                    placeholder="e.g., 1.0.0"
-                    value={versionTag}
-                    onChange={(e) => setVersionTag(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleTagVersion()}
-                />
-            </Dialog>
+            <TaggingFileDialog ref={tagDialogRef} />
 
-            <Dialog
-                open={linkDialogOpen}
-                onClose={() => {
-                    setLinkDialogOpen(false);
-                    setVideoPreviewUrl('');
-                }}
-                maxWidth="md"
-                fullWidth
-                title="Temporary Link"
-                actions={[
-                    {
-                        onClick: () => {
-                            setLinkDialogOpen(false);
-                            setVideoPreviewUrl('');
-                        },
-                        label: 'Close',
-                    },
-                ]}
-            >
-                <DialogTitle>Temporary Link</DialogTitle>
-                <DialogContent>
-                    <Typography variant="body2" sx={{ mb: 2 }}>
-                        This link will expire in 1 hour
-                    </Typography>
-                    <InputText
-                        fullWidth
-                        value={tempLink}
-                        endCmp={[<Button onClick={() => copyToClipboard(tempLink)} edge="end" icon="ContentCopy" />]}
-                        readOnly
-                        sx={{ mb: 2 }}
-                    />
-
-                    {videoPreviewUrl && (
-                        <Box className="video-preview" mt={2}>
-                            <video controls src={videoPreviewUrl}>
-                                Your browser does not support the video tag.
-                            </video>
-                        </Box>
-                    )}
-
-                    {isImageFile(Array.from(selectedFiles)?.[0] ?? '') && (
-                        <Box className="video-preview" mt={2}>
-                            <img src={tempLink} alt={Array.from(selectedFiles)[0]} />
-                        </Box>
-                    )}
-                </DialogContent>
-            </Dialog>
+            <FileUrlDialog ref={fileUrlDialogRef} />
         </div>
     );
 };
