@@ -1,7 +1,7 @@
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { Box, DialogTitle, DialogContent } from '@mui/material';
-import { Typography, Button, InputText, Dialog, copyToClipboard } from 'mui-simple';
-import { isImageFile, isVideoFile } from '../utils/fileUtils.ts';
+import { Typography, Button, InputText, Dialog } from 'mui-simple';
+import { copyToClipboard, isImageFile, isVideoFile } from '../utils/fileUtils.ts';
 import { s3Service } from '../services/s3Service.ts';
 import { S3File } from '../types/aws.ts';
 
@@ -76,6 +76,7 @@ export const FileUrlDialog = forwardRef<{ open: (file: S3File | undefined | null
                         endCmp={[<Button onClick={() => copyToClipboard(tempLink)} edge="end" icon="ContentCopy" />]}
                         readOnly
                         sx={{ mb: 2 }}
+                        copyAction
                     />
 
                     {videoPreviewUrl && (

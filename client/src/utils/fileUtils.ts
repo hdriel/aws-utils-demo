@@ -42,3 +42,7 @@ export const getFileIcon = (filename: string, isDirectory: boolean = false) => {
     if (isVideoFile(filename)) return treeItemIcon.video;
     return treeItemIcon.file;
 };
+
+export const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+};

@@ -3,7 +3,14 @@ import { v4 as uuid } from 'uuid';
 import { Box, useMediaQuery, Stack } from '@mui/material';
 import { Typography, Button, Checkbox, SVGIcon, LinearProgress, Text, CircularProgress } from 'mui-simple';
 import { s3Service } from '../services/s3Service.ts';
-import { formatFileSize, isVideoFile, downloadFile, getFileIcon, isImageFile } from '../utils/fileUtils.ts';
+import {
+    formatFileSize,
+    isVideoFile,
+    downloadFile,
+    getFileIcon,
+    isImageFile,
+    copyToClipboard,
+} from '../utils/fileUtils.ts';
 import { S3File } from '../types/aws.ts';
 import '../styles/filePanel.scss';
 import { FILE_TYPE } from '../types/ui.ts';
@@ -191,10 +198,6 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
         );
 
         return downloadFile(url, filename);
-    };
-
-    const copyToClipboard = (text: string) => {
-        navigator.clipboard.writeText(text);
     };
 
     useFetchingList({
