@@ -18,6 +18,7 @@ router.use(logApiMW);
 
 router.get('/', getBucketListCtrl);
 router.get('/bucket-info', s3UtilMW, getBucketInfoCtrl);
+router.get('/localstack', s3UtilLocalstackMW, getLocalstackBucketListCtrl);
 
 router.get('/:bucket', s3UtilMW, getBucketDirectoryTreeCtrl);
 
@@ -25,5 +26,4 @@ router.post('/', s3UtilMW, createBucketCtrl);
 
 router.delete('/:bucket', s3UtilMW, deleteBucketCtrl);
 
-router.get('/localstack', s3UtilLocalstackMW, getLocalstackBucketListCtrl);
 router.delete('/localstack/:bucket', s3UtilLocalstackMW, deleteLocalstackBucketCtrl);

@@ -76,7 +76,7 @@ export const toggingFileVersionCtrl = async (req: Request, res: Response, next: 
 
 export const deleteFileCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const filePath = req.query?.filePath as string;
+        const filePath = req.query?.file as string;
 
         const s3Util: S3Util = res.locals.s3Util;
         const result = await s3Util.deleteFile(filePath);
