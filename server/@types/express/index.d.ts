@@ -1,3 +1,4 @@
+import { S3Util } from '@hdriel/aws-utils';
 export {};
 
 declare global {
@@ -9,6 +10,9 @@ declare global {
             ua?: string;
             userAgent?: any;
             mac?: any;
+        }
+        interface Response {
+            s3Util: S3Util;
         }
     }
 }

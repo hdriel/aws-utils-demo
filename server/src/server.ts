@@ -1,6 +1,6 @@
 import env from './dotenv';
-import express, { Express } from 'express';
-import bodyParser from 'body-parser';
+import express, { Express, json, urlencoded } from 'express';
+import cookieParser from 'cookie-parser';
 import cors, { CorsOptions } from 'cors';
 import logger from './logger';
 import { initAppRoutes } from './routes/route';
@@ -10,13 +10,15 @@ export const app: Express = express();
 const corsOptions: CorsOptions = {
     origin: env.CLIENT_URL || '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
 };
 logger.debug(null, 'cors options', corsOptions);
 
 // @ts-ignore
 app.use(cors(corsOptions));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(json());
+app.use(urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.use((req: express.Request, _res: express.Response, next: any) => {
     req.id = req.id || 'UNKNOWN_ID';

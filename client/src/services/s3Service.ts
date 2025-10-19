@@ -14,6 +14,7 @@ class S3Service {
             baseURL: this.baseURL,
             timeout: 30000,
             headers: { 'Content-Type': 'application/json' },
+            withCredentials: true,
         });
     }
 

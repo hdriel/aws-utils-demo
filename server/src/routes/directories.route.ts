@@ -7,19 +7,20 @@ import {
     getDirectoryTreeCtrl,
 } from '../controls/directory.control';
 import { logApiMW } from '../middleware/logAPI.mw';
+import { s3UtilMW } from '../middleware/s3Util.mw';
 
 export const router: express.Router = express.Router();
 
 router.use(logApiMW);
 
-router.get('/', getDirectoryListCtrl);
+router.get('/', s3UtilMW, getDirectoryListCtrl);
 
-router.get('/files', getDirectoryFileListCtrl);
+router.get('/files', s3UtilMW, getDirectoryFileListCtrl);
 
-router.get('/tree', getDirectoryTreeCtrl);
+router.get('/tree', s3UtilMW, getDirectoryTreeCtrl);
 
-router.get('/tree/:directory', getDirectoryTreeCtrl);
+router.get('/tree/:directory', s3UtilMW, getDirectoryTreeCtrl);
 
-router.post('/', createDirectoryCtrl);
+router.post('/', s3UtilMW, createDirectoryCtrl);
 
-router.delete('/', deleteDirectoryCtrl);
+router.delete('/', s3UtilMW, deleteDirectoryCtrl);

@@ -1,44 +1,56 @@
 import env from '../dotenv';
-import { ACLs, S3BucketUtil } from '@hdriel/aws-utils';
+import { ACLs, S3Util, S3LocalstackUtil } from '@hdriel/aws-utils';
 import logger from '../logger';
+import type { CredentialsPayload } from '../decs';
 
-let s3BucketUtil: null | S3BucketUtil;
-let localstackS3BucketUtil: S3BucketUtil;
-// probably in your project you will initialize this instance immediately from your env variable
-// here in this project I simulate connections from multiple credentials
+/**
+ * probably in your personal project you will initialize this instance immediately from your env variable.
+ * for example:
+ * ```javascript
+ *      export const s3Utils = new S3Util({
+ *          accessKeyId: env?.AWS_ACCESS_KEY_ID,
+ *          region: env?.AWS_REGION,
+ *          secretAccessKey: env?.AWS_SECRET_ACCESS_KEY,
+ *          endpoint: env?.AWS_ENDPOINT,
+ *          bucket: env?.PROJECT_BUCKET,
+ *          logger,
+ *      });
+ * ```
+ * here in this project I simulate multiple credentials connections for this project proposes
+ */
 
-export const getS3BucketUtil = () => {
-    return s3BucketUtil;
-};
-
-export const changeS3BucketUtil = async (bucketName: string, acl: ACLs) => {
-    s3BucketUtil = new S3BucketUtil({ bucket: bucketName, logger });
-    await s3BucketUtil.initBucket(acl);
-
-    return s3BucketUtil;
-};
-
-export const removeS3BucketUtil = () => {
-    s3BucketUtil = null;
-};
-
-export const getLocalstackS3BucketUtil = (bucketName?: string) => {
-    if (!env) throw Error('env must be a defined');
-
-    if (!localstackS3BucketUtil || localstackS3BucketUtil?.bucket !== bucketName) {
-        const options = {
+export const getS3BucketUtil = ({
+    accessKeyId,
+    region,
+    secretAccessKey,
+    endpoint,
+    localstack,
+    bucketName,
+}: Omit<CredentialsPayload, 'acl'>) => {
+    if (localstack) {
+        return new S3LocalstackUtil({
             accessKeyId: env?.LOCALSTACK_ACCESS_KEY_ID,
             secretAccessKey: env?.LOCALSTACK_SECRET_ACCESS_KEY,
             region: env?.LOCALSTACK_REGION,
-            endpoint: env?.LOCALSTACK_ENDPOINT,
-            bucket: bucketName ?? 'demo',
+            endpoint: env?.LOCALSTACK_ENDPOINT || 'http://localhost:4566',
+            bucket: bucketName,
             logger,
-        };
-        localstackS3BucketUtil = new S3BucketUtil(options);
-
-        const { logger: _logger, ...logOptions } = options;
-        logger.info(null, 'localstack s3-bucket-util created', logOptions);
+        });
     }
 
-    return localstackS3BucketUtil;
+    return new S3Util({
+        accessKeyId,
+        region,
+        secretAccessKey,
+        endpoint,
+        bucket: bucketName,
+        logger,
+    });
+};
+
+export const changeS3BucketUtil = async (s3BucketUtil: S3Util, bucketName: string, acl: ACLs) => {
+    s3BucketUtil.changeBucket(bucketName);
+    await s3BucketUtil.initBucket(acl);
+
+    return s3BucketUtil;
 };
