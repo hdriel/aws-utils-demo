@@ -1,15 +1,18 @@
 import { Dialog, InputText } from 'mui-simple';
 import { DialogTitle } from '@mui/material';
-import { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { s3Service } from '../services/s3Service.ts';
 
 type Props = object;
+
+const versionPlaceholder = 'e.g., 1.0.0';
 
 // eslint-disable-next-line no-empty-pattern
 export const TaggingFileDialog = forwardRef<{ open: (key: string) => void }, Props>(({}, ref) => {
     const [tagDialogOpen, setTagDialogOpen] = useState(false);
     const [fileKey, setFileKey] = useState('');
     const [versionTag, setVersionTag] = useState('');
+    const [originalVersionTag, setOriginalVersionTag] = useState(versionPlaceholder);
 
     useImperativeHandle(ref, () => ({
         open: (key: string) => {
@@ -17,6 +20,20 @@ export const TaggingFileDialog = forwardRef<{ open: (key: string) => void }, Pro
             if (key) setTagDialogOpen(true);
         },
     }));
+
+    useEffect(() => {
+        if (tagDialogOpen) {
+            s3Service.getTagVersion(fileKey).then((version) => {
+                if (version) {
+                    setOriginalVersionTag(version);
+                    setVersionTag(version);
+                }
+            });
+        }
+        return () => {
+            setOriginalVersionTag(versionPlaceholder);
+        };
+    }, [tagDialogOpen]);
 
     const handleTagVersion = async () => {
         if (!fileKey || !versionTag.trim()) return;
@@ -40,7 +57,12 @@ export const TaggingFileDialog = forwardRef<{ open: (key: string) => void }, Pro
             onClose={() => setTagDialogOpen(false)}
             actions={[
                 { onClick: () => setTagDialogOpen(false), label: 'Cancel' },
-                { onClick: handleTagVersion, variant: 'contained', label: 'Apply Tag' },
+                {
+                    onClick: handleTagVersion,
+                    variant: 'contained',
+                    label: 'Apply Tag',
+                    disabled: !versionTag || originalVersionTag === versionTag,
+                },
             ]}
         >
             <DialogTitle>Tag File Version</DialogTitle>
@@ -49,7 +71,7 @@ export const TaggingFileDialog = forwardRef<{ open: (key: string) => void }, Pro
                 margin="dense"
                 label="Version"
                 fullWidth
-                placeholder="e.g., 1.0.0"
+                placeholder={versionPlaceholder}
                 value={versionTag}
                 onChange={(e) => setVersionTag(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleTagVersion()}

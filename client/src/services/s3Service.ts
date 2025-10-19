@@ -449,7 +449,7 @@ class S3Service {
         }
     }
 
-    async getTagVersion(filePath: string): Promise<void> {
+    async getTagVersion(filePath: string): Promise<string> {
         try {
             const query = qs.stringify({ filePath });
             const { data: response } = await this.api.get(`/files/version?${query}`);
