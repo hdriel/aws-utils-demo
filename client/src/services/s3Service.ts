@@ -449,6 +449,18 @@ class S3Service {
         }
     }
 
+    async getTagVersion(filePath: string): Promise<void> {
+        try {
+            const query = qs.stringify({ filePath });
+            const { data: response } = await this.api.get(`/files/version?${query}`);
+
+            return response;
+        } catch (error) {
+            console.error('Failed to tag object:', error);
+            throw error;
+        }
+    }
+
     abortDownloadFiles() {
         if (this.downloadAbortController) {
             this.downloadAbortController.abort();

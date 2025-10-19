@@ -23,6 +23,9 @@ export const TaggingFileDialog = forwardRef<{ open: (key: string) => void }, Pro
 
         try {
             await s3Service.tagObject(fileKey, versionTag);
+            const version = await s3Service.getTagVersion(fileKey);
+            console.log('version: ', version);
+
             setTagDialogOpen(false);
             setVersionTag('');
         } catch (error) {
