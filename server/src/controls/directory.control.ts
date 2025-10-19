@@ -4,7 +4,7 @@ import logger from '../logger';
 
 export const getDirectoryListCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const directory = req.query?.directory ? decodeURIComponent(req.query?.directory as string) : '';
+        const directory = req.query?.directory as string; // already handled decodeURIComponent inside s3Util
         const pageNumber = req.query?.page ? +req.query?.page : undefined;
         const pageSize = req.query?.size ? +req.query?.size : undefined;
 
@@ -20,7 +20,7 @@ export const getDirectoryListCtrl = async (req: Request, res: Response, next: Ne
 
 export const getDirectoryFileListCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const directory = req.query?.directory ? decodeURIComponent(req.query?.directory as string) : undefined;
+        const directory = req.query?.directory as string; // already handled decodeURIComponent inside s3Util
         const pageNumber = req.query?.page ? +req.query?.page : undefined;
         const pageSize = req.query?.size ? +req.query?.size : undefined;
 
@@ -40,7 +40,7 @@ export const getDirectoryFileListCtrl = async (req: Request, res: Response, next
 
 export const getDirectoryTreeCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const directory = req.query?.directory ? decodeURIComponent(req.query?.directory as string) : undefined;
+        const directory = req.query?.directory as string; // already handled decodeURIComponent inside s3Util
 
         const s3Util: S3Util = res.locals.s3Util;
         const result = await s3Util.directoryTree(directory);

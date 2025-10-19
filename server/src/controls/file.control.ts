@@ -62,10 +62,10 @@ export const getFileVersionCtrl = async (req: Request, res: Response, next: Next
 export const toggingFileVersionCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const filePath = req.query?.filePath as string;
-        const version = req.body as string;
+        const version = req.body?.version as string;
 
         const s3Util: S3Util = res.locals.s3Util;
-        const result = await s3Util.taggingFile(filePath, version);
+        const result = await s3Util.taggingFile(filePath, { Key: 'version', Value: version });
 
         res.json(result);
     } catch (err: any) {
@@ -124,9 +124,9 @@ export const uploadSingleFileCtrl = (req: Request & { s3File?: UploadedS3File },
             return res.status(400).json({ error: 'Directory header is required' });
         }
 
-        let directory = decodeURIComponent(encodedDirectory);
+        let directory = decodeURIComponent(encodedDirectory); // already handled decodeURIComponent inside s3Util
         directory = directory === '/' ? '' : directory;
-        const filename = encodedFilename ? decodeURIComponent(encodedFilename) : undefined;
+        const filename = encodedFilename; // already handled decodeURIComponent inside s3Util
 
         logger.info(req.id, 'uploading single file', { filename, directory });
 
@@ -179,7 +179,7 @@ export const uploadMultiFilesCtrl = (
         if (!encodedDirectory) {
             return res.status(400).json({ error: 'Directory header is required' });
         }
-        let directory = decodeURIComponent(encodedDirectory);
+        let directory = decodeURIComponent(encodedDirectory); // already handled decodeURIComponent inside s3Util
         directory = directory === '/' ? '' : directory;
 
         logger.info(req.id, 'uploading multiple files', { directory });
@@ -246,7 +246,7 @@ export const downloadFilesAsZipCtrl = async (req: Request, res: Response, next: 
         const filePaths = ([] as string[])
             .concat(req.query.file as string[])
             .filter((v) => v)
-            .map((file) => decodeURIComponent(file));
+            .map((file) => decodeURIComponent(file)); // already handled decodeURIComponent inside s3Util
 
         const s3Util: S3Util = res.locals.s3Util;
         const downloadMiddleware =
