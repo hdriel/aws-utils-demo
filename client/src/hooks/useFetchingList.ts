@@ -1,11 +1,14 @@
 import { useEffect, useRef } from 'react';
 
+const sleep = async (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 interface UseFetchingListProps {
     directory: string;
     listItemSelector: string;
     cb: (page: number) => Promise<number | undefined>;
     isListEmpty: boolean;
     timeout?: number;
+    mountedTimeout?: number;
     deps?: any[];
 }
 
@@ -16,6 +19,7 @@ export const useFetchingList = ({
     isListEmpty,
     timeout,
     deps,
+    mountedTimeout = 1000,
 }: UseFetchingListProps) => {
     const pageSelectorsRef = useRef<Record<string, { page: number; hasNext: boolean }>>({});
     const cbRef = useRef(cb);
@@ -48,17 +52,15 @@ export const useFetchingList = ({
                         observer.observe(newLastItem);
                     }
                 };
-                if (timeout) {
-                    setTimeout(effect, timeout);
-                } else {
-                    effect();
-                }
+
+                if (timeout) await sleep(timeout);
+                effect();
             }
         });
 
         const effect = () => {
             const lastItem = document.querySelector(selector) as HTMLElement | null;
-            pageSelectorsRef.current[selector] ||= { page: 0, hasNext: true };
+            pageSelectorsRef.current[selector] ||= { page: 1, hasNext: true };
 
             if (!lastItem || !pageSelectorsRef.current[selector].hasNext) return;
 
@@ -67,7 +69,7 @@ export const useFetchingList = ({
         };
 
         if (timeout) {
-            setTimeout(effect, timeout);
+            setTimeout(effect, mountedTimeout);
         } else {
             effect();
         }

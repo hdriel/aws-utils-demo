@@ -43,11 +43,14 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
         listItemSelector: `li.MuiTreeItem-root[role="treeitem"][parentid="${!selectedNode?.parentId || selectedNode?.parentId === '/' ? 'root' : selectedNode.parentId}"]`,
         isListEmpty: !selectedNode?.children?.length || !expanded.includes(selectedNode?.id as string),
         timeout: 1000,
+        mountedTimeout: 2000,
         cb: async (page) => {
             if (selectedNode?.id) return loadNodeFiles(selectedNode.id, page);
         },
         deps: [expanded.join()],
     });
+
+    console.log('treeData', treeData);
 
     return (
         <div className="tree-panel">
@@ -90,6 +93,12 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                     fieldId="id"
                     onExpanded={(nodeIds: string[]) => setExpanded(nodeIds)}
                     TransitionComponent={null}
+                    nodes={treeData ? [treeData] : undefined}
+                    TreeItemComponent={IndentBorderTreeItem as unknown as React.ReactElement}
+                    {...IndentBorderTreeItemIcons}
+                    collapseIcon="FolderOpen"
+                    expandIcon="Folder"
+                    endIcon="Folder"
                     onSelected={(nodeIds: string[]) => {
                         setSelectedIds((state) => (state.join(',') !== nodeIds.join(',') ? nodeIds : state));
                         const [nodeId] = nodeIds;
@@ -98,12 +107,6 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                             return handleNodeToggle(nodeId);
                         }
                     }}
-                    nodes={treeData ? [treeData] : undefined}
-                    TreeItemComponent={IndentBorderTreeItem as unknown as React.ReactElement}
-                    {...IndentBorderTreeItemIcons}
-                    collapseIcon="FolderOpen"
-                    expandIcon="Folder"
-                    endIcon="Folder"
                 />
             </div>
 

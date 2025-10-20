@@ -95,7 +95,7 @@ export const useNodeTree = ({ refreshTrigger, openDeleteDialog, onFolderSelect }
             <Box className="item-icon" style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
                 {isDirectory ? null : <SVGIcon muiIconName={getFileIcon(isDirectory ? '' : node.name)} size={'18px'} />}
                 <Typography className="item-name">
-                    {node.name} {node.children.length ? `(${node.children.length})` : ''}
+                    {node.name} {node.children?.length ? `(${node.children.length})` : ''}
                 </Typography>
                 <Box sx={{ marginInlineStart: 'auto' }}>
                     {!isDirectory && node.size !== undefined && (
@@ -217,7 +217,8 @@ export const useNodeTree = ({ refreshTrigger, openDeleteDialog, onFolderSelect }
                         } as TreeNodeItem;
                     });
 
-                const newChildren = page ? [...node.children, ...children] : children;
+                const allChildren = [...node.children, ...children];
+                const newChildren = page || !children.length ? allChildren : children;
 
                 updateNodeChildren(
                     nodeId,
