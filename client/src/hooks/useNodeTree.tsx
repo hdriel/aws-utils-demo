@@ -224,10 +224,13 @@ export const useNodeTree = ({ refreshTrigger, openDeleteDialog, onFolderSelect }
                     newChildren
                     // newChildren.sort((a, b) => +b.directory - +a.directory)
                 );
+
+                return result.files.length + result.directories.length;
             } catch (error) {
                 console.error('Failed to load folder contents:', error);
             }
         }
+        return 0;
     };
 
     const updateNodeChildren = (nodeId: string, children: TreeNodeItem[]) => {

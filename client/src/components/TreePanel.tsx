@@ -46,6 +46,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
         cb: async (page) => {
             if (selectedNode?.id) return loadNodeFiles(selectedNode.id, page);
         },
+        deps: [expanded.join()],
     });
 
     return (

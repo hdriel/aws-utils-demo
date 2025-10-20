@@ -3,13 +3,21 @@ import { useEffect, useRef } from 'react';
 interface UseFetchingListProps {
     directory: string;
     listItemSelector: string;
-    cb: (page: number) => Promise<void>;
+    cb: (page: number) => Promise<number | undefined>;
     isListEmpty: boolean;
     timeout?: number;
+    deps?: any[];
 }
 
-export const useFetchingList = ({ listItemSelector, cb, directory, isListEmpty, timeout }: UseFetchingListProps) => {
-    const pageNumberRef = useRef(1);
+export const useFetchingList = ({
+    listItemSelector,
+    cb,
+    directory,
+    isListEmpty,
+    timeout,
+    deps,
+}: UseFetchingListProps) => {
+    const pageSelectorsRef = useRef<Record<string, { page: number; hasNext: boolean }>>({});
     const cbRef = useRef(cb);
     const selector = `${listItemSelector}:last-child`;
 
@@ -26,7 +34,11 @@ export const useFetchingList = ({ listItemSelector, cb, directory, isListEmpty, 
             const entry = entries[0];
 
             if (entry.isIntersecting) {
-                await cbRef.current(pageNumberRef.current++);
+                const page = pageSelectorsRef.current[selector].page++;
+                const totalFetchItems = await cbRef.current(page);
+                if (!totalFetchItems) {
+                    pageSelectorsRef.current[selector].hasNext = false;
+                }
                 observer.unobserve(entries[0].target);
 
                 const effect = () => {
@@ -46,7 +58,10 @@ export const useFetchingList = ({ listItemSelector, cb, directory, isListEmpty, 
 
         const effect = () => {
             const lastItem = document.querySelector(selector) as HTMLElement | null;
-            if (!lastItem) return;
+            pageSelectorsRef.current[selector] ||= { page: 0, hasNext: true };
+
+            if (!lastItem || !pageSelectorsRef.current[selector].hasNext) return;
+
             lastInnerText = lastItem.innerText;
             observer.observe(lastItem);
         };
@@ -59,9 +74,8 @@ export const useFetchingList = ({ listItemSelector, cb, directory, isListEmpty, 
 
         return () => {
             observer.disconnect();
-            pageNumberRef.current = 1;
         };
-    }, [directory, listItemSelector, isListEmpty, selector]);
+    }, [directory, listItemSelector, isListEmpty, selector, ...(deps ?? [])]);
 
     return null;
 };

@@ -54,8 +54,11 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
             if (selectedFiles.size !== 0) {
                 setSelectedFiles(new Set());
             }
+
+            return files.length;
         } catch (error) {
             console.error('Failed to load files:', error);
+            return 0;
         }
     };
 

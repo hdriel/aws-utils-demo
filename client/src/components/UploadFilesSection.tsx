@@ -69,6 +69,7 @@ export const UploadFilesSection: React.FC<Props> = ({ currentPath, onUploadCB })
                     color={allowedMultipleFiles ? 'primary' : undefined}
                     onClick={() => setAllowedMultipleFiles((v) => !v)}
                     tooltipProps={{ title: 'Allow upload multiple files', placement: 'right' }}
+                    disabled={uploading}
                 />
             </Text>
             <Box className="upload-buttons">
