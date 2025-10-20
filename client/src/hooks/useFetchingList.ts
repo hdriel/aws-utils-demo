@@ -40,10 +40,12 @@ export const useFetchingList = ({
             if (entry.isIntersecting) {
                 const page = pageSelectorsRef.current[selector].page++;
                 const totalFetchItems = await cbRef.current(page);
+                observer.unobserve(entries[0].target);
+
                 if (!totalFetchItems) {
                     pageSelectorsRef.current[selector].hasNext = false;
+                    return;
                 }
-                observer.unobserve(entries[0].target);
 
                 const effect = () => {
                     const newLastItem = document.querySelector(selector) as HTMLElement | null;

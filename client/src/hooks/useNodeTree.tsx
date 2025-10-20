@@ -217,7 +217,7 @@ export const useNodeTree = ({ refreshTrigger, openDeleteDialog, onFolderSelect }
                         } as TreeNodeItem;
                     });
 
-                const allChildren = [...node.children, ...children];
+                const allChildren = [...node.children, ...children].filter((v) => v);
                 const newChildren = page || !children.length ? allChildren : children;
 
                 updateNodeChildren(
