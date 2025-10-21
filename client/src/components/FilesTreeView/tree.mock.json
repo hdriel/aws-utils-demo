@@ -1,0 +1,1363 @@
+{
+    "id": "root",
+    "parentId": null,
+    "level": 0,
+    "path": "/",
+    "name": "root",
+    "label": {
+        "type": {
+            "propTypes": {}
+        },
+        "key": null,
+        "ref": null,
+        "props": {
+            "className": "item-icon",
+            "style": {
+                "display": "flex",
+                "alignItems": "center",
+                "gap": "8px",
+                "width": "100%"
+            },
+            "children": [
+                null,
+                {
+                    "key": null,
+                    "ref": null,
+                    "props": {
+                        "className": "item-name",
+                        "children": ["root", " ", "(10)"]
+                    },
+                    "_owner": null,
+                    "_store": {}
+                },
+                {
+                    "type": {
+                        "propTypes": {}
+                    },
+                    "key": null,
+                    "ref": null,
+                    "props": {
+                        "sx": {
+                            "marginInlineStart": "auto"
+                        },
+                        "children": false
+                    },
+                    "_owner": null,
+                    "_store": {}
+                },
+                false
+            ]
+        },
+        "_owner": null,
+        "_store": {}
+    },
+    "size": 0,
+    "index": 0,
+    "isLast": false,
+    "directory": true,
+    "sx": {
+        "& .MuiTreeItem-content": {
+            "paddingY": "0 !important"
+        }
+    },
+    "children": [
+        {
+            "id": "0.PNG",
+            "parentId": "root",
+            "level": 1,
+            "path": "0.PNG",
+            "name": "0.PNG",
+            "label": {
+                "type": {
+                    "propTypes": {}
+                },
+                "key": null,
+                "ref": null,
+                "props": {
+                    "className": "item-icon",
+                    "style": {
+                        "display": "flex",
+                        "alignItems": "center",
+                        "gap": "8px",
+                        "width": "100%"
+                    },
+                    "children": [
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "muiIconName": "Image",
+                                "size": "18px"
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "className": "item-name",
+                                "children": ["0.PNG", " ", ""]
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "type": {
+                                "propTypes": {}
+                            },
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "sx": {
+                                    "marginInlineStart": "auto"
+                                },
+                                "children": {
+                                    "key": null,
+                                    "ref": null,
+                                    "props": {
+                                        "className": "item-size",
+                                        "children": "32.13 KB"
+                                    },
+                                    "_owner": null,
+                                    "_store": {}
+                                }
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "icon": "Delete",
+                                "size": "small",
+                                "tooltipProps": {
+                                    "placement": "top",
+                                    "title": {
+                                        "type": "p",
+                                        "key": null,
+                                        "ref": null,
+                                        "props": {
+                                            "style": {
+                                                "width": "max-content"
+                                            },
+                                            "children": [
+                                                "Delete ",
+                                                "file",
+                                                ":",
+                                                {
+                                                    "type": "br",
+                                                    "key": null,
+                                                    "ref": null,
+                                                    "props": {},
+                                                    "_owner": null,
+                                                    "_store": {}
+                                                },
+                                                "0.PNG"
+                                            ]
+                                        },
+                                        "_owner": null,
+                                        "_store": {}
+                                    }
+                                },
+                                "sx": {
+                                    "marginInlineEnd": "-1px"
+                                }
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        }
+                    ]
+                },
+                "_owner": null,
+                "_store": {}
+            },
+            "size": 32900,
+            "index": 0,
+            "isLast": false,
+            "directory": false,
+            "sx": {
+                "& .MuiTreeItem-content": {
+                    "paddingY": "0 !important"
+                },
+                "& .MuiTreeItem-label": {
+                    "marginLeft": "-1px"
+                },
+                "& .MuiTreeItem-iconContainer": {
+                    "display": "none"
+                }
+            },
+            "children": []
+        },
+        {
+            "id": "1.PNG",
+            "parentId": "root",
+            "level": 1,
+            "path": "1.PNG",
+            "name": "1.PNG",
+            "label": {
+                "type": {
+                    "propTypes": {}
+                },
+                "key": null,
+                "ref": null,
+                "props": {
+                    "className": "item-icon",
+                    "style": {
+                        "display": "flex",
+                        "alignItems": "center",
+                        "gap": "8px",
+                        "width": "100%"
+                    },
+                    "children": [
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "muiIconName": "Image",
+                                "size": "18px"
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "className": "item-name",
+                                "children": ["1.PNG", " ", ""]
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "type": {
+                                "propTypes": {}
+                            },
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "sx": {
+                                    "marginInlineStart": "auto"
+                                },
+                                "children": {
+                                    "key": null,
+                                    "ref": null,
+                                    "props": {
+                                        "className": "item-size",
+                                        "children": "35.46 KB"
+                                    },
+                                    "_owner": null,
+                                    "_store": {}
+                                }
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "icon": "Delete",
+                                "size": "small",
+                                "tooltipProps": {
+                                    "placement": "top",
+                                    "title": {
+                                        "type": "p",
+                                        "key": null,
+                                        "ref": null,
+                                        "props": {
+                                            "style": {
+                                                "width": "max-content"
+                                            },
+                                            "children": [
+                                                "Delete ",
+                                                "file",
+                                                ":",
+                                                {
+                                                    "type": "br",
+                                                    "key": null,
+                                                    "ref": null,
+                                                    "props": {},
+                                                    "_owner": null,
+                                                    "_store": {}
+                                                },
+                                                "1.PNG"
+                                            ]
+                                        },
+                                        "_owner": null,
+                                        "_store": {}
+                                    }
+                                },
+                                "sx": {
+                                    "marginInlineEnd": "-1px"
+                                }
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        }
+                    ]
+                },
+                "_owner": null,
+                "_store": {}
+            },
+            "size": 36316,
+            "index": 0,
+            "isLast": false,
+            "directory": false,
+            "sx": {
+                "& .MuiTreeItem-content": {
+                    "paddingY": "0 !important"
+                },
+                "& .MuiTreeItem-label": {
+                    "marginLeft": "-1px"
+                },
+                "& .MuiTreeItem-iconContainer": {
+                    "display": "none"
+                }
+            },
+            "children": []
+        },
+        {
+            "id": "1096d21f-3179-4f73-835f-5078d8a1edb4.png",
+            "parentId": "root",
+            "level": 1,
+            "path": "1096d21f-3179-4f73-835f-5078d8a1edb4.png",
+            "name": "1096d21f-3179-4f73-835f-5078d8a1edb4.png",
+            "label": {
+                "type": {
+                    "propTypes": {}
+                },
+                "key": null,
+                "ref": null,
+                "props": {
+                    "className": "item-icon",
+                    "style": {
+                        "display": "flex",
+                        "alignItems": "center",
+                        "gap": "8px",
+                        "width": "100%"
+                    },
+                    "children": [
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "muiIconName": "Image",
+                                "size": "18px"
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "className": "item-name",
+                                "children": ["1096d21f-3179-4f73-835f-5078d8a1edb4.png", " ", ""]
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "type": {
+                                "propTypes": {}
+                            },
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "sx": {
+                                    "marginInlineStart": "auto"
+                                },
+                                "children": {
+                                    "key": null,
+                                    "ref": null,
+                                    "props": {
+                                        "className": "item-size",
+                                        "children": "1.77 MB"
+                                    },
+                                    "_owner": null,
+                                    "_store": {}
+                                }
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "icon": "Delete",
+                                "size": "small",
+                                "tooltipProps": {
+                                    "placement": "top",
+                                    "title": {
+                                        "type": "p",
+                                        "key": null,
+                                        "ref": null,
+                                        "props": {
+                                            "style": {
+                                                "width": "max-content"
+                                            },
+                                            "children": [
+                                                "Delete ",
+                                                "file",
+                                                ":",
+                                                {
+                                                    "type": "br",
+                                                    "key": null,
+                                                    "ref": null,
+                                                    "props": {},
+                                                    "_owner": null,
+                                                    "_store": {}
+                                                },
+                                                "1096d21f-3179-4f73-835f-5078d8a1edb4.png"
+                                            ]
+                                        },
+                                        "_owner": null,
+                                        "_store": {}
+                                    }
+                                },
+                                "sx": {
+                                    "marginInlineEnd": "-1px"
+                                }
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        }
+                    ]
+                },
+                "_owner": null,
+                "_store": {}
+            },
+            "size": 1854797,
+            "index": 0,
+            "isLast": false,
+            "directory": false,
+            "sx": {
+                "& .MuiTreeItem-content": {
+                    "paddingY": "0 !important"
+                },
+                "& .MuiTreeItem-label": {
+                    "marginLeft": "-1px"
+                },
+                "& .MuiTreeItem-iconContainer": {
+                    "display": "none"
+                }
+            },
+            "children": []
+        },
+        {
+            "id": "12 תלושים אחורה מהתאונה.pdf",
+            "parentId": "root",
+            "level": 1,
+            "path": "12 תלושים אחורה מהתאונה.pdf",
+            "name": "12 תלושים אחורה מהתאונה.pdf",
+            "label": {
+                "type": {
+                    "propTypes": {}
+                },
+                "key": null,
+                "ref": null,
+                "props": {
+                    "className": "item-icon",
+                    "style": {
+                        "display": "flex",
+                        "alignItems": "center",
+                        "gap": "8px",
+                        "width": "100%"
+                    },
+                    "children": [
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "muiIconName": "InsertDriveFile",
+                                "size": "18px"
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "className": "item-name",
+                                "children": ["12 תלושים אחורה מהתאונה.pdf", " ", ""]
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "type": {
+                                "propTypes": {}
+                            },
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "sx": {
+                                    "marginInlineStart": "auto"
+                                },
+                                "children": {
+                                    "key": null,
+                                    "ref": null,
+                                    "props": {
+                                        "className": "item-size",
+                                        "children": "286.44 KB"
+                                    },
+                                    "_owner": null,
+                                    "_store": {}
+                                }
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "icon": "Delete",
+                                "size": "small",
+                                "tooltipProps": {
+                                    "placement": "top",
+                                    "title": {
+                                        "type": "p",
+                                        "key": null,
+                                        "ref": null,
+                                        "props": {
+                                            "style": {
+                                                "width": "max-content"
+                                            },
+                                            "children": [
+                                                "Delete ",
+                                                "file",
+                                                ":",
+                                                {
+                                                    "type": "br",
+                                                    "key": null,
+                                                    "ref": null,
+                                                    "props": {},
+                                                    "_owner": null,
+                                                    "_store": {}
+                                                },
+                                                "12 תלושים אחורה מהתאונה.pdf"
+                                            ]
+                                        },
+                                        "_owner": null,
+                                        "_store": {}
+                                    }
+                                },
+                                "sx": {
+                                    "marginInlineEnd": "-1px"
+                                }
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        }
+                    ]
+                },
+                "_owner": null,
+                "_store": {}
+            },
+            "size": 293319,
+            "index": 0,
+            "isLast": false,
+            "directory": false,
+            "sx": {
+                "& .MuiTreeItem-content": {
+                    "paddingY": "0 !important"
+                },
+                "& .MuiTreeItem-label": {
+                    "marginLeft": "-1px"
+                },
+                "& .MuiTreeItem-iconContainer": {
+                    "display": "none"
+                }
+            },
+            "children": []
+        },
+        {
+            "id": "2.PNG",
+            "parentId": "root",
+            "level": 1,
+            "path": "2.PNG",
+            "name": "2.PNG",
+            "label": {
+                "type": {
+                    "propTypes": {}
+                },
+                "key": null,
+                "ref": null,
+                "props": {
+                    "className": "item-icon",
+                    "style": {
+                        "display": "flex",
+                        "alignItems": "center",
+                        "gap": "8px",
+                        "width": "100%"
+                    },
+                    "children": [
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "muiIconName": "Image",
+                                "size": "18px"
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "className": "item-name",
+                                "children": ["2.PNG", " ", ""]
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "type": {
+                                "propTypes": {}
+                            },
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "sx": {
+                                    "marginInlineStart": "auto"
+                                },
+                                "children": {
+                                    "key": null,
+                                    "ref": null,
+                                    "props": {
+                                        "className": "item-size",
+                                        "children": "293.98 KB"
+                                    },
+                                    "_owner": null,
+                                    "_store": {}
+                                }
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "icon": "Delete",
+                                "size": "small",
+                                "tooltipProps": {
+                                    "placement": "top",
+                                    "title": {
+                                        "type": "p",
+                                        "key": null,
+                                        "ref": null,
+                                        "props": {
+                                            "style": {
+                                                "width": "max-content"
+                                            },
+                                            "children": [
+                                                "Delete ",
+                                                "file",
+                                                ":",
+                                                {
+                                                    "type": "br",
+                                                    "key": null,
+                                                    "ref": null,
+                                                    "props": {},
+                                                    "_owner": null,
+                                                    "_store": {}
+                                                },
+                                                "2.PNG"
+                                            ]
+                                        },
+                                        "_owner": null,
+                                        "_store": {}
+                                    }
+                                },
+                                "sx": {
+                                    "marginInlineEnd": "-1px"
+                                }
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        }
+                    ]
+                },
+                "_owner": null,
+                "_store": {}
+            },
+            "size": 301036,
+            "index": 0,
+            "isLast": false,
+            "directory": false,
+            "sx": {
+                "& .MuiTreeItem-content": {
+                    "paddingY": "0 !important"
+                },
+                "& .MuiTreeItem-label": {
+                    "marginLeft": "-1px"
+                },
+                "& .MuiTreeItem-iconContainer": {
+                    "display": "none"
+                }
+            },
+            "children": []
+        },
+        {
+            "id": "3.PNG",
+            "parentId": "root",
+            "level": 1,
+            "path": "3.PNG",
+            "name": "3.PNG",
+            "label": {
+                "type": {
+                    "propTypes": {}
+                },
+                "key": null,
+                "ref": null,
+                "props": {
+                    "className": "item-icon",
+                    "style": {
+                        "display": "flex",
+                        "alignItems": "center",
+                        "gap": "8px",
+                        "width": "100%"
+                    },
+                    "children": [
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "muiIconName": "Image",
+                                "size": "18px"
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "className": "item-name",
+                                "children": ["3.PNG", " ", ""]
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "type": {
+                                "propTypes": {}
+                            },
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "sx": {
+                                    "marginInlineStart": "auto"
+                                },
+                                "children": {
+                                    "key": null,
+                                    "ref": null,
+                                    "props": {
+                                        "className": "item-size",
+                                        "children": "890.93 KB"
+                                    },
+                                    "_owner": null,
+                                    "_store": {}
+                                }
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "icon": "Delete",
+                                "size": "small",
+                                "tooltipProps": {
+                                    "placement": "top",
+                                    "title": {
+                                        "type": "p",
+                                        "key": null,
+                                        "ref": null,
+                                        "props": {
+                                            "style": {
+                                                "width": "max-content"
+                                            },
+                                            "children": [
+                                                "Delete ",
+                                                "file",
+                                                ":",
+                                                {
+                                                    "type": "br",
+                                                    "key": null,
+                                                    "ref": null,
+                                                    "props": {},
+                                                    "_owner": null,
+                                                    "_store": {}
+                                                },
+                                                "3.PNG"
+                                            ]
+                                        },
+                                        "_owner": null,
+                                        "_store": {}
+                                    }
+                                },
+                                "sx": {
+                                    "marginInlineEnd": "-1px"
+                                }
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        }
+                    ]
+                },
+                "_owner": null,
+                "_store": {}
+            },
+            "size": 912310,
+            "index": 0,
+            "isLast": false,
+            "directory": false,
+            "sx": {
+                "& .MuiTreeItem-content": {
+                    "paddingY": "0 !important"
+                },
+                "& .MuiTreeItem-label": {
+                    "marginLeft": "-1px"
+                },
+                "& .MuiTreeItem-iconContainer": {
+                    "display": "none"
+                }
+            },
+            "children": []
+        },
+        {
+            "id": "576865687684_elasticloadbalancing_eu-north-1_app.server-alb.7513ba4d489810be_20250715T1815Z_13.61.120.25_5b178n8f.log",
+            "parentId": "root",
+            "level": 1,
+            "path": "576865687684_elasticloadbalancing_eu-north-1_app.server-alb.7513ba4d489810be_20250715T1815Z_13.61.120.25_5b178n8f.log",
+            "name": "576865687684_elasticloadbalancing_eu-north-1_app.server-alb.7513ba4d489810be_20250715T1815Z_13.61.120.25_5b178n8f.log",
+            "label": {
+                "type": {
+                    "propTypes": {}
+                },
+                "key": null,
+                "ref": null,
+                "props": {
+                    "className": "item-icon",
+                    "style": {
+                        "display": "flex",
+                        "alignItems": "center",
+                        "gap": "8px",
+                        "width": "100%"
+                    },
+                    "children": [
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "muiIconName": "InsertDriveFile",
+                                "size": "18px"
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "className": "item-name",
+                                "children": [
+                                    "576865687684_elasticloadbalancing_eu-north-1_app.server-alb.7513ba4d489810be_20250715T1815Z_13.61.120.25_5b178n8f.log",
+                                    " ",
+                                    ""
+                                ]
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "type": {
+                                "propTypes": {}
+                            },
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "sx": {
+                                    "marginInlineStart": "auto"
+                                },
+                                "children": {
+                                    "key": null,
+                                    "ref": null,
+                                    "props": {
+                                        "className": "item-size",
+                                        "children": "16.98 KB"
+                                    },
+                                    "_owner": null,
+                                    "_store": {}
+                                }
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "icon": "Delete",
+                                "size": "small",
+                                "tooltipProps": {
+                                    "placement": "top",
+                                    "title": {
+                                        "type": "p",
+                                        "key": null,
+                                        "ref": null,
+                                        "props": {
+                                            "style": {
+                                                "width": "max-content"
+                                            },
+                                            "children": [
+                                                "Delete ",
+                                                "file",
+                                                ":",
+                                                {
+                                                    "type": "br",
+                                                    "key": null,
+                                                    "ref": null,
+                                                    "props": {},
+                                                    "_owner": null,
+                                                    "_store": {}
+                                                },
+                                                "576865687684_elasticloadbalancing_eu-north-1_app.server-alb.7513ba4d489810be_20250715T1815Z_13.61.120.25_5b178n8f.log"
+                                            ]
+                                        },
+                                        "_owner": null,
+                                        "_store": {}
+                                    }
+                                },
+                                "sx": {
+                                    "marginInlineEnd": "-1px"
+                                }
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        }
+                    ]
+                },
+                "_owner": null,
+                "_store": {}
+            },
+            "size": 17388,
+            "index": 0,
+            "isLast": false,
+            "directory": false,
+            "sx": {
+                "& .MuiTreeItem-content": {
+                    "paddingY": "0 !important"
+                },
+                "& .MuiTreeItem-label": {
+                    "marginLeft": "-1px"
+                },
+                "& .MuiTreeItem-iconContainer": {
+                    "display": "none"
+                }
+            },
+            "children": []
+        },
+        {
+            "id": "576865687684_elasticloadbalancing_eu-north-1_app.server-alb.7513ba4d489810be_20250715T1815Z_13.61.120.25_5b178n8f.log.gz",
+            "parentId": "root",
+            "level": 1,
+            "path": "576865687684_elasticloadbalancing_eu-north-1_app.server-alb.7513ba4d489810be_20250715T1815Z_13.61.120.25_5b178n8f.log.gz",
+            "name": "576865687684_elasticloadbalancing_eu-north-1_app.server-alb.7513ba4d489810be_20250715T1815Z_13.61.120.25_5b178n8f.log.gz",
+            "label": {
+                "type": {
+                    "propTypes": {}
+                },
+                "key": null,
+                "ref": null,
+                "props": {
+                    "className": "item-icon",
+                    "style": {
+                        "display": "flex",
+                        "alignItems": "center",
+                        "gap": "8px",
+                        "width": "100%"
+                    },
+                    "children": [
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "muiIconName": "InsertDriveFile",
+                                "size": "18px"
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "className": "item-name",
+                                "children": [
+                                    "576865687684_elasticloadbalancing_eu-north-1_app.server-alb.7513ba4d489810be_20250715T1815Z_13.61.120.25_5b178n8f.log.gz",
+                                    " ",
+                                    ""
+                                ]
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "type": {
+                                "propTypes": {}
+                            },
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "sx": {
+                                    "marginInlineStart": "auto"
+                                },
+                                "children": {
+                                    "key": null,
+                                    "ref": null,
+                                    "props": {
+                                        "className": "item-size",
+                                        "children": "2.91 KB"
+                                    },
+                                    "_owner": null,
+                                    "_store": {}
+                                }
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "icon": "Delete",
+                                "size": "small",
+                                "tooltipProps": {
+                                    "placement": "top",
+                                    "title": {
+                                        "type": "p",
+                                        "key": null,
+                                        "ref": null,
+                                        "props": {
+                                            "style": {
+                                                "width": "max-content"
+                                            },
+                                            "children": [
+                                                "Delete ",
+                                                "file",
+                                                ":",
+                                                {
+                                                    "type": "br",
+                                                    "key": null,
+                                                    "ref": null,
+                                                    "props": {},
+                                                    "_owner": null,
+                                                    "_store": {}
+                                                },
+                                                "576865687684_elasticloadbalancing_eu-north-1_app.server-alb.7513ba4d489810be_20250715T1815Z_13.61.120.25_5b178n8f.log.gz"
+                                            ]
+                                        },
+                                        "_owner": null,
+                                        "_store": {}
+                                    }
+                                },
+                                "sx": {
+                                    "marginInlineEnd": "-1px"
+                                }
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        }
+                    ]
+                },
+                "_owner": null,
+                "_store": {}
+            },
+            "size": 2976,
+            "index": 0,
+            "isLast": false,
+            "directory": false,
+            "sx": {
+                "& .MuiTreeItem-content": {
+                    "paddingY": "0 !important"
+                },
+                "& .MuiTreeItem-label": {
+                    "marginLeft": "-1px"
+                },
+                "& .MuiTreeItem-iconContainer": {
+                    "display": "none"
+                }
+            },
+            "children": []
+        },
+        {
+            "id": "656ce36f40c86e6d81c1a9ab_688ce58410c1cfbc7a0e6661.pdf",
+            "parentId": "root",
+            "level": 1,
+            "path": "656ce36f40c86e6d81c1a9ab_688ce58410c1cfbc7a0e6661.pdf",
+            "name": "656ce36f40c86e6d81c1a9ab_688ce58410c1cfbc7a0e6661.pdf",
+            "label": {
+                "type": {
+                    "propTypes": {}
+                },
+                "key": null,
+                "ref": null,
+                "props": {
+                    "className": "item-icon",
+                    "style": {
+                        "display": "flex",
+                        "alignItems": "center",
+                        "gap": "8px",
+                        "width": "100%"
+                    },
+                    "children": [
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "muiIconName": "InsertDriveFile",
+                                "size": "18px"
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "className": "item-name",
+                                "children": ["656ce36f40c86e6d81c1a9ab_688ce58410c1cfbc7a0e6661.pdf", " ", ""]
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "type": {
+                                "propTypes": {}
+                            },
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "sx": {
+                                    "marginInlineStart": "auto"
+                                },
+                                "children": {
+                                    "key": null,
+                                    "ref": null,
+                                    "props": {
+                                        "className": "item-size",
+                                        "children": "2.22 MB"
+                                    },
+                                    "_owner": null,
+                                    "_store": {}
+                                }
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "icon": "Delete",
+                                "size": "small",
+                                "tooltipProps": {
+                                    "placement": "top",
+                                    "title": {
+                                        "type": "p",
+                                        "key": null,
+                                        "ref": null,
+                                        "props": {
+                                            "style": {
+                                                "width": "max-content"
+                                            },
+                                            "children": [
+                                                "Delete ",
+                                                "file",
+                                                ":",
+                                                {
+                                                    "type": "br",
+                                                    "key": null,
+                                                    "ref": null,
+                                                    "props": {},
+                                                    "_owner": null,
+                                                    "_store": {}
+                                                },
+                                                "656ce36f40c86e6d81c1a9ab_688ce58410c1cfbc7a0e6661.pdf"
+                                            ]
+                                        },
+                                        "_owner": null,
+                                        "_store": {}
+                                    }
+                                },
+                                "sx": {
+                                    "marginInlineEnd": "-1px"
+                                }
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        }
+                    ]
+                },
+                "_owner": null,
+                "_store": {}
+            },
+            "size": 2330538,
+            "index": 0,
+            "isLast": false,
+            "directory": false,
+            "sx": {
+                "& .MuiTreeItem-content": {
+                    "paddingY": "0 !important"
+                },
+                "& .MuiTreeItem-label": {
+                    "marginLeft": "-1px"
+                },
+                "& .MuiTreeItem-iconContainer": {
+                    "display": "none"
+                }
+            },
+            "children": []
+        },
+        {
+            "id": "656ce36f40c86e6d81c1a9ab_688ce5e410c1cfbc7a0e6668.pdf",
+            "parentId": "root",
+            "level": 1,
+            "path": "656ce36f40c86e6d81c1a9ab_688ce5e410c1cfbc7a0e6668.pdf",
+            "name": "656ce36f40c86e6d81c1a9ab_688ce5e410c1cfbc7a0e6668.pdf",
+            "label": {
+                "type": {
+                    "propTypes": {}
+                },
+                "key": null,
+                "ref": null,
+                "props": {
+                    "className": "item-icon",
+                    "style": {
+                        "display": "flex",
+                        "alignItems": "center",
+                        "gap": "8px",
+                        "width": "100%"
+                    },
+                    "children": [
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "muiIconName": "InsertDriveFile",
+                                "size": "18px"
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "className": "item-name",
+                                "children": ["656ce36f40c86e6d81c1a9ab_688ce5e410c1cfbc7a0e6668.pdf", " ", ""]
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "type": {
+                                "propTypes": {}
+                            },
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "sx": {
+                                    "marginInlineStart": "auto"
+                                },
+                                "children": {
+                                    "key": null,
+                                    "ref": null,
+                                    "props": {
+                                        "className": "item-size",
+                                        "children": "2.23 MB"
+                                    },
+                                    "_owner": null,
+                                    "_store": {}
+                                }
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        },
+                        {
+                            "key": null,
+                            "ref": null,
+                            "props": {
+                                "icon": "Delete",
+                                "size": "small",
+                                "tooltipProps": {
+                                    "placement": "top",
+                                    "title": {
+                                        "type": "p",
+                                        "key": null,
+                                        "ref": null,
+                                        "props": {
+                                            "style": {
+                                                "width": "max-content"
+                                            },
+                                            "children": [
+                                                "Delete ",
+                                                "file",
+                                                ":",
+                                                {
+                                                    "type": "br",
+                                                    "key": null,
+                                                    "ref": null,
+                                                    "props": {},
+                                                    "_owner": null,
+                                                    "_store": {}
+                                                },
+                                                "656ce36f40c86e6d81c1a9ab_688ce5e410c1cfbc7a0e6668.pdf"
+                                            ]
+                                        },
+                                        "_owner": null,
+                                        "_store": {}
+                                    }
+                                },
+                                "sx": {
+                                    "marginInlineEnd": "-1px"
+                                }
+                            },
+                            "_owner": null,
+                            "_store": {}
+                        }
+                    ]
+                },
+                "_owner": null,
+                "_store": {}
+            },
+            "size": 2339628,
+            "index": 0,
+            "isLast": false,
+            "directory": false,
+            "sx": {
+                "& .MuiTreeItem-content": {
+                    "paddingY": "0 !important"
+                },
+                "& .MuiTreeItem-label": {
+                    "marginLeft": "-1px"
+                },
+                "& .MuiTreeItem-iconContainer": {
+                    "display": "none"
+                }
+            },
+            "children": []
+        }
+    ]
+}
