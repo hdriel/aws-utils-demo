@@ -1,4 +1,4 @@
-import React, { memo, SyntheticEvent, useCallback } from 'react';
+import React, { forwardRef, memo, SyntheticEvent, useCallback, useImperativeHandle } from 'react';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeNodeItem } from '../../types/ui';
 import { treeViewNodeIcons } from './FilesTreeView.consts';
@@ -10,50 +10,69 @@ interface FilesTreeViewProps {
     onSelect?: (itemId: string) => void;
 }
 
-const FilesTreeView: React.FC<FilesTreeViewProps> = ({ data = null, onDeleteFileDialogOpen, onSelect }) => {
-    const renderTreeItem = useCallback(
-        (node: TreeNodeItem | null) => {
-            if (!node) return null;
-            const { children, ...restProps } = node;
+const FilesTreeView = forwardRef<{ isExpandedId: (id: string) => boolean }, FilesTreeViewProps>(
+    ({ data = null, onDeleteFileDialogOpen, onSelect }, ref) => {
+        const [expandedIds, setExpandedIds] = React.useState<string[]>(['/']);
 
-            const itemProps = {
-                itemId: restProps.path as string,
-                name: restProps.name,
-                size: restProps.size,
-                directory: restProps.directory,
-                color: restProps.color,
-                bgColor: restProps.bgColor,
-                colorForDarkMode: restProps.colorForDarkMode,
-                bgColorForDarkMode: restProps.bgColorForDarkMode,
-                iconName: restProps.iconName,
-                path: restProps.path,
-                parentId: restProps.parentId,
-            };
+        useImperativeHandle(ref, () => ({
+            isExpandedId: (id: string) => expandedIds.includes(id),
+        }));
 
-            return (
-                <CustomTreeItem key={node.id} {...itemProps} onDeleteClick={onDeleteFileDialogOpen}>
-                    {children?.map((child: TreeNodeItem) => renderTreeItem(child))}
-                </CustomTreeItem>
-            );
-        },
-        [onDeleteFileDialogOpen]
-    );
+        const renderTreeItem = useCallback(
+            (node: TreeNodeItem | null) => {
+                if (!node) return null;
+                const { children, ...restProps } = node;
 
-    const handleSelectedItemsChange = (_event: SyntheticEvent<Element, Event> | null, itemId: string | null): void => {
-        onSelect?.(itemId ?? '');
-    };
+                const itemProps = {
+                    itemId: restProps.path as string,
+                    name: restProps.name,
+                    size: restProps.size,
+                    directory: restProps.directory,
+                    color: restProps.color,
+                    bgColor: restProps.bgColor,
+                    colorForDarkMode: restProps.colorForDarkMode,
+                    bgColorForDarkMode: restProps.bgColorForDarkMode,
+                    iconName: restProps.iconName,
+                    path: restProps.path,
+                    parentId: restProps.parentId,
+                };
 
-    return (
-        <SimpleTreeView
-            aria-label="customized"
-            defaultExpandedItems={['/']}
-            slots={treeViewNodeIcons}
-            sx={{ overflowX: 'hidden', minHeight: 200, flexGrow: 1 }}
-            onSelectedItemsChange={handleSelectedItemsChange}
-        >
-            {renderTreeItem(data)}
-        </SimpleTreeView>
-    );
-};
+                return (
+                    <CustomTreeItem key={node.id} {...itemProps} onDeleteClick={onDeleteFileDialogOpen}>
+                        {children?.map((child: TreeNodeItem) => renderTreeItem(child))}
+                    </CustomTreeItem>
+                );
+            },
+            [onDeleteFileDialogOpen]
+        );
+
+        const handleSelectedItemsChange = (
+            _event: SyntheticEvent<Element, Event> | null,
+            itemId: string | null
+        ): void => {
+            onSelect?.(itemId ?? '');
+            if (itemId && !expandedIds.includes(itemId)) {
+                setExpandedIds([...expandedIds, itemId]);
+            }
+        };
+
+        const handleExpandedItemsChange = (_event: React.SyntheticEvent | null, itemIds: string[]) => {
+            setExpandedIds(itemIds);
+        };
+
+        return (
+            <SimpleTreeView
+                aria-label="customized"
+                slots={treeViewNodeIcons}
+                sx={{ overflowX: 'hidden', minHeight: 200, flexGrow: 1 }}
+                expandedItems={expandedIds}
+                onExpandedItemsChange={handleExpandedItemsChange}
+                onSelectedItemsChange={handleSelectedItemsChange}
+            >
+                {renderTreeItem(data)}
+            </SimpleTreeView>
+        );
+    }
+);
 
 export default memo(FilesTreeView);

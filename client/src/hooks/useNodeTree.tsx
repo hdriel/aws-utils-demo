@@ -27,9 +27,10 @@ const findNodeById = (node: TreeNodeItem | null, nodeId: string): TreeNodeItem |
 interface UseNodeTreeProps {
     refreshTrigger: number;
     onFolderSelect: (path: string) => void;
+    isExpandedId?: (id: string) => boolean;
 }
 
-export const useNodeTree = ({ refreshTrigger, onFolderSelect }: UseNodeTreeProps) => {
+export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: UseNodeTreeProps) => {
     const [treeData, setTreeData] = useState<TreeNodeItem | null>(null);
     const [selectedId, setSelectedId] = useState<string>();
 
@@ -52,9 +53,10 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect }: UseNodeTreeProps
 
     const loadNodeFiles = async (nodeId: string, page: number = 0) => {
         const node = findNodeById(treeData, nodeId) as TreeNodeItem;
-        debugger;
 
-        if (node?.directory) {
+        const isExpanded = node?.directory && !isExpandedId?.(nodeId);
+
+        if (node?.directory && isExpanded) {
             try {
                 const paths = node.children.map((n) => n.path);
                 const nodeData = await s3Service.listObjects(node.path, page);
@@ -76,7 +78,7 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect }: UseNodeTreeProps
                             size: isDirectory ? '' : formatFileSize(currNode.size),
                             directory: isDirectory,
                             children: [],
-                            iconName: getFileIcon(isDirectory ? '' : node.name, isDirectory),
+                            iconName: getFileIcon(isDirectory ? '' : currNode.name, isDirectory),
                         } as TreeNodeItem;
                     });
 
@@ -117,10 +119,6 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect }: UseNodeTreeProps
         }
     };
 
-    const handleNodeToggle = async (nodeId: string) => {
-        return loadNodeFiles(nodeId);
-    };
-
     const selectedNode = useMemo(() => {
         return selectedId ? findNodeById(treeData, selectedId) : null;
     }, [selectedId]);
@@ -144,7 +142,6 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect }: UseNodeTreeProps
     }, [selectedId]);
 
     return {
-        handleNodeToggle,
         loadNodeFiles,
         loadRootFiles,
         selectedNode,

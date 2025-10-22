@@ -1,4 +1,4 @@
-import { AWSCredentials, BucketInfo, ListObjectsOutput, S3ResponseFile } from '../types/aws.ts';
+import { AWSCredentials, BucketInfo, S3ResponseFile } from '../types/aws.ts';
 import axios, { Axios, AxiosProgressEvent } from 'axios';
 import qs from 'qs';
 import { AwsTreeItem, FILE_TYPE } from '../types/ui.ts';
