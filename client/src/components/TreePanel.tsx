@@ -23,15 +23,15 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
 
     const {
         expanded,
-        handleNodeToggle,
         loadNodeFiles,
         loadRootFiles,
-        selected,
         selectedNode,
         setExpanded,
         setSelected,
-        setSelectedIds,
         treeData,
+        // handleNodeToggle,
+        // selected,
+        // setSelectedIds,
     } = useNodeTree({
         openDeleteDialog: deleteDialogRef.current?.open,
         onFolderSelect,
@@ -88,30 +88,30 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
 
             <div className="tree-content">
                 <FilesTreeView data={treeData} />
-                {false && (
-                    <TreeView
-                        expandedIds={expanded}
-                        // selectedIds={selectedIds}
-                        selectedIds={['root']}
-                        fieldId="id"
-                        onExpanded={(nodeIds: string[]) => setExpanded(nodeIds)}
-                        TransitionComponent={null}
-                        nodes={treeData ? [treeData] : undefined}
-                        TreeItemComponent={IndentBorderTreeItem as unknown as React.ReactElement}
-                        {...IndentBorderTreeItemIcons}
-                        collapseIcon="FolderOpen"
-                        expandIcon="Folder"
-                        endIcon="Folder"
-                        onSelected={(nodeIds: string[]) => {
-                            setSelectedIds((state) => (state.join(',') !== nodeIds.join(',') ? nodeIds : state));
-                            const [nodeId] = nodeIds;
-                            if (nodeId !== selected || nodeId !== 'root') {
-                                setSelected(nodeId);
-                                return handleNodeToggle(nodeId);
-                            }
-                        }}
-                    />
-                )}
+                {/*{false && (*/}
+                {/*    <TreeView*/}
+                {/*        expandedIds={expanded}*/}
+                {/*        // selectedIds={selectedIds}*/}
+                {/*        selectedIds={['root']}*/}
+                {/*        fieldId="id"*/}
+                {/*        onExpanded={(nodeIds: string[]) => setExpanded(nodeIds)}*/}
+                {/*        TransitionComponent={null}*/}
+                {/*        nodes={treeData ? [treeData] : undefined}*/}
+                {/*        TreeItemComponent={IndentBorderTreeItem as unknown as React.ReactElement}*/}
+                {/*        {...IndentBorderTreeItemIcons}*/}
+                {/*        collapseIcon="FolderOpen"*/}
+                {/*        expandIcon="Folder"*/}
+                {/*        endIcon="Folder"*/}
+                {/*        onSelected={(nodeIds: string[]) => {*/}
+                {/*            setSelectedIds((state) => (state.join(',') !== nodeIds.join(',') ? nodeIds : state));*/}
+                {/*            const [nodeId] = nodeIds;*/}
+                {/*            if (nodeId !== selected || nodeId !== 'root') {*/}
+                {/*                setSelected(nodeId);*/}
+                {/*                return handleNodeToggle(nodeId);*/}
+                {/*            }*/}
+                {/*        }}*/}
+                {/*    />*/}
+                {/*)}*/}
             </div>
 
             <CreateFolderDialog

@@ -25,17 +25,18 @@ const icons = {
 
 const renderTreeItem = (node: TreeNodeItem | null) => {
     if (!node) return null;
-    const { children, icon, ...restProps } = node;
+    const { children, ...restProps } = node;
 
     const itemProps = {
-        itemId: node.id as string,
-        name: node.name,
-        size: node.size,
+        itemId: restProps.id as string,
+        name: restProps.name,
+        size: restProps.size,
+        directory: restProps.directory,
         color: restProps.color,
         bgColor: restProps.bgColor,
         colorForDarkMode: restProps.colorForDarkMode,
         bgColorForDarkMode: restProps.bgColorForDarkMode,
-        icon: icon, // Pass icon directly, not from spread
+        iconName: restProps.iconName,
     };
 
     return (

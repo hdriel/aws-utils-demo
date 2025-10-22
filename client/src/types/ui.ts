@@ -21,7 +21,7 @@ export interface TreeNodeItem {
     prefix?: string;
     path: string;
     name: string;
-    icon: any;
+    iconName: string;
     color?: string;
     bgColor?: string;
     colorForDarkMode?: string;

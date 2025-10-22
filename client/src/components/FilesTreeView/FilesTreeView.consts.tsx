@@ -3,6 +3,7 @@ import IndeterminateCheckBoxRoundedIcon from '@mui/icons-material/IndeterminateC
 import DisabledByDefaultRoundedIcon from '@mui/icons-material/DisabledByDefaultRounded';
 import AddBoxRoundedIcon from '@mui/icons-material/AddBoxRounded';
 import { styled, alpha } from '@mui/material/styles';
+import { SVGIcon } from 'mui-simple';
 import { TreeItem, treeItemClasses } from '@mui/x-tree-view/TreeItem';
 
 export const TreeItemStyled = styled(TreeItem)(({ theme }) => ({
@@ -23,13 +24,13 @@ export const TreeItemStyled = styled(TreeItem)(({ theme }) => ({
 }));
 
 export function ExpandIcon(props: React.PropsWithoutRef<typeof AddBoxRoundedIcon>) {
-    return <AddBoxRoundedIcon {...props} sx={{ opacity: 0.8 }} />;
+    return <SVGIcon muiIconName="Folder" sx={{ opacity: 0.7 }} {...props} />;
 }
 
 export function CollapseIcon(props: React.PropsWithoutRef<typeof IndeterminateCheckBoxRoundedIcon>) {
-    return <IndeterminateCheckBoxRoundedIcon {...props} sx={{ opacity: 0.8 }} />;
+    return <SVGIcon muiIconName="FolderOpen" sx={{ opacity: 0.7 }} {...props} />;
 }
 
 export function EndIcon(props: React.PropsWithoutRef<typeof DisabledByDefaultRoundedIcon>) {
-    return <DisabledByDefaultRoundedIcon {...props} sx={{ opacity: 0.3 }} />;
+    return <SVGIcon muiIconName="Folder" sx={{ opacity: 0.7 }} {...props} />;
 }

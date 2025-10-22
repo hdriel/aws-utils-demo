@@ -148,9 +148,7 @@ export const useNodeTree = ({ refreshTrigger, openDeleteDialog, onFolderSelect }
             name: root.name,
             size: isDirectory ? '' : formatFileSize(root.size),
             directory: isDirectory,
-            icon: isDirectory ? null : (
-                <SVGIcon muiIconName={getFileIcon(isDirectory ? '' : root.name)} size={'18px'} />
-            ),
+            iconName: getFileIcon(isDirectory ? '' : root.name, isDirectory),
             // sx: {
             //     '& .MuiTreeItem-content': { paddingY: '0 !important' },
             //     ...((root.type === 'file' || !root.name) && {
@@ -206,9 +204,7 @@ export const useNodeTree = ({ refreshTrigger, openDeleteDialog, onFolderSelect }
                             size: isDirectory ? '' : formatFileSize(currNode.size),
                             directory: isDirectory,
                             children: [],
-                            icon: isDirectory ? null : (
-                                <SVGIcon muiIconName={getFileIcon(isDirectory ? '' : node.name)} size={'18px'} />
-                            ),
+                            iconName: getFileIcon(isDirectory ? '' : node.name, isDirectory),
                             // sx: {
                             //     ...((currNode.type === 'file' || !currNode.name) && {
                             //         '& .MuiTreeItem-label': { marginLeft: '-5px' },

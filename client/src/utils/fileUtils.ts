@@ -18,6 +18,16 @@ export function isImageFile(filename: string): boolean {
     return imageExtensions.some((ext) => filename.toLowerCase().endsWith(ext));
 }
 
+export function isPDFFile(filename: string): boolean {
+    const imageExtensions = ['.pdf'];
+    return imageExtensions.some((ext) => filename.toLowerCase().endsWith(ext));
+}
+
+export function isSoftwareFile(filename: string): boolean {
+    const imageExtensions = ['.exe', '.msi', '.excalidraw'];
+    return imageExtensions.some((ext) => filename.toLowerCase().endsWith(ext));
+}
+
 export async function downloadFile(url: string, filename: string): Promise<void> {
     const link = document.createElement('a');
     link.href = url;
@@ -33,13 +43,18 @@ const treeItemIcon = {
     directory: 'FolderOpenTwoTone',
     video: 'PlayCircle',
     image: 'Image',
+    pdf: 'PictureAsPdf',
+    setting: 'SettingsOutlined',
 };
 
 export const getFileIcon = (filename: string, isDirectory: boolean = false) => {
-    if (!filename) return;
+    if (!filename) return '';
     if (isDirectory) return treeItemIcon.directory;
     if (isImageFile(filename)) return treeItemIcon.image;
     if (isVideoFile(filename)) return treeItemIcon.video;
+    if (isPDFFile(filename)) return treeItemIcon.pdf;
+    if (isPDFFile(filename)) return treeItemIcon.setting;
+    if (isSoftwareFile(filename)) return treeItemIcon.setting;
     return treeItemIcon.file;
 };
 

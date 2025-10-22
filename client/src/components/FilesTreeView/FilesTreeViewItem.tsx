@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { alpha, styled } from '@mui/material/styles';
+import { SVGIcon, Text } from 'mui-simple';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {
@@ -92,7 +93,6 @@ export const CustomTreeItem = React.forwardRef((props: StyledTreeItemProps, ref:
         children,
         bgColor,
         color,
-        icon: LabelIcon,
         size: labelInfo,
         colorForDarkMode,
         bgColorForDarkMode,
@@ -100,8 +100,11 @@ export const CustomTreeItem = React.forwardRef((props: StyledTreeItemProps, ref:
         path,
         directory,
         prefix,
+        iconName,
         ...other
     } = props;
+
+    const iconLabel = <SVGIcon muiIconName={iconName || 'Description'} sx={{ opacity: 0.7 }} />;
 
     const {
         getContextProviderProps,
@@ -125,7 +128,7 @@ export const CustomTreeItem = React.forwardRef((props: StyledTreeItemProps, ref:
             <CustomTreeItemRoot {...getRootProps(other)} ownerState={treeItemRootOwnerState}>
                 <CustomTreeItemContent {...getContentProps()}>
                     <CustomTreeItemIconContainer {...getIconContainerProps()}>
-                        <TreeItemIcon status={status} />
+                        {directory ? <TreeItemIcon status={status} /> : iconLabel}
                     </CustomTreeItemIconContainer>
                     <Box
                         sx={{
@@ -138,13 +141,9 @@ export const CustomTreeItem = React.forwardRef((props: StyledTreeItemProps, ref:
                             '& .MuiTreeItem-iconContainer': { display: 'none' },
                         }}
                     >
-                        {LabelIcon}
-                        <Typography
-                            {...getLabelProps({
-                                variant: 'body2',
-                                sx: { display: 'flex', fontWeight: 'inherit', flexGrow: 1 },
-                            })}
-                        />
+                        <Box sx={{ display: 'flex', fontWeight: 'inherit', flexGrow: 1 }}>
+                            <Text {...getLabelProps({ variant: 'body2' })} />
+                        </Box>
                         <Typography variant="caption" color="inherit">
                             {labelInfo}
                         </Typography>
