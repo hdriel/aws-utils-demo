@@ -9,6 +9,7 @@ interface UseFetchingListProps {
     isListEmpty: boolean;
     timeout?: number;
     mountedTimeout?: number;
+    reset?: number;
     deps?: any[];
 }
 
@@ -19,6 +20,7 @@ export const useFetchingList = ({
     isListEmpty,
     timeout,
     deps,
+    reset,
     mountedTimeout = 1000,
 }: UseFetchingListProps) => {
     const pageSelectorsRef = useRef<Record<string, { page: number; hasNext: boolean }>>({});
@@ -88,6 +90,10 @@ export const useFetchingList = ({
             observer.disconnect();
         };
     }, [directory, listItemSelector, isListEmpty, selector, ...(deps ?? [])]);
+
+    useEffect(() => {
+        pageSelectorsRef.current = {};
+    }, [reset]);
 
     return null;
 };
