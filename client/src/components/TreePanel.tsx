@@ -99,7 +99,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
             <CreateFolderDialog
                 ref={createDialogRef}
                 isNodeSelected={!!selectedNode}
-                path={selectedNode?.path ?? ''}
+                path={!selectedNode?.path || selectedNode?.path === '/' ? '' : selectedNode.path}
                 setLoading={setLoading}
                 onCreateFolder={async () => {
                     await loadRootFiles();
