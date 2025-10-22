@@ -82,7 +82,7 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
 
                         return {
                             id: currNodeId,
-                            parentId: node.path !== '/' ? node.path : 'root',
+                            parentId: node.path || '/',
                             path: currNodePath,
                             name: currNode.name,
                             size: isDirectory ? '' : formatFileSize(currNode.size),
@@ -154,7 +154,7 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
         if (selectedId) loadNodeFiles(selectedId);
     }, [selectedId]);
 
-    let parentDirectory = !selectedNode?.parentId || selectedNode?.parentId === '/' ? 'root' : selectedNode.parentId;
+    let parentDirectory = selectedNode?.parentId || '/';
     if (selectedNode?.directory && parentDirectory !== selectedNode?.path) parentDirectory = selectedNode?.path;
     const listItemSelector = `ul[role="group"] li[role="treeitem"][list-data-type="files-tree-view"][directory="${parentDirectory}"]`;
     const emptyChildren = !selectedNode?.children?.length;

@@ -114,7 +114,7 @@ export const CustomTreeItem = React.forwardRef((props: StyledTreeItemProps, ref:
         bgColorForDarkMode,
     };
 
-    const directoryPath = !parentId || parentId === '/' ? 'root' : parentId || 'root';
+    const directoryPath = parentId || '/';
 
     return (
         <TreeItemProvider {...getContextProviderProps()}>

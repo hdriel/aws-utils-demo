@@ -17,7 +17,7 @@ export const DeleteFolderOrFileDialog = forwardRef<{ open: (node?: TreeNodeItem)
 
         const handleDeleteAction = async () => {
             const nodeAction = nodeActionSelected;
-            if (!nodeAction || nodeAction?.id === 'root') return;
+            if (!nodeAction || nodeAction?.id === '/') return;
 
             setLoading(true);
             try {

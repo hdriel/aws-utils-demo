@@ -23,7 +23,7 @@ export const useFetchingList = ({
     reset,
     mountedTimeout = 1000,
 }: UseFetchingListProps) => {
-    const pageSelectorsRef = useRef<Record<string, { page: number; hasNext: boolean }>>({});
+    const pageSelectorsRef = useRef<Record<string, { page: number }>>({});
     const cbRef = useRef(cb);
     const selector = listItemSelector ? `${listItemSelector}:last-child` : '';
 
@@ -42,13 +42,8 @@ export const useFetchingList = ({
             if (entry.isIntersecting) {
                 console.log('🔴 Intersecting detected!', entry.target);
                 const page = pageSelectorsRef.current[selector].page++;
-                const totalFetchItems = await cbRef.current(page);
+                await cbRef.current(page);
                 observer.unobserve(entries[0].target);
-
-                if (!totalFetchItems) {
-                    pageSelectorsRef.current[selector].hasNext = false;
-                    return;
-                }
 
                 const effect = () => {
                     const newLastItem = document.querySelector(selector) as HTMLElement | null;
@@ -66,7 +61,7 @@ export const useFetchingList = ({
 
         const effect = () => {
             const lastItem = document.querySelector(selector) as HTMLElement | null;
-            pageSelectorsRef.current[selector] ||= { page: 1, hasNext: true };
+            pageSelectorsRef.current[selector] ||= { page: 1 };
 
             if (!lastItem) {
                 console.log('⚠️ No item to observe or no more pages');

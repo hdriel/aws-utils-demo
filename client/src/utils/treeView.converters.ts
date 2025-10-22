@@ -45,7 +45,7 @@ export const buildTreeFromFiles = (result: ListObjectsOutput, basePath: string =
 export function buildTreeData(root: AwsTreeItem, parentId: string | null = null, level = 0): TreeNodeItem | null {
     if (!root) return null;
 
-    const nodeId = !root.path || root.path === '/' ? 'root' : root.path || '/';
+    const nodeId = root.path || '/';
     const isDirectory = root.type === 'directory';
 
     return {
