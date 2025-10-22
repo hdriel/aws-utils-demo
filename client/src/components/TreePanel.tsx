@@ -55,9 +55,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                         tooltipProps={{ title: 'refresh tree' }}
                         onClick={() => {
                             setSelectedId('');
-                            setTimeout(() => {
-                                loadRootFiles();
-                            }, 500);
+                            setTimeout(() => loadRootFiles(), 500);
                         }}
                     />
                 </Box>

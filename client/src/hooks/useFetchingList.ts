@@ -31,7 +31,7 @@ export const useFetchingList = ({
 
     // Separate effect: set up IntersectionObserver ONLY after lastItem is detected
     useEffect(() => {
-        if (isListEmpty || !selector) return;
+        if (!selector) return;
         let lastInnerText: string = '';
 
         const observer = new IntersectionObserver(async (entries) => {
@@ -66,7 +66,7 @@ export const useFetchingList = ({
             const lastItem = document.querySelector(selector) as HTMLElement | null;
             pageSelectorsRef.current[selector] ||= { page: 1, hasNext: true };
 
-            if (!lastItem || !pageSelectorsRef.current[selector]?.hasNext) {
+            if (!lastItem) {
                 console.log('⚠️ No item to observe or no more pages');
                 return;
             }

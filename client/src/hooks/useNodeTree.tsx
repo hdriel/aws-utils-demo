@@ -31,9 +31,16 @@ interface UseNodeTreeProps {
     isExpandedId?: (id: string) => boolean;
 }
 
+const useRender = () => {
+    const [, render] = useState<number>(0);
+    return () => render((c) => c + 1);
+};
+
 export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: UseNodeTreeProps) => {
     const [treeData, setTreeData] = useState<TreeNodeItem | null>(null);
-    const [selectedId, setSelectedId] = useState<string>();
+    const [selectedId, setSelectedId] = useState<string>('');
+    const render = useRender();
+    const isSelectedIdExpanded = isExpandedId?.(selectedId);
 
     useEffect(() => {
         loadRootFiles();
@@ -54,7 +61,7 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
 
     const loadNodeFiles = async (nodeId: string, page: number = 0) => {
         const node = findNodeById(treeData, nodeId) as TreeNodeItem;
-        const isExpanded = node?.directory && !isExpandedId?.(nodeId);
+        const isExpanded = node?.directory && isExpandedId?.(nodeId);
 
         if (node?.directory && isExpanded) {
             try {
@@ -64,15 +71,17 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
                 const children = nodeData.children
                     .filter((n) => !paths.includes(n.path))
                     .map((currNode) => {
-                        const currNodePath =
-                            currNode.type === 'file' ? currNode.path : `${node.path ?? ''}/${currNode.path}`;
-
-                        const currNodeId = currNodePath;
                         const isDirectory = currNode.type === 'directory';
+
+                        let currNodePath = currNode.path;
+                        if (isDirectory) {
+                            currNodePath = `${node.path === '/' ? '' : (node.path ?? '')}/${currNode.path}`;
+                        }
+                        const currNodeId = currNodePath;
 
                         return {
                             id: currNodeId,
-                            parentId: node.path,
+                            parentId: node.path !== '/' ? node.path : 'root',
                             path: currNodePath,
                             name: currNode.name,
                             size: isDirectory ? '' : formatFileSize(currNode.size),
@@ -136,14 +145,17 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
     }, [selectedNode]);
 
     useEffect(() => {
-        if (selectedId) {
-            loadNodeFiles(selectedId);
-        }
+        if (selectedId) loadNodeFiles(selectedId);
+        render();
     }, [selectedId]);
 
-    const parentDirectory = !selectedNode?.parentId || selectedNode?.parentId === '/' ? 'root' : selectedNode.parentId;
+    useEffect(() => {
+        if (selectedId) loadNodeFiles(selectedId);
+    }, [selectedId]);
+
+    let parentDirectory = !selectedNode?.parentId || selectedNode?.parentId === '/' ? 'root' : selectedNode.parentId;
+    if (selectedNode?.directory && parentDirectory !== selectedNode?.path) parentDirectory = selectedNode?.path;
     const listItemSelector = `ul[role="group"] li[role="treeitem"][list-data-type="files-tree-view"][directory="${parentDirectory}"]`;
-    const expandedNode = isExpandedId?.(selectedNode?.id ?? '');
     const emptyChildren = !selectedNode?.children?.length;
 
     useFetchingList({
@@ -155,7 +167,7 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
         cb: async (page) => {
             if (selectedNode?.id) return loadNodeFiles(selectedNode.id, page);
         },
-        deps: [expandedNode],
+        deps: [isSelectedIdExpanded],
     });
 
     return {
@@ -163,7 +175,10 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
         loadRootFiles,
         selectedNode,
         selectedId,
-        setSelectedId,
+        setSelectedId: (id: string) => {
+            setSelectedId(id);
+            render();
+        },
         treeData,
     };
 };

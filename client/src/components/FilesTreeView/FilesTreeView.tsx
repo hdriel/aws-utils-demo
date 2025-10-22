@@ -13,9 +13,13 @@ interface FilesTreeViewProps {
 const FilesTreeView = forwardRef<{ isExpandedId: (id: string) => boolean }, FilesTreeViewProps>(
     ({ data = null, onDeleteFileDialogOpen, onSelect }, ref) => {
         const [expandedIds, setExpandedIds] = React.useState<string[]>(['/']);
+        console.log('expandedIds', expandedIds);
 
         useImperativeHandle(ref, () => ({
-            isExpandedId: (id: string) => expandedIds.includes(id),
+            isExpandedId: (id: string) => {
+                if (id === 'root') return expandedIds.includes('/');
+                return expandedIds.includes(id);
+            },
         }));
 
         const renderTreeItem = useCallback(
@@ -50,10 +54,11 @@ const FilesTreeView = forwardRef<{ isExpandedId: (id: string) => boolean }, File
             _event: SyntheticEvent<Element, Event> | null,
             itemId: string | null
         ): void => {
-            onSelect?.(itemId ?? '');
-            if (itemId && !expandedIds.includes(itemId)) {
-                setExpandedIds([...expandedIds, itemId]);
+            if (itemId) {
+                if (expandedIds.includes(itemId)) setExpandedIds(expandedIds.filter((id) => id !== itemId));
+                else setExpandedIds([...expandedIds, itemId]);
             }
+            setTimeout(() => onSelect?.(itemId ?? ''), 0);
         };
 
         const handleExpandedItemsChange = (_event: React.SyntheticEvent | null, itemIds: string[]) => {
