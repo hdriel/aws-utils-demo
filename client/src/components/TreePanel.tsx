@@ -22,7 +22,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
     const TreeViewRef = useRef<{ isExpandedId: (id: string) => boolean }>(null);
     const [loading, setLoading] = useState(false);
 
-    const { loadRootFiles, selectedNode, setSelectedId, treeData } = useNodeTree({
+    const { loadRootFiles, selectedNode, setSelectedId, treeData, reset, selectedId } = useNodeTree({
         isExpandedId: TreeViewRef.current?.isExpandedId,
         onFolderSelect,
         refreshTrigger,
@@ -67,6 +67,8 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                     onDeleteFileDialogOpen={deleteDialogRef.current?.open}
                     onSelect={setSelectedId}
                     ref={TreeViewRef}
+                    reset={reset}
+                    selectedId={selectedId}
                 />
                 {/*{false && (*/}
                 {/*    <TreeView*/}
@@ -111,7 +113,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                 setLoading={setLoading}
                 onDeleteCB={async () => {
                     await loadRootFiles();
-                    setSelectedId('root');
+                    setSelectedId('/');
                     onRefresh();
                 }}
             />

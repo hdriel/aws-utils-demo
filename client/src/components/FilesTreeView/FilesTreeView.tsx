@@ -1,4 +1,4 @@
-import React, { forwardRef, memo, SyntheticEvent, useCallback, useImperativeHandle } from 'react';
+import React, { forwardRef, memo, SyntheticEvent, useCallback, useEffect, useImperativeHandle } from 'react';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeNodeItem } from '../../types/ui';
 import { treeViewNodeIcons } from './FilesTreeView.consts';
@@ -8,19 +8,24 @@ interface FilesTreeViewProps {
     data?: TreeNodeItem | null;
     onDeleteFileDialogOpen?: (node: TreeNodeItem) => void;
     onSelect?: (itemId: string) => void;
+    reset?: number;
+    selectedId?: string;
 }
 
 const FilesTreeView = forwardRef<{ isExpandedId: (id: string) => boolean }, FilesTreeViewProps>(
-    ({ data = null, onDeleteFileDialogOpen, onSelect }, ref) => {
+    ({ data = null, onDeleteFileDialogOpen, onSelect, reset, selectedId }, ref) => {
         const [expandedIds, setExpandedIds] = React.useState<string[]>(['/']);
         console.log('expandedIds', expandedIds);
 
         useImperativeHandle(ref, () => ({
             isExpandedId: (id: string) => {
-                if (id === 'root') return expandedIds.includes('/');
                 return expandedIds.includes(id);
             },
         }));
+
+        useEffect(() => {
+            setExpandedIds(['/']);
+        }, [reset]);
 
         const renderTreeItem = useCallback(
             (node: TreeNodeItem | null) => {
@@ -73,6 +78,7 @@ const FilesTreeView = forwardRef<{ isExpandedId: (id: string) => boolean }, File
                 expandedItems={expandedIds}
                 onExpandedItemsChange={handleExpandedItemsChange}
                 onSelectedItemsChange={handleSelectedItemsChange}
+                selectedItems={selectedId}
             >
                 {renderTreeItem(data)}
             </SimpleTreeView>

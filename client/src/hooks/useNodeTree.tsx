@@ -39,7 +39,7 @@ const useRender = () => {
 export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: UseNodeTreeProps) => {
     const [treeData, setTreeData] = useState<TreeNodeItem | null>(null);
     const [selectedId, setSelectedId] = useState<string>('');
-    const [resetPagination, setResetPagination] = useState<number>(0);
+    const [reset, setReset] = useState<number>(0);
     const render = useRender();
     const isSelectedIdExpanded = isExpandedId?.(selectedId);
 
@@ -52,8 +52,7 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
             const result = await s3Service.listObjects();
             const data = buildTreeData(result);
             if (!data) return;
-            setResetPagination((c) => c + 1);
-
+            setReset((c) => c + 1);
             setTreeData(data);
             setSelectedId(data.id);
         } catch (error) {
@@ -167,9 +166,9 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
         timeout: 500,
         mountedTimeout: 1000,
         deps: [isSelectedIdExpanded],
-        reset: resetPagination,
+        reset,
         cb: async (page) => {
-            if (selectedNode?.id) return loadNodeFiles(selectedNode.id, page);
+            if (selectedId) return loadNodeFiles(selectedId, page);
         },
     });
 
@@ -178,6 +177,7 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
         loadRootFiles,
         selectedNode,
         selectedId,
+        reset,
         setSelectedId: (id: string) => {
             setSelectedId(id);
             render();
