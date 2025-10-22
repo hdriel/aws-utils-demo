@@ -12,6 +12,7 @@
         "docker:localstack": "cross-env NODE_ENV=localhost && docker-compose -f docker-compose.localstack.yml --env-file server/.env.local up -d --build",
         "docker:localstack:down": "docker-compose -f docker-compose.localstack.yml down",
         "docker:full": "cross-env NODE_ENV=localhost && docker-compose -f docker-compose.yml --env-file server/.env.local up -d --build",
+        "podman:full": "cross-env NODE_ENV=localhost && podman compose -f docker-compose.yml --env-file server/.env.local up -d --build",
         "docker:full:down": "docker-compose -f docker-compose.yml down"
     },
     "devDependencies": {

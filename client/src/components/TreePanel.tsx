@@ -87,7 +87,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
             </div>
 
             <div className="tree-content">
-                <FilesTreeView />
+                <FilesTreeView data={treeData} />
                 {false && (
                     <TreeView
                         expandedIds={expanded}

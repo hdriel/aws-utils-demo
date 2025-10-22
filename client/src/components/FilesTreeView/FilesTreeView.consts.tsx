@@ -5,7 +5,7 @@ import AddBoxRoundedIcon from '@mui/icons-material/AddBoxRounded';
 import { styled, alpha } from '@mui/material/styles';
 import { TreeItem, treeItemClasses } from '@mui/x-tree-view/TreeItem';
 
-export const CustomTreeItem = styled(TreeItem)(({ theme }) => ({
+export const TreeItemStyled = styled(TreeItem)(({ theme }) => ({
     [`& .${treeItemClasses.content}`]: {
         padding: theme.spacing(0.5, 1),
         margin: theme.spacing(0.2, 0),

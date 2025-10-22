@@ -138,26 +138,26 @@ export const useNodeTree = ({ refreshTrigger, openDeleteDialog, onFolderSelect }
         if (!root) return null;
 
         const nodeId = !root.path || root.path === '/' ? 'root' : root.path || '/';
-        const label = buildNodeLabel(root, nodeId, root.path, parentId || 'root', { paddingDeleteAction: '-1px' });
+        // const label = buildNodeLabel(root, nodeId, root.path, parentId || 'root', { paddingDeleteAction: '-1px' });
+        const isDirectory = root.type === 'directory';
 
         return {
             id: nodeId,
             parentId,
-            level,
             path: root.path,
             name: root.name,
-            label,
-            size: root.size,
-            index: root.index ?? 0,
-            isLast: root.isLast ?? false,
-            directory: root.type === 'directory',
-            sx: {
-                '& .MuiTreeItem-content': { paddingY: '0 !important' },
-                ...((root.type === 'file' || !root.name) && {
-                    '& .MuiTreeItem-label': { marginLeft: '-1px' },
-                    '& .MuiTreeItem-iconContainer': { display: 'none' },
-                }),
-            },
+            size: isDirectory ? '' : formatFileSize(root.size),
+            directory: isDirectory,
+            icon: isDirectory ? null : (
+                <SVGIcon muiIconName={getFileIcon(isDirectory ? '' : root.name)} size={'18px'} />
+            ),
+            // sx: {
+            //     '& .MuiTreeItem-content': { paddingY: '0 !important' },
+            //     ...((root.type === 'file' || !root.name) && {
+            //         '& .MuiTreeItem-label': { marginLeft: '-1px' },
+            //         '& .MuiTreeItem-iconContainer': { display: 'none' },
+            //     }),
+            // },
             children: root.children
                 ?.map((node) => buildTreeData(node, nodeId, level + 1))
                 .filter((v) => v) as TreeNodeItem[],
@@ -189,31 +189,32 @@ export const useNodeTree = ({ refreshTrigger, openDeleteDialog, onFolderSelect }
 
                 const children = nodeData.children
                     .filter((n) => !paths.includes(n.path))
-                    .map((currNode, index, arr) => {
+                    .map((currNode) => {
                         const currNodePath =
                             currNode.type === 'file' ? currNode.path : `${node.path ?? ''}/${currNode.path}`;
 
                         const currNodeId = currNodePath;
-                        const label = buildNodeLabel(currNode, nodeId, currNodePath, node.id);
+                        // const label = buildNodeLabel(currNode, nodeId, currNodePath, currNodeId);
+                        const isDirectory = currNode.type === 'directory';
 
                         return {
                             id: currNodeId,
-                            parentId: node.id,
-                            level: node.level + 1,
+                            parentId: node.path,
                             path: currNodePath,
                             name: currNode.name,
-                            label,
-                            size: currNode.size,
-                            directory: currNode.type === 'directory',
+                            // label,
+                            size: isDirectory ? '' : formatFileSize(currNode.size),
+                            directory: isDirectory,
                             children: [],
-                            sx: {
-                                ...((currNode.type === 'file' || !currNode.name) && {
-                                    '& .MuiTreeItem-label': { marginLeft: '-5px' },
-                                    '& .MuiTreeItem-iconContainer': { display: 'none' },
-                                }),
-                            },
-                            index,
-                            isLast: index === arr.length - 1,
+                            icon: isDirectory ? null : (
+                                <SVGIcon muiIconName={getFileIcon(isDirectory ? '' : node.name)} size={'18px'} />
+                            ),
+                            // sx: {
+                            //     ...((currNode.type === 'file' || !currNode.name) && {
+                            //         '& .MuiTreeItem-label': { marginLeft: '-5px' },
+                            //         '& .MuiTreeItem-iconContainer': { display: 'none' },
+                            //     }),
+                            // },
                         } as TreeNodeItem;
                     });
 

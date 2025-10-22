@@ -18,6 +18,7 @@ const theme = createTheme({
 
 function App() {
     const [loading, setIsLoading] = useState(true);
+    // const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [bucketName, setBucketName] = useState('');
     const [bucketAccess, setBucketAccess] = useState<'private' | 'public'>('private');
