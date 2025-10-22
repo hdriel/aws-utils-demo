@@ -15,7 +15,6 @@ interface FilesTreeViewProps {
 const FilesTreeView = forwardRef<{ isExpandedId: (id: string) => boolean }, FilesTreeViewProps>(
     ({ data = null, onDeleteFileDialogOpen, onSelect, reset, selectedId }, ref) => {
         const [expandedIds, setExpandedIds] = React.useState<string[]>(['/']);
-        console.log('expandedIds', expandedIds);
 
         useImperativeHandle(ref, () => ({
             isExpandedId: (id: string) => {
@@ -47,6 +46,8 @@ const FilesTreeView = forwardRef<{ isExpandedId: (id: string) => boolean }, File
                 };
 
                 return (
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
                     <CustomTreeItem key={node.id} {...itemProps} onDeleteClick={onDeleteFileDialogOpen}>
                         {children?.map((child: TreeNodeItem) => renderTreeItem(child))}
                     </CustomTreeItem>

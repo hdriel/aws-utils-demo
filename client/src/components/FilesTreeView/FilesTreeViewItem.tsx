@@ -33,6 +33,7 @@ type CustomTreeItemRootOwnerState = Pick<
 
 const CustomTreeItemRoot = styled(TreeItemRoot)<{
     ownerState: CustomTreeItemRootOwnerState;
+    directory: string;
 }>(({ theme, ownerState }) => ({
     '--tree-view-color': ownerState.color,
     '--tree-view-bg-color': ownerState.bgColor,

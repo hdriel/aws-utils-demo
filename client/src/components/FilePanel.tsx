@@ -62,14 +62,14 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
         }
     };
 
-    // useFetchingList({
-    //     directory: currentPath === '/' ? '' : currentPath,
-    //     listItemSelector: '.file-item',
-    //     timeout: 1000,
-    //     mountedTimeout: 1000,
-    //     cb: async (page) => loadFiles(page),
-    //     isListEmpty: !files.length,
-    // });
+    useFetchingList({
+        directory: currentPath === '/' ? '' : currentPath,
+        listItemSelector: '.file-item',
+        timeout: 1000,
+        mountedTimeout: 1000,
+        cb: async (page) => loadFiles(page),
+        isListEmpty: !files.length,
+    });
 
     const uploadSectionCmp = (
         <UploadFilesSection

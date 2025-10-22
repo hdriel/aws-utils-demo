@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { Box } from '@mui/material';
-// import {  Button, Typography, SVGIcon, TreeView, IndentBorderTreeItemIcons, IndentBorderTreeItem } from 'mui-simple';
 import { Button, Typography, SVGIcon } from 'mui-simple';
 import '../styles/treeView.scss';
 import { TreeNodeItem } from '../types/ui';
@@ -28,7 +27,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
         refreshTrigger,
     });
 
-    console.log('treeData', treeData);
+    console.debug('treeData', treeData);
 
     return (
         <div className="tree-panel">
@@ -70,30 +69,6 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                     reset={reset}
                     selectedId={selectedId}
                 />
-                {/*{false && (*/}
-                {/*    <TreeView*/}
-                {/*        expandedIds={expanded}*/}
-                {/*        // selectedIds={selectedIds}*/}
-                {/*        selectedIds={['root']}*/}
-                {/*        fieldId="id"*/}
-                {/*        onExpanded={(nodeIds: string[]) => setExpanded(nodeIds)}*/}
-                {/*        TransitionComponent={null}*/}
-                {/*        nodes={treeData ? [treeData] : undefined}*/}
-                {/*        TreeItemComponent={IndentBorderTreeItem as unknown as React.ReactElement}*/}
-                {/*        {...IndentBorderTreeItemIcons}*/}
-                {/*        collapseIcon="FolderOpen"*/}
-                {/*        expandIcon="Folder"*/}
-                {/*        endIcon="Folder"*/}
-                {/*        onSelected={(nodeIds: string[]) => {*/}
-                {/*            setSelectedIds((state) => (state.join(',') !== nodeIds.join(',') ? nodeIds : state));*/}
-                {/*            const [nodeId] = nodeIds;*/}
-                {/*            if (nodeId !== selected || nodeId !== 'root') {*/}
-                {/*                setSelected(nodeId);*/}
-                {/*                return handleNodeToggle(nodeId);*/}
-                {/*            }*/}
-                {/*        }}*/}
-                {/*    />*/}
-                {/*)}*/}
             </div>
 
             <CreateFolderDialog
