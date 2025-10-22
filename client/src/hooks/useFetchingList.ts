@@ -41,6 +41,7 @@ export const useFetchingList = ({
 
             if (entry.isIntersecting) {
                 console.log('🔴 Intersecting detected!', entry.target);
+                pageSelectorsRef.current[selector] ||= { page: 1 };
                 const page = pageSelectorsRef.current[selector].page++;
                 await cbRef.current(page);
                 observer.unobserve(entries[0].target);

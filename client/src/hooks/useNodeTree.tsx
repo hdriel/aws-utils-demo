@@ -163,7 +163,7 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
         directory: selectedNode?.path as string,
         listItemSelector,
         isListEmpty: emptyChildren,
-        timeout: 500,
+        timeout: 1500,
         mountedTimeout: 1000,
         deps: [isSelectedIdExpanded],
         reset,

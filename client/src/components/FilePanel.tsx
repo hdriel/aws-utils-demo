@@ -27,6 +27,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
     const [pinnedActions, setPinnedActions] = useState(largeLayout);
     const [files, setFiles] = useState<S3File[]>([]);
     const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
+    const [reset, setReset] = useState<number>(0);
 
     useEffect(() => {
         loadFiles();
@@ -49,6 +50,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
                 lastModified: new Date(file.LastModified),
                 type: 'file',
             }));
+
             setFiles((prevFiles) => (page ? [...prevFiles, ...loadedFiles] : loadedFiles));
 
             if (selectedFiles.size !== 0) {
@@ -62,13 +64,18 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
         }
     };
 
+    useEffect(() => {
+        setReset((c) => c + 1);
+    }, [currentPath]);
+
     useFetchingList({
-        directory: currentPath === '/' ? '' : currentPath,
-        listItemSelector: '.file-item',
-        timeout: 1000,
+        directory: currentPath,
+        listItemSelector: `.file-item[file-directory="${currentPath}"]`,
+        timeout: 1500,
         mountedTimeout: 1000,
         cb: async (page) => loadFiles(page),
         isListEmpty: !files.length,
+        reset,
     });
 
     const uploadSectionCmp = (
@@ -83,6 +90,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
 
     const fileListSectionCmp = (
         <FileListSelectionSection
+            directory={currentPath}
             flatPanels={flatPanels}
             pinnedActions={pinnedActions}
             selectedFiles={selectedFiles}

@@ -5,6 +5,7 @@ import { formatFileSize, getFileIcon } from '../utils/fileUtils.ts';
 import { S3File } from '../types/aws.ts';
 
 interface Props {
+    directory: string;
     pinnedActions: boolean;
     flatPanels: boolean;
     files: S3File[];
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export const FileListSelectionSection: React.FC<Props> = ({
+    directory,
     flatPanels,
     pinnedActions,
     files,
@@ -64,6 +66,7 @@ export const FileListSelectionSection: React.FC<Props> = ({
                         key={file.id}
                         className={`file-item ${selectedFiles.has(file.key) ? 'selected' : ''}`}
                         onClick={() => handleFileSelect(file.key)}
+                        file-directory={directory}
                     >
                         <Box className="file-info">
                             <Checkbox
