@@ -1,6 +1,8 @@
 import { ListObjectsOutput, S3ResponseFile } from '../types/aws.ts';
 import { AwsTreeItem, TreeNodeItem } from '../types/ui.ts';
 import { formatFileSize, getFileIcon } from './fileUtils.ts';
+import randomColor from '../utils/random-color.ts';
+import { darken } from '@mui/material';
 
 export const buildTreeFromFiles = (result: ListObjectsOutput, basePath: string = ''): AwsTreeItem => {
     const { files, directories } = result;
@@ -42,11 +44,17 @@ export const buildTreeFromFiles = (result: ListObjectsOutput, basePath: string =
     };
 };
 
-export function buildTreeData(root: AwsTreeItem, parentId: string | null = null, level = 0): TreeNodeItem | null {
+export function buildTreeData(
+    root: AwsTreeItem,
+    parentId: string | null = null,
+    level = 0,
+    color: string = ''
+): TreeNodeItem | null {
     if (!root) return null;
 
     const nodeId = root.path || '/';
     const isDirectory = root.type === 'directory';
+    const directoryColor = color || darken(randomColor(), 0.25);
 
     return {
         id: nodeId,
@@ -56,8 +64,9 @@ export function buildTreeData(root: AwsTreeItem, parentId: string | null = null,
         size: isDirectory ? '' : formatFileSize(root.size),
         directory: isDirectory,
         iconName: getFileIcon(isDirectory ? '' : root.name, isDirectory),
+        color: directoryColor,
         children: root.children
-            ?.map((node) => buildTreeData(node, nodeId, level + 1))
+            ?.map((node) => buildTreeData(node, nodeId, level + 1, node.type === 'directory' ? '' : directoryColor))
             .filter((v) => v) as TreeNodeItem[],
     };
 }

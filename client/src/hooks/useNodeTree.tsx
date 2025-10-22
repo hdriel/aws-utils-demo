@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { s3Service } from '../services/s3Service.ts';
-import { TreeNodeItem } from '../types/ui.ts';
-import { formatFileSize, getFileIcon } from '../utils/fileUtils.ts';
-import { buildTreeData } from '../utils/treeView.converters.ts';
-import { useFetchingList } from './useFetchingList.ts';
+import randomColor from '../utils/random-color';
+import { darken } from '@mui/material';
+import { s3Service } from '../services/s3Service';
+import { TreeNodeItem } from '../types/ui';
+import { formatFileSize, getFileIcon } from '../utils/fileUtils';
+import { buildTreeData } from '../utils/treeView.converters';
+import { useFetchingList } from './useFetchingList';
 
 const findNodeById = (node: TreeNodeItem | null, nodeId: string): TreeNodeItem | null => {
     if (!node) return null;
@@ -79,6 +81,7 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
                             currNodePath = `${node.path === '/' ? '' : (node.path ?? '')}/${currNode.path}`;
                         }
                         const currNodeId = currNodePath;
+                        const directoryColor = isDirectory ? darken(randomColor(), 1) : node.color;
 
                         return {
                             id: currNodeId,
@@ -87,6 +90,7 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
                             name: currNode.name,
                             size: isDirectory ? '' : formatFileSize(currNode.size),
                             directory: isDirectory,
+                            color: directoryColor,
                             iconName: getFileIcon(isDirectory ? '' : currNode.name, isDirectory),
                             children: [],
                         } as TreeNodeItem;

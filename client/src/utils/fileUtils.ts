@@ -48,8 +48,8 @@ const treeItemIcon = {
 };
 
 export const getFileIcon = (filename: string, isDirectory: boolean = false) => {
-    if (!filename) return '';
     if (isDirectory) return treeItemIcon.directory;
+    if (!filename) return '';
     if (isImageFile(filename)) return treeItemIcon.image;
     if (isVideoFile(filename)) return treeItemIcon.video;
     if (isPDFFile(filename)) return treeItemIcon.pdf;

@@ -12,7 +12,7 @@ import {
 } from '@mui/x-tree-view/TreeItem';
 import { useTreeItem, UseTreeItemParameters } from '@mui/x-tree-view/useTreeItem';
 import { TreeItemProvider } from '@mui/x-tree-view/TreeItemProvider';
-import { TreeItemIcon } from '@mui/x-tree-view/TreeItemIcon';
+// import { TreeItemIcon } from '@mui/x-tree-view/TreeItemIcon';
 import { TreeNodeItem } from '../../types/ui';
 
 declare module 'react' {
@@ -105,7 +105,7 @@ export const CustomTreeItem = React.forwardRef((props: StyledTreeItemProps, ref:
         getIconContainerProps,
         getLabelProps,
         getGroupTransitionProps,
-        status,
+        // status,
     } = useTreeItem({ id, itemId, children, label, disabled, rootRef: ref });
 
     const treeItemRootOwnerState = {
@@ -116,6 +116,8 @@ export const CustomTreeItem = React.forwardRef((props: StyledTreeItemProps, ref:
     };
 
     const directoryPath = parentId || '/';
+    // const iconContainer = directory ? <TreeItemIcon status={status} /> : React.cloneElement(iconLabel, { color });
+    const iconContainer = React.cloneElement(iconLabel, { color });
 
     return (
         <TreeItemProvider {...getContextProviderProps()}>
@@ -128,7 +130,7 @@ export const CustomTreeItem = React.forwardRef((props: StyledTreeItemProps, ref:
             >
                 <CustomTreeItemContent {...getContentProps()}>
                     <CustomTreeItemIconContainer {...getIconContainerProps()}>
-                        {directory ? <TreeItemIcon status={status} /> : iconLabel}
+                        {iconContainer}
                     </CustomTreeItemIconContainer>
                     <Box
                         sx={{
@@ -140,10 +142,10 @@ export const CustomTreeItem = React.forwardRef((props: StyledTreeItemProps, ref:
                         }}
                     >
                         <Box sx={{ display: 'flex', fontWeight: 'inherit', flexGrow: 1 }}>
-                            <Text {...getLabelProps({ variant: 'body2' })} />
+                            <Text {...getLabelProps({ variant: 'body2' })} color={color || 'inherit'} />
                         </Box>
 
-                        <Typography variant="caption" color="inherit">
+                        <Typography variant="caption" color={color || 'inherit'}>
                             {labelInfo}
                         </Typography>
 
@@ -152,6 +154,7 @@ export const CustomTreeItem = React.forwardRef((props: StyledTreeItemProps, ref:
                                 icon="DeleteForever"
                                 size="small"
                                 padding={'0 5px'}
+                                color={color || 'inherit'}
                                 onClick={() => onDeleteClick?.(props)}
                             />
                         ) : (
@@ -159,6 +162,7 @@ export const CustomTreeItem = React.forwardRef((props: StyledTreeItemProps, ref:
                                 icon="Delete"
                                 size="small"
                                 padding={'0 5px'}
+                                color={color || 'inherit'}
                                 onClick={() => onDeleteClick?.(props)}
                             />
                         )}
