@@ -3,6 +3,7 @@ import { s3Service } from '../services/s3Service.ts';
 import { TreeNodeItem } from '../types/ui.ts';
 import { formatFileSize, getFileIcon } from '../utils/fileUtils.ts';
 import { buildTreeData } from '../utils/treeView.converters.ts';
+import { useFetchingList } from './useFetchingList.ts';
 
 const findNodeById = (node: TreeNodeItem | null, nodeId: string): TreeNodeItem | null => {
     if (!node) return null;
@@ -53,7 +54,6 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
 
     const loadNodeFiles = async (nodeId: string, page: number = 0) => {
         const node = findNodeById(treeData, nodeId) as TreeNodeItem;
-
         const isExpanded = node?.directory && !isExpandedId?.(nodeId);
 
         if (node?.directory && isExpanded) {
@@ -77,8 +77,8 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
                             name: currNode.name,
                             size: isDirectory ? '' : formatFileSize(currNode.size),
                             directory: isDirectory,
-                            children: [],
                             iconName: getFileIcon(isDirectory ? '' : currNode.name, isDirectory),
+                            children: [],
                         } as TreeNodeItem;
                     });
 
@@ -140,6 +140,25 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
             loadNodeFiles(selectedId);
         }
     }, [selectedId]);
+
+    const parentDirectory = !selectedNode?.parentId || selectedNode?.parentId === '/' ? 'root' : selectedNode.parentId;
+    const listItemSelector = `li[role="treeitem"][directory="${parentDirectory}"]`;
+    const expandedNode = isExpandedId?.(selectedNode?.id ?? '');
+    const emptyChildren = !selectedNode?.children?.length;
+
+    console.log(listItemSelector);
+
+    useFetchingList({
+        directory: selectedNode?.path as string,
+        listItemSelector,
+        isListEmpty: emptyChildren || !expandedNode,
+        timeout: 1000,
+        mountedTimeout: 2000,
+        cb: async (page) => {
+            debugger;
+            if (selectedNode?.id) return loadNodeFiles(selectedNode.id, page);
+        },
+    });
 
     return {
         loadNodeFiles,

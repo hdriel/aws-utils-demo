@@ -4,7 +4,6 @@ import { Box } from '@mui/material';
 import { Button, Typography, SVGIcon } from 'mui-simple';
 import '../styles/treeView.scss';
 import { TreeNodeItem } from '../types/ui';
-import { useFetchingList } from '../hooks/useFetchingList.ts';
 import { CreateFolderDialog } from '../dialogs/CreateFolderDialog.tsx';
 import { DeleteFolderOrFileDialog } from '../dialogs/DeleteFolderOrFileDialog.tsx';
 import { useNodeTree } from '../hooks/useNodeTree.tsx';
@@ -21,25 +20,12 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
     const deleteDialogRef = useRef<{ open: (node?: TreeNodeItem) => void }>(null);
     const createDialogRef = useRef<{ open: () => void }>(null);
     const TreeViewRef = useRef<{ isExpandedId: (id: string) => boolean }>(null);
-
     const [loading, setLoading] = useState(false);
 
-    const { loadNodeFiles, loadRootFiles, selectedNode, setSelectedId, treeData } = useNodeTree({
+    const { loadRootFiles, selectedNode, setSelectedId, treeData } = useNodeTree({
         isExpandedId: TreeViewRef.current?.isExpandedId,
         onFolderSelect,
         refreshTrigger,
-    });
-
-    useFetchingList({
-        directory: selectedNode?.path as string,
-        // todo: need to put in the list some intensifier on the sub list group to pull nested directory by pulling scrollable
-        listItemSelector: `li.MuiTreeItem-root[role="treeitem"][parentid="${!selectedNode?.parentId || selectedNode?.parentId === '/' ? 'root' : selectedNode.parentId}"]`,
-        isListEmpty: !selectedNode?.children?.length,
-        timeout: 1000,
-        mountedTimeout: 2000,
-        cb: async (page) => {
-            if (selectedNode?.id) return loadNodeFiles(selectedNode.id, page);
-        },
     });
 
     console.log('treeData', treeData);

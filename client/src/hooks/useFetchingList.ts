@@ -38,6 +38,7 @@ export const useFetchingList = ({
             const entry = entries[0];
 
             if (entry.isIntersecting) {
+                console.log('🔴 Intersecting detected!', entry.target);
                 const page = pageSelectorsRef.current[selector].page++;
                 const totalFetchItems = await cbRef.current(page);
                 observer.unobserve(entries[0].target);
@@ -63,6 +64,8 @@ export const useFetchingList = ({
         const effect = () => {
             const lastItem = document.querySelector(selector) as HTMLElement | null;
             pageSelectorsRef.current[selector] ||= { page: 1, hasNext: true };
+
+            // console.log('🟢 Found items:', allItems.length, 'Last item:', newLastItem);
 
             if (!lastItem || !pageSelectorsRef.current[selector].hasNext) return;
 
