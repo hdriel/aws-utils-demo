@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import randomColor from '../utils/random-color';
-import { darken } from '@mui/material';
+import { darken, lighten } from '@mui/material';
 import { s3Service } from '../services/s3Service';
 import { TreeNodeItem } from '../types/ui';
 import { formatFileSize, getFileIcon } from '../utils/fileUtils';
@@ -91,6 +91,7 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
                             size: isDirectory ? '' : formatFileSize(currNode.size),
                             directory: isDirectory,
                             color: directoryColor,
+                            bgColor: directoryColor && lighten(directoryColor, 0.7),
                             iconName: getFileIcon(isDirectory ? '' : currNode.name, isDirectory),
                             children: [],
                         } as TreeNodeItem;

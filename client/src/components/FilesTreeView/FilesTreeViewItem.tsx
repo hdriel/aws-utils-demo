@@ -58,7 +58,7 @@ const CustomTreeItemRoot = styled(TreeItemRoot)<{
 
 const CustomTreeItemContent = styled(TreeItemContent)(({ theme }) => ({
     color: (theme.vars || theme).palette.text.secondary,
-    paddingLeft: `calc(${theme.spacing(1)} + var(--TreeView-itemChildrenIndentation) * var(--TreeView-itemDepth) * 1)`,
+    paddingLeft: `calc(${theme.spacing(1)} + var(--TreeView-itemChildrenIndentation) * var(--TreeView-itemDepth) * 0)`,
     fontWeight: theme.typography.fontWeightMedium,
     '&[data-expanded]': {
         fontWeight: theme.typography.fontWeightRegular,
