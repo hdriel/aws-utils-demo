@@ -10,10 +10,11 @@ interface FilesTreeViewProps {
     onSelect?: (itemId: string) => void;
     reset?: number;
     selectedId?: string;
+    colorize?: boolean;
 }
 
 const FilesTreeView = forwardRef<{ isExpandedId: (id: string) => boolean }, FilesTreeViewProps>(
-    ({ data = null, onDeleteFileDialogOpen, onSelect, reset, selectedId }, ref) => {
+    ({ data = null, onDeleteFileDialogOpen, onSelect, reset, selectedId, colorize }, ref) => {
         const [expandedIds, setExpandedIds] = React.useState<string[]>(['/']);
 
         useImperativeHandle(ref, () => ({
@@ -36,13 +37,15 @@ const FilesTreeView = forwardRef<{ isExpandedId: (id: string) => boolean }, File
                     name: restProps.name,
                     size: restProps.size,
                     directory: restProps.directory,
-                    color: restProps.color,
-                    bgColor: restProps.bgColor,
-                    colorForDarkMode: restProps.colorForDarkMode,
-                    bgColorForDarkMode: restProps.bgColorForDarkMode,
                     iconName: restProps.iconName,
                     path: restProps.path,
                     parentId: restProps.parentId,
+                    ...(colorize && {
+                        color: restProps.color,
+                        bgColor: restProps.bgColor,
+                        colorForDarkMode: restProps.colorForDarkMode,
+                        bgColorForDarkMode: restProps.bgColorForDarkMode,
+                    }),
                 };
 
                 return (

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Box } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { Button, Typography, SVGIcon } from 'mui-simple';
 import '../styles/treeView.scss';
 import { TreeNodeItem } from '../types/ui';
@@ -19,6 +19,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
     const deleteDialogRef = useRef<{ open: (node?: TreeNodeItem) => void }>(null);
     const createDialogRef = useRef<{ open: () => void }>(null);
     const TreeViewRef = useRef<{ isExpandedId: (id: string) => boolean }>(null);
+    const [colorize, setColorize] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const { loadRootFiles, selectedNode, setSelectedId, treeData, reset, selectedId } = useNodeTree({
@@ -47,21 +48,32 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                         onClick={() => createDialogRef.current?.open()}
                     />
 
-                    <Button
-                        variant="outlined"
-                        size="small"
-                        icon="Refresh"
-                        tooltipProps={{ title: 'refresh tree' }}
-                        onClick={() => {
-                            setSelectedId('');
-                            setTimeout(() => loadRootFiles(), 500);
-                        }}
-                    />
+                    <Stack direction="row" spacing={0}>
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            icon="Palette"
+                            color={colorize ? 'primary' : undefined}
+                            tooltipProps={{ title: 'colorize tree' }}
+                            onClick={() => setColorize((v) => !v)}
+                        />
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            icon="Refresh"
+                            tooltipProps={{ title: 'refresh tree' }}
+                            onClick={() => {
+                                setSelectedId('');
+                                setTimeout(() => loadRootFiles(), 500);
+                            }}
+                        />
+                    </Stack>
                 </Box>
             </div>
 
             <div className="tree-content">
                 <FilesTreeView
+                    colorize={colorize}
                     data={treeData}
                     onDeleteFileDialogOpen={deleteDialogRef.current?.open}
                     onSelect={setSelectedId}
