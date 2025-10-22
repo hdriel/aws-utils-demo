@@ -19,4 +19,4 @@ export const getProjectEnvVariables = (): ProjectEnvVariablesType => {
     return env;
 };
 
-console.table(getProjectEnvVariables());
+// console.table(getProjectEnvVariables());

@@ -23,7 +23,7 @@ export const useFetchingList = ({
 }: UseFetchingListProps) => {
     const pageSelectorsRef = useRef<Record<string, { page: number; hasNext: boolean }>>({});
     const cbRef = useRef(cb);
-    const selector = `${listItemSelector}:last-child`;
+    const selector = listItemSelector ? `${listItemSelector}:last-child` : '';
 
     useEffect(() => {
         cbRef.current = cb;
@@ -31,7 +31,7 @@ export const useFetchingList = ({
 
     // Separate effect: set up IntersectionObserver ONLY after lastItem is detected
     useEffect(() => {
-        if (isListEmpty || !listItemSelector) return;
+        if (isListEmpty || !selector) return;
         let lastInnerText: string = '';
 
         const observer = new IntersectionObserver(async (entries) => {
@@ -50,6 +50,7 @@ export const useFetchingList = ({
 
                 const effect = () => {
                     const newLastItem = document.querySelector(selector) as HTMLElement | null;
+
                     if (newLastItem && newLastItem.innerText !== lastInnerText) {
                         lastInnerText = newLastItem.innerText;
                         observer.observe(newLastItem);
@@ -65,12 +66,16 @@ export const useFetchingList = ({
             const lastItem = document.querySelector(selector) as HTMLElement | null;
             pageSelectorsRef.current[selector] ||= { page: 1, hasNext: true };
 
-            // console.log('🟢 Found items:', allItems.length, 'Last item:', newLastItem);
+            if (!lastItem || !pageSelectorsRef.current[selector]?.hasNext) {
+                console.log('⚠️ No item to observe or no more pages');
+                return;
+            }
 
-            if (!lastItem || !pageSelectorsRef.current[selector].hasNext) return;
+            console.log('🔵 Initial setup - Found Last item:', lastItem);
 
             lastInnerText = lastItem.innerText;
             observer.observe(lastItem);
+            console.log('🔵 Started observing:', lastItem);
         };
 
         if (timeout) {

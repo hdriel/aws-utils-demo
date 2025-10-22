@@ -142,22 +142,20 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
     }, [selectedId]);
 
     const parentDirectory = !selectedNode?.parentId || selectedNode?.parentId === '/' ? 'root' : selectedNode.parentId;
-    const listItemSelector = `li[role="treeitem"][directory="${parentDirectory}"]`;
+    const listItemSelector = `ul[role="group"] li[role="treeitem"][list-data-type="files-tree-view"][directory="${parentDirectory}"]`;
     const expandedNode = isExpandedId?.(selectedNode?.id ?? '');
     const emptyChildren = !selectedNode?.children?.length;
-
-    console.log(listItemSelector);
 
     useFetchingList({
         directory: selectedNode?.path as string,
         listItemSelector,
-        isListEmpty: emptyChildren || !expandedNode,
-        timeout: 1000,
-        mountedTimeout: 2000,
+        isListEmpty: emptyChildren,
+        timeout: 500,
+        mountedTimeout: 1000,
         cb: async (page) => {
-            debugger;
             if (selectedNode?.id) return loadNodeFiles(selectedNode.id, page);
         },
+        deps: [expandedNode],
     });
 
     return {

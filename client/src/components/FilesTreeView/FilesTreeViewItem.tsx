@@ -31,8 +31,6 @@ type CustomTreeItemRootOwnerState = Pick<
     'color' | 'bgColor' | 'bgColorForDarkMode' | 'colorForDarkMode'
 >;
 
-console.log('treeItemClasses.groupTransition', treeItemClasses.groupTransition);
-
 const CustomTreeItemRoot = styled(TreeItemRoot)<{
     ownerState: CustomTreeItemRootOwnerState;
 }>(({ theme, ownerState }) => ({
@@ -116,13 +114,16 @@ export const CustomTreeItem = React.forwardRef((props: StyledTreeItemProps, ref:
         bgColorForDarkMode,
     };
 
+    const directoryPath = !parentId || parentId === '/' ? 'root' : parentId || 'root';
+
     return (
         <TreeItemProvider {...getContextProviderProps()}>
             <CustomTreeItemRoot
                 {...getRootProps(other)}
                 ownerState={treeItemRootOwnerState}
                 id={path}
-                directory={parentId ?? 'root'}
+                directory={directoryPath}
+                list-data-type={'files-tree-view'}
             >
                 <CustomTreeItemContent {...getContentProps()}>
                     <CustomTreeItemIconContainer {...getIconContainerProps()}>

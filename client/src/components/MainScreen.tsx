@@ -60,11 +60,11 @@ const MainScreen: React.FC<MainScreenProps> = ({ bucketName, isPublicBucket, onL
                         minSize={mobileLayout ? 35 : 50}
                         style={{ width: '100%', height: '100%', borderRadius: '20px' }}
                     >
-                        <FilePanel
-                            currentPath={currentPath}
-                            onRefresh={handleRefresh}
-                            isPublicBucket={isPublicBucket}
-                        />
+                        {/*<FilePanel*/}
+                        {/*    currentPath={currentPath}*/}
+                        {/*    onRefresh={handleRefresh}*/}
+                        {/*    isPublicBucket={isPublicBucket}*/}
+                        {/*/>*/}
                     </Panel>
                 </PanelGroup>
             </Box>

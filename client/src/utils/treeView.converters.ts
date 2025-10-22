@@ -38,7 +38,7 @@ export const buildTreeFromFiles = (result: ListObjectsOutput, basePath: string =
         path: basePath || '/',
         type: 'directory',
         size: 0,
-        children: !basePath || children.length ? children : ([{ id: '.', name: '', path: '' }] as AwsTreeItem[]),
+        children: !basePath || children.length ? children : ([] as AwsTreeItem[]),
     };
 };
 
