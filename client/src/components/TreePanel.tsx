@@ -88,7 +88,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
             </div>
 
             <div className="tree-content">
-                <FilesTreeView data={treeData} />
+                <FilesTreeView data={treeData} onDeleteFileDialogOpen={deleteDialogRef.current?.open} />
                 {/*{false && (*/}
                 {/*    <TreeView*/}
                 {/*        expandedIds={expanded}*/}

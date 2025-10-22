@@ -34,3 +34,5 @@ export function CollapseIcon(props: React.PropsWithoutRef<typeof IndeterminateCh
 export function EndIcon(props: React.PropsWithoutRef<typeof DisabledByDefaultRoundedIcon>) {
     return <SVGIcon muiIconName="Folder" sx={{ opacity: 0.7 }} {...props} />;
 }
+
+export const treeViewNodeIcons = { expandIcon: ExpandIcon, collapseIcon: CollapseIcon, endIcon: EndIcon };

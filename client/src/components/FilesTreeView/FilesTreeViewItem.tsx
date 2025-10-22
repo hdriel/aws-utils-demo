@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { alpha, styled } from '@mui/material/styles';
-import { SVGIcon, Text } from 'mui-simple';
+import { Button, SVGIcon, Text } from 'mui-simple';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {
@@ -22,23 +22,18 @@ declare module 'react' {
     }
 }
 
-type StyledTreeItemProps = Omit<UseTreeItemParameters, 'rootRef'> & React.HTMLAttributes<HTMLLIElement> & TreeNodeItem;
+type StyledTreeItemProps = Omit<UseTreeItemParameters, 'rootRef'> &
+    React.HTMLAttributes<HTMLLIElement> &
+    TreeNodeItem & { onDeleteClick?: (node: TreeNodeItem) => void };
 
 type CustomTreeItemRootOwnerState = Pick<
     StyledTreeItemProps,
-    // | 'parentId'
-    // | 'directory'
-    // | 'prefix'
-    // | 'path'
-    // | 'name'
-    // | 'size'
-    // | 'icon'
     'color' | 'bgColor' | 'bgColorForDarkMode' | 'colorForDarkMode'
 >;
 
 console.log('treeItemClasses.groupTransition', treeItemClasses.groupTransition);
 
-const CustomTreeItemRoot = styled(TreeItemRoot, { label: 'custom-tree-view-item-group' })<{
+const CustomTreeItemRoot = styled(TreeItemRoot)<{
     ownerState: CustomTreeItemRootOwnerState;
 }>(({ theme, ownerState }) => ({
     '--tree-view-color': ownerState.color,
@@ -60,8 +55,6 @@ const CustomTreeItemRoot = styled(TreeItemRoot, { label: 'custom-tree-view-item-
         paddingLeft: 18,
         borderLeft: `1px dashed ${alpha(theme.palette.text.primary, 0.4)}`,
     },
-    // [`& .${treeItemClasses.label}`]: { marginLeft: '-5px' },
-    // [`& .${treeItemClasses.iconContainer}`]: { display: 'none' },
 }));
 
 const CustomTreeItemContent = styled(TreeItemContent)(({ theme }) => ({
@@ -86,6 +79,7 @@ const CustomTreeItemIconContainer = styled(TreeItemIconContainer)(({ theme }) =>
 
 export const CustomTreeItem = React.forwardRef((props: StyledTreeItemProps, ref: React.Ref<HTMLLIElement>) => {
     const {
+        onDeleteClick,
         id,
         itemId,
         name: label,
@@ -96,11 +90,10 @@ export const CustomTreeItem = React.forwardRef((props: StyledTreeItemProps, ref:
         size: labelInfo,
         colorForDarkMode,
         bgColorForDarkMode,
-        parentId,
-        path,
-        directory,
-        prefix,
         iconName,
+        directory,
+        path,
+        parentId,
         ...other
     } = props;
 
@@ -125,7 +118,12 @@ export const CustomTreeItem = React.forwardRef((props: StyledTreeItemProps, ref:
 
     return (
         <TreeItemProvider {...getContextProviderProps()}>
-            <CustomTreeItemRoot {...getRootProps(other)} ownerState={treeItemRootOwnerState}>
+            <CustomTreeItemRoot
+                {...getRootProps(other)}
+                ownerState={treeItemRootOwnerState}
+                id={path}
+                directory={parentId ?? 'root'}
+            >
                 <CustomTreeItemContent {...getContentProps()}>
                     <CustomTreeItemIconContainer {...getIconContainerProps()}>
                         {directory ? <TreeItemIcon status={status} /> : iconLabel}
@@ -137,18 +135,34 @@ export const CustomTreeItem = React.forwardRef((props: StyledTreeItemProps, ref:
                             alignItems: 'center',
                             p: 0.5,
                             pr: 0,
-                            '& .MuiTreeItem-label': { marginLeft: '-5px' },
-                            '& .MuiTreeItem-iconContainer': { display: 'none' },
                         }}
                     >
                         <Box sx={{ display: 'flex', fontWeight: 'inherit', flexGrow: 1 }}>
                             <Text {...getLabelProps({ variant: 'body2' })} />
                         </Box>
+
                         <Typography variant="caption" color="inherit">
                             {labelInfo}
                         </Typography>
+
+                        {directory ? (
+                            <Button
+                                icon="DeleteForever"
+                                size="small"
+                                padding={'0 5px'}
+                                onClick={() => onDeleteClick?.(props)}
+                            />
+                        ) : (
+                            <Button
+                                icon="Delete"
+                                size="small"
+                                padding={'0 5px'}
+                                onClick={() => onDeleteClick?.(props)}
+                            />
+                        )}
                     </Box>
                 </CustomTreeItemContent>
+
                 {children && <TreeItemGroupTransition {...getGroupTransitionProps()} />}
             </CustomTreeItemRoot>
         </TreeItemProvider>
