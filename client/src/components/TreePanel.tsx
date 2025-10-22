@@ -23,18 +23,15 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
     const [loading, setLoading] = useState(false);
 
     const {
-        expanded,
         loadNodeFiles,
         loadRootFiles,
         selectedNode,
-        setExpanded,
-        setSelected,
+        setSelectedId,
+        selectedId,
         treeData,
         // handleNodeToggle,
         // selected,
-        // setSelectedIds,
     } = useNodeTree({
-        openDeleteDialog: deleteDialogRef.current?.open,
         onFolderSelect,
         refreshTrigger,
     });
@@ -43,13 +40,12 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
         directory: selectedNode?.path as string,
         // todo: need to put in the list some intensifier on the sub list group to pull nested directory by pulling scrollable
         listItemSelector: `li.MuiTreeItem-root[role="treeitem"][parentid="${!selectedNode?.parentId || selectedNode?.parentId === '/' ? 'root' : selectedNode.parentId}"]`,
-        isListEmpty: !selectedNode?.children?.length || !expanded.includes(selectedNode?.id as string),
+        isListEmpty: !selectedNode?.children?.length,
         timeout: 1000,
         mountedTimeout: 2000,
         cb: async (page) => {
             if (selectedNode?.id) return loadNodeFiles(selectedNode.id, page);
         },
-        deps: [expanded.join()],
     });
 
     console.log('treeData', treeData);
@@ -78,7 +74,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                         icon="Refresh"
                         tooltipProps={{ title: 'refresh tree' }}
                         onClick={() => {
-                            setSelected('');
+                            setSelectedId('');
                             setTimeout(() => {
                                 loadRootFiles();
                             }, 500);
@@ -88,7 +84,11 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
             </div>
 
             <div className="tree-content">
-                <FilesTreeView data={treeData} onDeleteFileDialogOpen={deleteDialogRef.current?.open} />
+                <FilesTreeView
+                    data={treeData}
+                    onDeleteFileDialogOpen={deleteDialogRef.current?.open}
+                    onSelect={setSelectedId}
+                />
                 {/*{false && (*/}
                 {/*    <TreeView*/}
                 {/*        expandedIds={expanded}*/}
@@ -132,8 +132,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                 setLoading={setLoading}
                 onDeleteCB={async () => {
                     await loadRootFiles();
-                    setExpanded(['root']);
-                    setSelected('root');
+                    setSelectedId('root');
                     onRefresh();
                 }}
             />

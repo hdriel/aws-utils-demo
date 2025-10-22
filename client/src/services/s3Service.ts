@@ -3,6 +3,7 @@ import axios, { Axios, AxiosProgressEvent } from 'axios';
 import qs from 'qs';
 import { AwsTreeItem, FILE_TYPE } from '../types/ui.ts';
 import { getProjectEnvVariables } from '../projectEnvVariables.ts';
+import { buildTreeFromFiles } from '../utils/treeView.converters.ts';
 
 class S3Service {
     private api: Axios;
@@ -121,7 +122,7 @@ class S3Service {
         }
     }
 
-    async listObjects(directory: string = '', page: number = 0): Promise<ListObjectsOutput> {
+    async listObjects(directory: string = '', page: number = 0): Promise<AwsTreeItem> {
         try {
             const query = qs.stringify({
                 ...(directory && directory !== '/' && { directory: encodeURIComponent(directory) }),
@@ -130,7 +131,8 @@ class S3Service {
             });
             const { data: response } = await this.api.get(`/directories?${query}`);
 
-            return response;
+            const data = buildTreeFromFiles(response, directory);
+            return data;
         } catch (error) {
             console.error('Failed to list objects:', error);
             throw error;

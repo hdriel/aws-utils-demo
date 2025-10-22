@@ -7,9 +7,10 @@ import { CustomTreeItem } from './FilesTreeViewItem.tsx';
 interface FilesTreeViewProps {
     data?: TreeNodeItem | null;
     onDeleteFileDialogOpen?: (node: TreeNodeItem) => void;
+    onSelect?: (itemId: string) => void;
 }
 
-const FilesTreeView: React.FC<FilesTreeViewProps> = ({ data = null, onDeleteFileDialogOpen }) => {
+const FilesTreeView: React.FC<FilesTreeViewProps> = ({ data = null, onDeleteFileDialogOpen, onSelect }) => {
     const renderTreeItem = useCallback(
         (node: TreeNodeItem | null) => {
             if (!node) return null;
@@ -39,7 +40,7 @@ const FilesTreeView: React.FC<FilesTreeViewProps> = ({ data = null, onDeleteFile
     );
 
     const handleSelectedItemsChange = (_event: SyntheticEvent<Element, Event> | null, itemId: string | null): void => {
-        console.log('event, value', itemId);
+        onSelect?.(itemId ?? '');
     };
 
     return (
