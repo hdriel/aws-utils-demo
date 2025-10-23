@@ -52,34 +52,57 @@ const Header: React.FC<HeaderProps> = ({ bucketName, isPublicBucket, onLogout, l
                             }
                             onDelete={localstack ? () => deleteDialogRef.current?.open() : undefined}
                         />
-                        {localstack && (
-                            <Chip
-                                label="localstack"
-                                color="secondary"
-                                sx={{ marginInlineStart: '1em', height: '28px', borderRadius: '5px' }}
-                            />
-                        )}
                     </Stack>
                 </Box>
             </Box>
 
             {mobileLayout ? (
-                <Button
-                    variant="contained"
-                    color={'#FFFFFF'}
-                    icon="LogoutOutlined"
-                    onClick={handleLogout}
-                    className="logout-button"
-                />
+                <Stack direction="row" spacing={2}>
+                    {localstack && (
+                        <Tooltip title="localstack">
+                            <Box
+                                sx={{
+                                    borderRadius: '10px',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    display: 'flex',
+                                    padding: '2px 5px',
+                                    backgroundColor: 'rgba(255,255,255,0.2)',
+                                }}
+                            >
+                                <img src="localstack.svg" width={30} height={20} />
+                            </Box>
+                        </Tooltip>
+                    )}
+                    <Button
+                        variant="contained"
+                        color={'#FFFFFF'}
+                        icon="LogoutOutlined"
+                        onClick={handleLogout}
+                        className="logout-button"
+                    />
+                </Stack>
             ) : (
-                <Button
-                    variant="outlined"
-                    color="#FFFFFF"
-                    startIcon="LogoutOutlined"
-                    onClick={handleLogout}
-                    className="logout-button"
-                    label="Logout"
-                />
+                <Stack direction="row" spacing={2}>
+                    {localstack && (
+                        <Button
+                            disabled
+                            disableRipple
+                            variant="contained"
+                            label="localstack"
+                            color="secondary"
+                            sx={{ marginInlineStart: '1em', height: '35px', borderRadius: '5px' }}
+                        />
+                    )}
+                    <Button
+                        variant="outlined"
+                        color="#FFFFFF"
+                        startIcon="LogoutOutlined"
+                        onClick={handleLogout}
+                        className="logout-button"
+                        label="Logout"
+                    />
+                </Stack>
             )}
 
             <DeleteBucketDialog
