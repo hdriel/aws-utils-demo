@@ -104,6 +104,8 @@ export const FileActionsSection: React.FC<Props> = ({
     const file = fileKey ? files?.find((f) => f.key === fileKey) : null;
     const fileLink = file?.link as string;
 
+    console.log('files', files);
+
     return (
         <Box
             className="file-actions"

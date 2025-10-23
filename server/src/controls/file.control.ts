@@ -10,12 +10,11 @@ export const getFileInfoCtrl = async (req: Request, res: Response, next: NextFun
         const result = await s3Util.fileInfo(filePath);
         const versionResult = await s3Util.fileVersion(filePath);
 
-        // todo: check why not getting fully path
         const filePaths = decodeURIComponent(filePath).split('/');
         const fileName = filePaths.pop();
 
         const data = {
-            filePath: filePaths.join('/'),
+            filePath: filePaths.join('/') || '/',
             fileName,
             size: result.ContentLength,
             type: result.ContentType,
