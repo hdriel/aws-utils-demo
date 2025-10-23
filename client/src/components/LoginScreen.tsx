@@ -265,7 +265,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                                     variant="text"
                                     size={12}
                                     padding={0}
-                                    icon={<SVGIcon muiIconName="Storage" />}
+                                    icon={<SVGIcon muiIconName="CloudSync" />}
                                     onClick={() => loadBucketList()}
                                     tooltipProps={{ title: 'Re-fetch bucket list options' }}
                                 />
