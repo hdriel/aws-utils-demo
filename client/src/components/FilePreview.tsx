@@ -52,7 +52,7 @@ export const FilePreview: React.FC<Props> = ({ show: showPreviewFile, isPublicBu
                 <Box className="pdf-preview">
                     <iframe
                         src={`${s3Service.baseURL}/files/pdf?file=${encodedFileKey}`}
-                        style={{ width: '100%', height: '600px', border: 'none' }}
+                        style={{ width: '100%', height: '390px', border: 'none' }}
                         title="PDF Preview"
                     />
                 </Box>
