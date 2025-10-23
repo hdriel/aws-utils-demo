@@ -85,14 +85,19 @@ const Header: React.FC<HeaderProps> = ({ bucketName, isPublicBucket, onLogout, l
             ) : (
                 <Stack direction="row" spacing={2}>
                     {localstack && (
-                        <Button
-                            disabled
-                            disableRipple
+                        <Box
                             variant="contained"
-                            label="localstack"
                             color="secondary"
-                            sx={{ marginInlineStart: '1em', height: '35px', borderRadius: '5px' }}
-                        />
+                            sx={{
+                                padding: '5px 1em',
+                                backgroundColor: 'rgba(255,255,255,0.3)',
+                                height: '35px',
+                                borderRadius: '5px',
+                                color: 'white',
+                            }}
+                        >
+                            LOCALSTACK
+                        </Box>
                     )}
                     <Button
                         variant="outlined"
