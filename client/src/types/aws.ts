@@ -20,6 +20,7 @@ export interface S3ResponseFile {
     ChecksumType: string;
     ETag: string;
     Name: string;
+    Location: string;
     Key: string;
     LastModified: string;
     Size: number;

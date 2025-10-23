@@ -45,7 +45,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
                 id: uuid(),
                 key: file.Key,
                 name: file.Name,
-                link: file.link,
+                link: file.Location,
                 size: file.Size,
                 lastModified: new Date(file.LastModified),
                 type: 'file',

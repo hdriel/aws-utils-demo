@@ -28,10 +28,6 @@ export const getDirectoryFileListCtrl = async (req: Request, res: Response, next
 
         const s3Util: S3Util = res.locals.s3Util;
         const { files: result } = await s3Util.fileListInfoPaginated(directory, { pageNumber, pageSize });
-        result.forEach((file) => {
-            // @ts-ignore
-            file.link = file.Location; // todo: get in client from Location field
-        });
 
         res.json(result);
     } catch (err: any) {
