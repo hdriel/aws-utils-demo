@@ -86,8 +86,6 @@ const Header: React.FC<HeaderProps> = ({ bucketName, isPublicBucket, onLogout, l
                 <Stack direction="row" spacing={2}>
                     {localstack && (
                         <Box
-                            variant="contained"
-                            color="secondary"
                             sx={{
                                 padding: '5px 1em',
                                 backgroundColor: 'rgba(255,255,255,0.3)',
