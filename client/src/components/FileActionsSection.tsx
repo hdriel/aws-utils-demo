@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Button, SVGIcon, Text, CircularProgress } from 'mui-simple';
-import { Box, useMediaQuery } from '@mui/material';
+import { Box } from '@mui/material';
 import { s3Service } from '../services/s3Service.ts';
 import { isVideoFile, downloadFile, isImageFile, copyToClipboard } from '../utils/fileUtils.ts';
 import { FilePreview } from './FilePreview.tsx';
@@ -13,19 +13,15 @@ import { FileInfoDialog } from '../dialogs/FileInfoDialog.tsx';
 interface Props {
     isPublicBucket: boolean;
     flatPanels: boolean;
-    pinnedActions: boolean;
     selectedFiles: Set<string>;
     files: S3File[];
-    setPinnedActions: (value: boolean | ((value: boolean) => boolean)) => void;
     onDeleteCB: () => Promise<void>;
 }
 
 export const FileActionsSection: React.FC<Props> = ({
     flatPanels,
-    pinnedActions,
     isPublicBucket,
     selectedFiles,
-    setPinnedActions,
     files,
     onDeleteCB,
 }) => {
@@ -35,8 +31,6 @@ export const FileActionsSection: React.FC<Props> = ({
     const tagDialogRef = useRef<{ open: (key: string) => void }>(null);
     const fileUrlDialogRef = useRef<{ open: (file: S3File | null | undefined) => void }>(null);
     const fileInfoDialogRef = useRef<{ open: (key: string | undefined) => void }>(null);
-
-    const smallLayout = useMediaQuery((theme) => theme.breakpoints.down('xl'));
 
     const handleAbortDownload = () => {
         s3Service.abortDownloadFiles();
@@ -115,7 +109,7 @@ export const FileActionsSection: React.FC<Props> = ({
         >
             <Box
                 sx={{
-                    position: pinnedActions && !flatPanels ? 'sticky' : 'relative',
+                    position: !flatPanels ? 'sticky' : 'relative',
                     top: 0,
                     background: 'white',
                     zIndex: 1,
@@ -124,17 +118,6 @@ export const FileActionsSection: React.FC<Props> = ({
             >
                 <Text variant="subtitle1" component="h3" fullWidth>
                     Actions
-                    {!smallLayout && (
-                        <Button
-                            color="primary"
-                            tooltipProps={{
-                                title: pinnedActions ? 'Move Panel Down' : 'Move Panel Right',
-                            }}
-                            icon={pinnedActions ? 'PictureInPictureAlt' : 'PictureInPicture'}
-                            onClick={() => setPinnedActions((v) => !v)}
-                            sx={{ position: 'absolute', top: '-7px', right: '-5px' }}
-                        />
-                    )}
                 </Text>
             </Box>
 

@@ -20,11 +20,9 @@ interface FilePanelProps {
 
 const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicBucket }) => {
     const theme = useTheme();
-    const largeLayout = useMediaQuery((theme) => theme.breakpoints.up('xl'));
     const mobileLayout = useMediaQuery((theme) => theme.breakpoints.down('lg'));
 
     const [flatPanels, setFlatPanels] = useState(mobileLayout);
-    const [pinnedActions, setPinnedActions] = useState(largeLayout);
     const [files, setFiles] = useState<S3File[]>([]);
     const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
     const [reset, setReset] = useState<number>(0);
@@ -92,7 +90,6 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
         <FileListSelectionSection
             directory={currentPath}
             flatPanels={flatPanels}
-            pinnedActions={pinnedActions}
             selectedFiles={selectedFiles}
             setSelectedFiles={setSelectedFiles}
             files={files}
@@ -101,9 +98,7 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
 
     const fileActionsSectionCmp = (
         <FileActionsSection
-            pinnedActions={pinnedActions}
             selectedFiles={selectedFiles}
-            setPinnedActions={setPinnedActions}
             flatPanels={flatPanels}
             isPublicBucket={isPublicBucket}
             files={files}
@@ -141,73 +136,40 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
 
             {!flatPanels && (
                 <div className="file-content">
-                    {(!files.length || pinnedActions || flatPanels) && uploadSectionCmp}
+                    {(!files.length || flatPanels) && uploadSectionCmp}
 
                     {files.length > 0 ? (
                         <>
                             <PanelGroup
                                 autoSaveId="files-section"
-                                direction={pinnedActions ? 'horizontal' : 'vertical'}
+                                direction="horizontal"
                                 style={{
                                     width: '100%',
-                                    height: pinnedActions ? 'calc(100vh - 410px)' : '100%',
+                                    height: '100%',
                                 }}
                             >
                                 <Panel
                                     defaultSize={30}
                                     minSize={30}
-                                    style={{ width: '100%', height: 'inherit', overflowY: 'auto' }}
-                                >
-                                    <PanelGroup
-                                        autoSaveId="files-section"
-                                        direction={flatPanels ? 'vertical' : 'horizontal'}
-                                        style={{ width: '100%', height: '100%' }}
-                                    >
-                                        <Panel
-                                            defaultSize={30}
-                                            minSize={30}
-                                            style={{
-                                                width: '100%',
-                                                height: 'inherit',
-                                                overflowY: 'auto',
-                                                paddingInlineEnd: '1em',
-                                                paddingBottom: '1em',
-                                            }}
-                                        >
-                                            {fileListSectionCmp}
-                                        </Panel>
-                                        {!pinnedActions && !flatPanels && (
-                                            <>
-                                                <PanelResizeHandle
-                                                    style={{ background: theme.palette.primary.main, width: '3px' }}
-                                                />
-                                                <Panel
-                                                    minSize={30}
-                                                    style={{
-                                                        width: '100%',
-                                                        overflowY: 'hidden',
-                                                        padding: '1em',
-                                                    }}
-                                                >
-                                                    {uploadSectionCmp}
-                                                </Panel>
-                                            </>
-                                        )}
-                                    </PanelGroup>
-                                </Panel>
-                                <PanelResizeHandle
                                     style={{
-                                        background: theme.palette.primary.main,
-                                        ...(pinnedActions ? { width: '3px' } : { height: '3px' }),
+                                        width: '100%',
+                                        height: 'inherit',
+                                        overflowY: 'auto',
+                                        paddingInlineEnd: '1em',
                                     }}
-                                />
+                                >
+                                    {uploadSectionCmp}
+                                    {fileListSectionCmp}
+                                </Panel>
+                                <PanelResizeHandle style={{ background: theme.palette.primary.main, width: '3px' }} />
                                 <Panel
                                     minSize={30}
                                     style={{
                                         width: '100%',
-                                        overflowY: pinnedActions ? 'auto' : 'hidden',
+                                        overflowY: 'auto',
                                         paddingInlineStart: '1em',
-                                        paddingTop: pinnedActions ? 0 : '1em',
+                                        paddingTop: 0,
+                                        paddingInlineEnd: '1em',
                                     }}
                                 >
                                     {fileActionsSectionCmp}

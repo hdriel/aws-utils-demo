@@ -6,7 +6,6 @@ import { S3File } from '../types/aws.ts';
 
 interface Props {
     directory: string;
-    pinnedActions: boolean;
     flatPanels: boolean;
     files: S3File[];
     selectedFiles: Set<string>;
@@ -16,7 +15,6 @@ interface Props {
 export const FileListSelectionSection: React.FC<Props> = ({
     directory,
     flatPanels,
-    pinnedActions,
     files,
     selectedFiles,
     setSelectedFiles,
@@ -41,7 +39,7 @@ export const FileListSelectionSection: React.FC<Props> = ({
 
     return (
         <Box className="file-list">
-            <Box className="file-list-header" sx={{ position: pinnedActions && !flatPanels ? 'sticky' : 'relative' }}>
+            <Box className="file-list-header" sx={{ position: flatPanels ? 'relative' : 'sticky' }}>
                 <Stack direction="row" spacing={1}>
                     <Typography variant="subtitle1" component="h3">
                         {files.length} - Files in Current Folder View
