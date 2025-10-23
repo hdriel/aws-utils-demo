@@ -7,6 +7,7 @@ import { CustomTreeItem } from './FilesTreeViewItem.tsx';
 interface FilesTreeViewProps {
     data?: TreeNodeItem | null;
     onDeleteFileDialogOpen?: (node: TreeNodeItem) => void;
+    onReloadDirectoryObjects?: (node: TreeNodeItem) => Promise<void>;
     onSelect?: (itemId: string) => void;
     reset?: number;
     selectedId?: string;
@@ -14,7 +15,7 @@ interface FilesTreeViewProps {
 }
 
 const FilesTreeView = forwardRef<{ isExpandedId: (id: string) => boolean }, FilesTreeViewProps>(
-    ({ data = null, onDeleteFileDialogOpen, onSelect, reset, selectedId, colorize }, ref) => {
+    ({ data = null, onDeleteFileDialogOpen, onReloadDirectoryObjects, onSelect, reset, selectedId, colorize }, ref) => {
         const [expandedIds, setExpandedIds] = React.useState<string[]>(['/']);
 
         useImperativeHandle(ref, () => ({
@@ -51,7 +52,12 @@ const FilesTreeView = forwardRef<{ isExpandedId: (id: string) => boolean }, File
                 return (
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-expect-error
-                    <CustomTreeItem key={node.id} {...itemProps} onDeleteClick={onDeleteFileDialogOpen}>
+                    <CustomTreeItem
+                        key={node.id}
+                        {...itemProps}
+                        onDeleteClick={onDeleteFileDialogOpen}
+                        onRefreshClick={onReloadDirectoryObjects}
+                    >
                         {children?.map((child: TreeNodeItem) => renderTreeItem(child))}
                     </CustomTreeItem>
                 );

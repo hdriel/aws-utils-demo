@@ -468,7 +468,7 @@ class S3Service {
         if (this.downloadAbortController) {
             this.downloadAbortController.abort();
             this.downloadAbortController = null;
-            console.log('Download canceled by user');
+            console.debug('Download canceled by user');
         }
     }
 
@@ -476,7 +476,7 @@ class S3Service {
         if (this.uploadAbortController) {
             this.uploadAbortController.abort();
             this.uploadAbortController = null;
-            console.log('Upload canceled by user');
+            console.debug('Upload canceled by user');
         }
     }
 

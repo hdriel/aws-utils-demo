@@ -146,7 +146,7 @@ export const FileActionsSection: React.FC<Props> = ({
                                 setIsDownloading(true);
                                 handleDownload()
                                     .then(() => {
-                                        console.log(`download ${selectedFiles.size > 1 ? 'as zip' : 'file'} done!`);
+                                        console.debug(`download ${selectedFiles.size > 1 ? 'as zip' : 'file'} done!`);
                                     })
                                     .finally(() => {
                                         setIsDownloading(false);
@@ -181,7 +181,7 @@ export const FileActionsSection: React.FC<Props> = ({
                                             setIsDownloading(true);
                                             handleDownloadViaSignedLink()
                                                 .then(() => {
-                                                    console.log('download via link done!');
+                                                    console.debug('download via link done!');
                                                 })
                                                 .finally(() => {
                                                     setIsDownloading(false);

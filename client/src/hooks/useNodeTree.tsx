@@ -6,6 +6,7 @@ import { TreeNodeItem } from '../types/ui';
 import { formatFileSize, getFileIcon } from '../utils/fileUtils';
 import { buildTreeData } from '../utils/treeView.converters';
 import { useFetchingList } from './useFetchingList';
+import { useRender } from './useRender.ts';
 
 const findNodeById = (node: TreeNodeItem | null, nodeId: string): TreeNodeItem | null => {
     if (!node) return null;
@@ -33,16 +34,11 @@ interface UseNodeTreeProps {
     isExpandedId?: (id: string) => boolean;
 }
 
-const useRender = () => {
-    const [, render] = useState<number>(0);
-    return () => render((c) => c + 1);
-};
-
 export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: UseNodeTreeProps) => {
     const [treeData, setTreeData] = useState<TreeNodeItem | null>(null);
     const [selectedId, setSelectedId] = useState<string>('');
     const [reset, setReset] = useState<number>(0);
-    const render = useRender();
+    const { render } = useRender();
     const isSelectedIdExpanded = isExpandedId?.(selectedId);
 
     useEffect(() => {
@@ -129,7 +125,6 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
 
         if (treeData) {
             const result = updateNodes([treeData]);
-
             setTreeData({ ...result[0] });
         }
     };

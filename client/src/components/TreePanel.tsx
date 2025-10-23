@@ -22,7 +22,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
     const [colorize, setColorize] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const { loadRootFiles, selectedNode, setSelectedId, treeData, reset, selectedId } = useNodeTree({
+    const { loadRootFiles, selectedNode, setSelectedId, treeData, reset, selectedId, reloadDirectory } = useNodeTree({
         isExpandedId: TreeViewRef.current?.isExpandedId,
         onFolderSelect,
         refreshTrigger,
@@ -76,6 +76,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                     colorize={colorize}
                     data={treeData}
                     onDeleteFileDialogOpen={deleteDialogRef.current?.open}
+                    onReloadDirectoryObjects={reloadDirectory}
                     onSelect={setSelectedId}
                     ref={TreeViewRef}
                     reset={reset}
