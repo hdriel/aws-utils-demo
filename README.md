@@ -13,10 +13,11 @@ This project serves dual purposes:
 ## ✨ Key Features
 
 The [@hdriel/aws-utils](https://www.npmjs.com/package/@hdriel/aws-utils) npm package provides powerful capabilities:
-- **C.R.U.D** - S3 File Management 
+- **C.R.U.D** - S3 File Management
 - **Upload** - Easy files uploads
 - **Download** - Stream files directly to your device
 - **Streaming** - Optimized video streaming with chunked delivery
+- **Pagination** - Efficient loading for large buckets with thousands of files by infinity scrolling
 
 > **Note**: The entire project is built using the [mui-simple](https://github.com/hdriel/mui-simple) component library that I created, providing a clean and consistent UI throughout the application. You can see how to add it to your projects and use it in this project: [vite-mui-simple](https://github.com/hdriel/vite-mui-simple)
 
@@ -39,10 +40,9 @@ This project demonstrates simple and elegant usage of the package, allowing you 
 
 The project is tested and validated against **LocalStack** - a Docker image that emulates AWS services locally, including:
 - S3
-- Lambda
-- SQS
-- SNS
-- IAM
+- Lambda [TBD]
+- SQS [TBD]
+- SNS [TBD]
 - And more
 
 ### Running with LocalStack
@@ -54,7 +54,7 @@ The project is tested and validated against **LocalStack** - a Docker image that
    npm run docker:localstack
 ```
 
-OR run this command to run also server & client images: 
+OR run this command to run also server & client images:
 
 ```bash
    npm run docker
@@ -74,7 +74,7 @@ You can connect with your official AWS credentials to access your actual buckets
 
 ### Option 1: Full Docker Setup
 
-Run everything through Docker via: 
+Run everything through Docker via:
 
 ```bash
   npm run docker
@@ -112,7 +112,7 @@ You'll need to provide:
 ```
 C:\Users\<YOUR-USERNAME>\.aws\credentials
 ```
-   
+
 2. **Bucket Name** with public/private access setting (global checkbox)
 
 - If the bucket doesn't exist, it will be created with your specified permissions
@@ -141,6 +141,7 @@ The main interface is divided into three sections:
 - Add new folders
 - View list of folders and files in your bucket/directory
 - Navigate through your bucket structure
+- **Smart Pagination** - Loads folders and files progressively as you scroll through large directory structures
 
 #### Right Panel: File Management
 
@@ -149,28 +150,36 @@ When you select a folder/file from the tree, you'll see:
 1. **Full Path Navigation** - Complete breadcrumb to current directory
 
 2. **Upload Section**
-    - Dedicated buttons for image/video/file uploads
-    - "Double plus" button for uploading multiple files simultaneously
+   - Dedicated buttons for image/video/file uploads
+   - "Double plus" button for uploading multiple files simultaneously
 
 3. **File List Section**
-    - Select single or multiple files
-    - Available actions adapt based on selection
+   - Select single or multiple files
+   - Available actions adapt based on selection
+   - **Lazy Loading** - Automatically loads more files as you scroll, perfect for directories with thousands of files
 
 4. **Actions Section**
-    - **Download to Computer** - Streams files directly (creates a unified ZIP for multiple files)
-    - **Download via Public Link** - Opens a public URL for download
-    - **Copy File Key URL** - accessible link for public bucket or public sign url
-    - **Version Tagging** - Add version tags (e.g., 1.0.0) to files
-    - **Generate Public Link** - Create public access links for files in private buckets
-    - **Delete File** - Remove selected files
+   - **Download to Computer** - Streams files directly (creates a unified ZIP for multiple files)
+   - **Download via Public Link** - Opens a public URL for download
+   - **Copy File Key URL** - accessible link for public bucket or public sign url
+   - **Version Tagging** - Add version tags (e.g., 1.0.0) to files
+   - **Generate Public Link** - Create public access links for files in private buckets
+   - **Delete File** - Remove selected files
 
 5. **Preview Section**
-   When you select a single image or video file:
-    - **Secure Private Preview** - View content directly without external public links
-    - **Optimized Streaming** - Video streaming with chunk delivery
-    - **Efficient Image Display** - With network request caching and optimization
+   When you select a single file:
+   - **Image Preview** - View images directly with network request caching and optimization
+   - **Video Streaming** - Optimized video playback with chunked delivery for smooth streaming
+   - **PDF Viewer** - Inline PDF display with full document navigation
+   - **Secure Private Preview** - View all content directly without requiring external public links
 
    This is one of the most impressive features of the application!
+
+6. **Smart Pagination**
+   - **Lazy Loading** - Files and folders load progressively as you scroll
+   - **Large Bucket Support** - Handles buckets with thousands of files efficiently
+   - **Tree View Pagination** - Navigate through extensive folder structures without performance issues
+   - **File List Pagination** - Browse large directories seamlessly with automatic loading
 
 ![Main Screen - Preview](./readme-assets/demo-bucket-image-preview.webp)
 
@@ -200,7 +209,7 @@ Feel free to explore the project code to see how to implement these capabilities
 
 I'd love to hear from you! If you encounter any issues or have additional ideas, please open an issue in this repository.
 
-## 📝 License
+## 📄 License
 
 The MIT License (MIT)
 
@@ -210,4 +219,4 @@ The MIT License (MIT)
 
 ---
 
-**Built with ❤️ to demonstrate the power and simplicity of `@hdriel/aws-utils`**
+**Built with ❤️ to demonstrate the power and simplicity of my package: `@hdriel/aws-utils`**
