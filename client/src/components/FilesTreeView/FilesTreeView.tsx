@@ -12,21 +12,26 @@ interface FilesTreeViewProps {
     reset?: number;
     selectedId?: string;
     colorize?: boolean;
+    setExpandedIds: (expandedIds: string[]) => void;
+    expandedIds: string[];
 }
 
 const FilesTreeView = forwardRef<{ isExpandedId: (id: string) => boolean }, FilesTreeViewProps>(
-    ({ data = null, onDeleteFileDialogOpen, onReloadDirectoryObjects, onSelect, reset, selectedId, colorize }, ref) => {
-        const [expandedIds, setExpandedIds] = React.useState<string[]>(['/']);
-
-        useImperativeHandle(ref, () => ({
-            isExpandedId: (id: string) => {
-                return expandedIds.includes(id);
-            },
-        }));
-
-        useEffect(() => {
-            setExpandedIds(['/']);
-        }, [reset]);
+    (
+        {
+            data = null,
+            onDeleteFileDialogOpen,
+            onReloadDirectoryObjects,
+            onSelect,
+            reset,
+            selectedId,
+            colorize,
+            setExpandedIds,
+            expandedIds,
+        },
+        ref
+    ) => {
+        const [selectedItemId, setSelectedItemId] = React.useState<string>(selectedId ?? '');
 
         const renderTreeItem = useCallback(
             (node: TreeNodeItem | null) => {
@@ -56,7 +61,12 @@ const FilesTreeView = forwardRef<{ isExpandedId: (id: string) => boolean }, File
                         key={node.id}
                         {...itemProps}
                         onDeleteClick={onDeleteFileDialogOpen}
-                        onRefreshClick={onReloadDirectoryObjects}
+                        onRefreshClick={async (node) => {
+                            const itemId = node.directory ? node.path : (node.parentId ?? '');
+                            setSelectedItemId(itemId);
+                            addToExpanded(itemId);
+                            onReloadDirectoryObjects?.(node);
+                        }}
                     >
                         {children?.map((child: TreeNodeItem) => renderTreeItem(child))}
                     </CustomTreeItem>
@@ -65,20 +75,55 @@ const FilesTreeView = forwardRef<{ isExpandedId: (id: string) => boolean }, File
             [onDeleteFileDialogOpen]
         );
 
+        useImperativeHandle(ref, () => ({
+            isExpandedId: (id: string) => {
+                return expandedIds.includes(id);
+            },
+        }));
+
+        useEffect(() => {
+            setExpandedIds(['/']);
+        }, [reset]);
+
+        useEffect(() => {
+            setSelectedItemId(selectedId ?? '');
+        }, [selectedId]);
+
+        const removeFromExpanded = (itemId: string) => {
+            if (!itemId) return;
+            if (!expandedIds.includes(itemId)) return;
+            setExpandedIds(expandedIds.filter((id) => id !== itemId));
+        };
+        const addToExpanded = (itemId: string) => {
+            if (!itemId) return;
+            if (expandedIds.includes(itemId)) return;
+            setExpandedIds([...expandedIds, itemId]);
+        };
+
         const handleSelectedItemsChange = (
             _event: SyntheticEvent<Element, Event> | null,
             itemId: string | null
         ): void => {
-            if (itemId) {
-                if (expandedIds.includes(itemId)) setExpandedIds(expandedIds.filter((id) => id !== itemId));
-                else setExpandedIds([...expandedIds, itemId]);
+            const selectNewItem = itemId !== selectedItemId;
+            setSelectedItemId(itemId ?? '');
+
+            if (selectNewItem) {
+                if (itemId) {
+                    if (expandedIds.includes(itemId)) removeFromExpanded(itemId);
+                    else addToExpanded(itemId);
+                }
+            } else {
+                addToExpanded(itemId);
             }
-            setTimeout(() => onSelect?.(itemId ?? ''), 0);
         };
 
         const handleExpandedItemsChange = (_event: React.SyntheticEvent | null, itemIds: string[]) => {
             setExpandedIds(itemIds);
         };
+
+        useEffect(() => {
+            onSelect?.(selectedItemId ?? '');
+        }, [selectedItemId]);
 
         return (
             <SimpleTreeView
@@ -88,7 +133,7 @@ const FilesTreeView = forwardRef<{ isExpandedId: (id: string) => boolean }, File
                 expandedItems={expandedIds}
                 onExpandedItemsChange={handleExpandedItemsChange}
                 onSelectedItemsChange={handleSelectedItemsChange}
-                selectedItems={selectedId}
+                selectedItems={selectedItemId}
             >
                 {renderTreeItem(data)}
             </SimpleTreeView>

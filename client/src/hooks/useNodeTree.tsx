@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import randomColor from '../utils/random-color';
 import { darken, lighten } from '@mui/material';
 import { s3Service } from '../services/s3Service';
@@ -34,9 +34,31 @@ interface UseNodeTreeProps {
     isExpandedId?: (id: string) => boolean;
 }
 
+const updateNodes = ({
+    nodes,
+    children,
+    nodeId,
+}: {
+    nodes: TreeNodeItem[];
+    children: TreeNodeItem[];
+    nodeId: string;
+}): TreeNodeItem[] => {
+    return nodes.map((node) => {
+        if (node.id === nodeId) {
+            return { ...node, children };
+        }
+        if (node.children) {
+            return { ...node, children: updateNodes({ nodes: node.children, children, nodeId }) };
+        }
+        return node;
+    });
+};
+
 export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: UseNodeTreeProps) => {
     const [treeData, setTreeData] = useState<TreeNodeItem | null>(null);
     const [selectedId, setSelectedId] = useState<string>('');
+    const [expandedIds, setExpandedIds] = React.useState<string[]>(['/']);
+
     const [reset, setReset] = useState<number>(0);
     const { render } = useRender();
     const isSelectedIdExpanded = isExpandedId?.(selectedId);
@@ -64,12 +86,39 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
 
         if (node?.directory && isExpanded) {
             try {
-                const paths = node.children.map((n) => n.path);
                 const nodeData = await s3Service.listObjects(node.path, page);
+                let newChildren: TreeNodeItem[] = [];
+                if (page) {
+                    const paths = node.children.map((n) => n.path);
+                    const children = nodeData.children
+                        .filter((n) => !paths.includes(n.path))
+                        .map((currNode) => {
+                            const isDirectory = currNode.type === 'directory';
 
-                const children = nodeData.children
-                    .filter((n) => !paths.includes(n.path))
-                    .map((currNode) => {
+                            let currNodePath = currNode.path;
+                            if (isDirectory) {
+                                currNodePath = `${node.path === '/' ? '' : (node.path ?? '')}/${currNode.path}`;
+                            }
+                            const currNodeId = currNodePath;
+                            const directoryColor = isDirectory ? darken(randomColor(), 1) : node.color;
+
+                            return {
+                                id: currNodeId,
+                                parentId: node.path || '/',
+                                path: currNodePath,
+                                name: currNode.name,
+                                size: isDirectory ? '' : formatFileSize(currNode.size),
+                                directory: isDirectory,
+                                color: directoryColor,
+                                bgColor: directoryColor && lighten(directoryColor, 0.7),
+                                iconName: getFileIcon(isDirectory ? '' : currNode.name, isDirectory),
+                                children: [],
+                            } as TreeNodeItem;
+                        });
+
+                    newChildren = [...node.children, ...children].filter((v) => v);
+                } else {
+                    const children = nodeData.children.map((currNode) => {
                         const isDirectory = currNode.type === 'directory';
 
                         let currNodePath = currNode.path;
@@ -93,40 +142,21 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
                         } as TreeNodeItem;
                     });
 
-                const allChildren = [...node.children, ...children].filter((v) => v);
-                const newChildren = page || !children.length ? allChildren : children;
+                    newChildren = children;
+                }
 
-                updateNodeChildren(
-                    nodeId,
-                    newChildren
-                    // newChildren.sort((a, b) => +b.directory - +a.directory)
-                );
+                if (treeData) {
+                    const result = updateNodes({ nodes: [treeData], children: newChildren, nodeId });
+                    setTreeData({ ...result[0] });
+                }
 
                 return nodeData ? 1 : 0;
             } catch (error) {
                 console.error('Failed to load folder contents:', error);
             }
         }
+
         return 0;
-    };
-
-    const updateNodeChildren = (nodeId: string, children: TreeNodeItem[]) => {
-        const updateNodes = (nodes: TreeNodeItem[]): TreeNodeItem[] => {
-            return nodes.map((node) => {
-                if (node.id === nodeId) {
-                    return { ...node, children };
-                }
-                if (node.children) {
-                    return { ...node, children: updateNodes(node.children) };
-                }
-                return node;
-            });
-        };
-
-        if (treeData) {
-            const result = updateNodes([treeData]);
-            setTreeData({ ...result[0] });
-        }
     };
 
     const selectedNode = useMemo(() => {
@@ -150,16 +180,12 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
         render();
     }, [selectedId]);
 
-    useEffect(() => {
-        if (selectedId) loadNodeFiles(selectedId);
-    }, [selectedId]);
-
     let parentDirectory = selectedNode?.parentId || '/';
     if (selectedNode?.directory && parentDirectory !== selectedNode?.path) parentDirectory = selectedNode?.path;
     const listItemSelector = `ul[role="group"] li[role="treeitem"][list-data-type="files-tree-view"][directory="${parentDirectory}"]`;
     const emptyChildren = !selectedNode?.children?.length;
 
-    useFetchingList({
+    const { resetPagination } = useFetchingList({
         directory: selectedNode?.path as string,
         listItemSelector,
         isListEmpty: emptyChildren,
@@ -172,16 +198,31 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
         },
     });
 
+    const reloadDirectory = useCallback(async () => {
+        if (selectedNode?.parentId) {
+            const path = selectedNode.directory ? selectedNode.path : (selectedNode.parentId ?? '');
+            if (!expandedIds.includes(path)) setExpandedIds([...expandedIds, path]);
+
+            setTimeout(async () => {
+                await loadNodeFiles(path); // here the path tab is not expanded
+                resetPagination(selectedNode?.path);
+            }, 0);
+        }
+    }, [selectedNode]);
+
     return {
         loadNodeFiles,
         loadRootFiles,
         selectedNode,
         selectedId,
+        setExpandedIds,
+        expandedIds,
         reset,
+        treeData,
+        reloadDirectory,
         setSelectedId: (id: string) => {
             setSelectedId(id);
             render();
         },
-        treeData,
     };
 };

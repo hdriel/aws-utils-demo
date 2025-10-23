@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useRender } from './useRender.ts';
 
 const sleep = async (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -23,6 +24,7 @@ export const useFetchingList = ({
     reset,
     mountedTimeout = 1000,
 }: UseFetchingListProps) => {
+    const { render, isRendered } = useRender();
     const pageSelectorsRef = useRef<Record<string, { page: number }>>({});
     const cbRef = useRef(cb);
     const selector = listItemSelector ? `${listItemSelector}:last-child` : '';
@@ -40,9 +42,9 @@ export const useFetchingList = ({
             const entry = entries[0];
 
             if (entry.isIntersecting) {
-                console.log('🔴 Intersecting detected!', entry.target);
-                pageSelectorsRef.current[selector] ||= { page: 1 };
-                const page = pageSelectorsRef.current[selector].page++;
+                console.debug('🔴 Intersecting detected!', entry.target);
+                pageSelectorsRef.current[directory] ||= { page: 1 };
+                const page = pageSelectorsRef.current[directory].page++;
                 await cbRef.current(page);
                 observer.unobserve(entries[0].target);
 
@@ -62,18 +64,18 @@ export const useFetchingList = ({
 
         const effect = () => {
             const lastItem = document.querySelector(selector) as HTMLElement | null;
-            pageSelectorsRef.current[selector] ||= { page: 1 };
+            pageSelectorsRef.current[directory] ||= { page: 1 };
 
             if (!lastItem) {
-                console.log('⚠️ No item to observe or no more pages');
+                console.debug('⚠️ No item to observe or no more pages');
                 return;
             }
 
-            console.log('🔵 Initial setup - Found Last item:', lastItem);
+            console.debug('🔵 Initial setup - Found Last item:', lastItem);
 
             lastInnerText = lastItem.innerText;
             observer.observe(lastItem);
-            console.log('🔵 Started observing:', lastItem);
+            console.debug('🔵 Started observing:', lastItem);
         };
 
         if (timeout) {
@@ -85,11 +87,17 @@ export const useFetchingList = ({
         return () => {
             observer.disconnect();
         };
-    }, [directory, listItemSelector, isListEmpty, selector, ...(deps ?? [])]);
+    }, [directory, listItemSelector, isListEmpty, selector, isRendered, ...(deps ?? [])]);
 
     useEffect(() => {
         pageSelectorsRef.current = {};
     }, [reset]);
 
-    return null;
+    return {
+        resetPagination: (directory: string = '') => {
+            pageSelectorsRef.current[directory] ||= { page: 1 };
+            pageSelectorsRef.current[directory].page = 1;
+            render();
+        },
+    };
 };

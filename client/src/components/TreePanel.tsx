@@ -22,7 +22,17 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
     const [colorize, setColorize] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const { loadRootFiles, selectedNode, setSelectedId, treeData, reset, selectedId, reloadDirectory } = useNodeTree({
+    const {
+        loadRootFiles,
+        selectedNode,
+        setSelectedId,
+        treeData,
+        reset,
+        selectedId,
+        reloadDirectory,
+        setExpandedIds,
+        expandedIds,
+    } = useNodeTree({
         isExpandedId: TreeViewRef.current?.isExpandedId,
         onFolderSelect,
         refreshTrigger,
@@ -81,6 +91,8 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
                     ref={TreeViewRef}
                     reset={reset}
                     selectedId={selectedId}
+                    setExpandedIds={setExpandedIds}
+                    expandedIds={expandedIds}
                 />
             </div>
 
