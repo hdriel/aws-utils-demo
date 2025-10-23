@@ -199,7 +199,7 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
     });
 
     const reloadDirectory = useCallback(async () => {
-        if (selectedNode?.parentId) {
+        if (selectedNode?.parentId || selectedNode?.path === '/') {
             const path = selectedNode.directory ? selectedNode.path : (selectedNode.parentId ?? '');
             if (!expandedIds.includes(path)) setExpandedIds([...expandedIds, path]);
 
