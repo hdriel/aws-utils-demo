@@ -277,12 +277,12 @@ export const downloadFilesAsZipCtrl = async (req: Request, res: Response, next: 
             .map((file) => decodeURIComponent(file)); // already handled decodeURIComponent inside s3Util
 
         const s3Util: S3Util = res.locals.s3Util;
-        const downloadMiddleware =
+        const mw =
             filePaths.length === 1
                 ? await s3Util.getStreamFileCtrl({ filePath: filePaths[0] })
                 : await s3Util.getStreamZipFileCtr({ filePath: filePaths });
 
-        return downloadMiddleware(req, res, next);
+        return mw(req, res, next);
     } catch (err: any) {
         logger.error(req.id, 'failed on downloadFilesAsZipCtrl', { errMsg: err.message });
         next(err);
@@ -294,9 +294,9 @@ export const streamVideoFilesCtrl = async (req: Request, res: Response, next: Ne
         const fileKey = req.query?.file as string;
 
         const s3Util: S3Util = res.locals.s3Util;
-        const downloadMiddleware = await s3Util.getStreamVideoFileCtrl({ fileKey });
+        const mw = await s3Util.getStreamVideoFileCtrl({ fileKey });
 
-        return downloadMiddleware(req, res, next);
+        return mw(req, res, next);
     } catch (err: any) {
         logger.error(req.id, 'failed on streamVideoFilesCtrl', { errMsg: err.message });
         next(err);
