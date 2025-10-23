@@ -3,15 +3,29 @@ import { FILE_TYPE, type S3Util, type UploadedS3File } from '../shared';
 import logger from '../logger';
 
 export const getFileInfoCtrl = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const filePath = req.query?.filePath as string;
+    const filePath = req.query?.filePath as string;
 
+    try {
         const s3Util: S3Util = res.locals.s3Util;
         const result = await s3Util.fileInfo(filePath);
+        const versionResult = await s3Util.fileVersion(filePath);
 
-        res.json(result);
+        // todo: check why not getting fully path
+        const filePaths = decodeURIComponent(filePath).split('/');
+        const fileName = filePaths.pop();
+
+        const data = {
+            filePath: filePaths.join('/'),
+            fileName,
+            size: result.ContentLength,
+            type: result.ContentType,
+            lastModified: result.LastModified,
+            version: versionResult,
+        };
+
+        res.json(data);
     } catch (err: any) {
-        logger.error(req.id, 'failed on getFileInfoCtrl', { errMsg: err.message });
+        logger.error(req.id, 'failed on getFileInfoCtrl', { errMsg: err.message, file: filePath });
         next(err);
     }
 };

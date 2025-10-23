@@ -429,11 +429,23 @@ class S3Service {
     async getObject(filePath: string): Promise<string> {
         try {
             const query = qs.stringify({ filePath });
-            const { data: response } = await this.api.get(`/file/data?${query}`);
+            const { data: response } = await this.api.get(`/files/data?${query}`);
 
             return response;
         } catch (error) {
             console.error('Failed to get object:', error);
+            throw error;
+        }
+    }
+
+    async getFileInfo(filePath: string) {
+        try {
+            const query = qs.stringify({ filePath });
+            const { data: response } = await this.api.get(`/files/info?${query}`);
+
+            return response;
+        } catch (error) {
+            console.error('Failed to get file info:', error);
             throw error;
         }
     }

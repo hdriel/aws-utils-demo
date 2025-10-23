@@ -8,6 +8,7 @@ import { S3File } from '../types/aws.ts';
 import { DeleteSelectedFilesDialog } from '../dialogs/DeleteSelectedFilesDialog.tsx';
 import { TaggingFileDialog } from '../dialogs/TaggingFileDialog.tsx';
 import { FileUrlDialog } from '../dialogs/FileUrlDialog.tsx';
+import { FileInfoDialog } from '../dialogs/FileInfoDialog.tsx';
 
 interface Props {
     isPublicBucket: boolean;
@@ -33,6 +34,7 @@ export const FileActionsSection: React.FC<Props> = ({
     const deleteDialogRef = useRef<{ open: (keys: string[]) => void }>(null);
     const tagDialogRef = useRef<{ open: (key: string) => void }>(null);
     const fileUrlDialogRef = useRef<{ open: (file: S3File | null | undefined) => void }>(null);
+    const fileInfoDialogRef = useRef<{ open: (key: string | undefined) => void }>(null);
 
     const smallLayout = useMediaQuery((theme) => theme.breakpoints.down('xl'));
 
@@ -218,6 +220,13 @@ export const FileActionsSection: React.FC<Props> = ({
                                 onClick={() => fileUrlDialogRef.current?.open(file)}
                                 label="Generate Link"
                             />
+                            <Button
+                                variant="outlined"
+                                fullWidth
+                                startIcon="Info"
+                                onClick={() => fileInfoDialogRef.current?.open(file?.key)}
+                                label="File Info"
+                            />
                         </>
                     )}
 
@@ -240,6 +249,8 @@ export const FileActionsSection: React.FC<Props> = ({
             <TaggingFileDialog ref={tagDialogRef} />
 
             <FileUrlDialog ref={fileUrlDialogRef} />
+
+            <FileInfoDialog ref={fileInfoDialogRef} />
         </Box>
     );
 };

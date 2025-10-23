@@ -1,0 +1,40 @@
+.file-info-container{
+  display: grid;
+  grid-template: 50px 50px 60px/ repeat(3, 1fr);
+  grid-gap: 20px;
+  grid-template-areas:
+    "name name size"
+    "path path path"
+    "type version date";
+
+  & > div {
+    //outline: 2px solid #1a202c;
+  }
+}
+
+.file-name {
+  grid-area: name;
+}
+
+.file-path {
+  grid-area: path;
+}
+
+.file-size {
+  grid-area: size;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.file-type {
+  grid-area: type;
+}
+
+.file-data {
+  grid-area: date;
+}
+
+.file-version {
+  grid-area: version;
+}
