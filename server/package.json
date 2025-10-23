@@ -10,7 +10,7 @@
         "yalc:remove": "yalc remove @hdriel/aws-utils"
     },
     "dependencies": {
-        "@hdriel/aws-utils": "^1.1.1",
+        "@hdriel/aws-utils": "file:.yalc/@hdriel/aws-utils",
         "axios": "^1.12.2",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",

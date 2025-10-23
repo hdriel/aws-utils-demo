@@ -226,6 +226,21 @@ export const viewFileContentCtrl = async (req: Request, res: Response, next: Nex
     }
 };
 
+export const viewPdfFileCtrl = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const s3Util: S3Util = res.locals.s3Util;
+        const mw = await s3Util.getStreamFileCtrl({
+            filePath: req.query?.file as string,
+            forDownloading: false,
+        });
+
+        return mw(req, res, next);
+    } catch (err: any) {
+        logger.error(req.id, 'failed on viewFileContentCtrl', { errMsg: err.message });
+        next(err);
+    }
+};
+
 export const uploadFileDataCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const fileKey = req.body?.path as string;

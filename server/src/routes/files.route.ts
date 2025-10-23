@@ -13,6 +13,7 @@ import {
     viewImageFileCtrl,
     uploadMultiFilesCtrl,
     viewFileContentCtrl,
+    viewPdfFileCtrl,
 } from '../controls/file.control';
 import { logApiMW } from '../middleware/logAPI.mw';
 import { s3UtilMW } from '../middleware/s3Util.mw';
@@ -26,6 +27,7 @@ router.post(['/upload/:fileType', '/upload'], s3UtilMW, uploadSingleFileCtrl);
 router.post(['/multi-upload/:fileType', '/multi-upload'], s3UtilMW, uploadMultiFilesCtrl);
 
 router.get('/image', s3UtilMW, viewImageFileCtrl);
+router.get('/pdf', s3UtilMW, viewPdfFileCtrl);
 router.get('/content', s3UtilMW, viewFileContentCtrl);
 
 router.get('/download', s3UtilMW, downloadFilesAsZipCtrl);
