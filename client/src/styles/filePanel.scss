@@ -1,12 +1,12 @@
 
-.video-preview {
+.file-preview {
   border-radius: 8px;
   overflow: hidden;
   background-color: rgba(2, 2, 2, 0.5);
   width: 100%;
   justify-content: center;
   align-content: center;
-  display: grid;
+  display: flex;
   margin-top: 10px;
 
   video, img {
@@ -16,6 +16,10 @@
     display: block;
     object-fit: contain;
   }
+}
+
+.pdf-preview{
+  max-height: 200px;
 }
 
 .file-panel {

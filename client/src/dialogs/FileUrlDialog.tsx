@@ -80,7 +80,7 @@ export const FileUrlDialog = forwardRef<{ open: (file: S3File | undefined | null
                     />
 
                     {videoPreviewUrl && (
-                        <Box className="video-preview" mt={2}>
+                        <Box className="file-preview" mt={2}>
                             <video controls src={videoPreviewUrl}>
                                 Your browser does not support the video tag.
                             </video>
@@ -88,7 +88,7 @@ export const FileUrlDialog = forwardRef<{ open: (file: S3File | undefined | null
                     )}
 
                     {isImageFile(file?.key ?? '') && (
-                        <Box className="video-preview" mt={2}>
+                        <Box className="file-preview" mt={2}>
                             <img src={tempLink} alt={file?.key} />
                         </Box>
                     )}

@@ -35,7 +35,7 @@ export const FilePreview: React.FC<Props> = ({ show: showPreviewFile, isPublicBu
             )}
 
             {videoPrivateUrl && (
-                <Box className="video-preview">
+                <Box className="file-preview">
                     <video controls src={videoPrivateUrl}>
                         Your browser does not support the video tag.
                     </video>
@@ -43,13 +43,13 @@ export const FilePreview: React.FC<Props> = ({ show: showPreviewFile, isPublicBu
             )}
 
             {showImagePreview && (
-                <Box className="video-preview">
+                <Box className="file-preview">
                     <img src={`${s3Service.baseURL}/files/image?file=${encodedFileKey}`} alt={file?.name} />
                 </Box>
             )}
 
             {showReadPreview && (
-                <Box className="video-preview">
+                <Box className="pdf-preview">
                     <iframe
                         src={`${s3Service.baseURL}/files/pdf?file=${encodedFileKey}`}
                         style={{ width: '100%', height: '600px', border: 'none' }}
