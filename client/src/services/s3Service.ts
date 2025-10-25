@@ -316,8 +316,9 @@ class S3Service {
 
     async getSignedUrl(filePath: string, expireIn: number): Promise<string> {
         try {
-            const query = qs.stringify({ expireIn: String(expireIn), filePath: encodeURIComponent(filePath) });
-            const { data: response } = await this.api.get(`/files/url?${query}`);
+            const query = qs.stringify({ expireIn: String(expireIn) });
+            const fileKeyEncoded = encodeURIComponent(filePath);
+            const { data: response } = await this.api.get(`/files/${fileKeyEncoded}/url?${query}`);
 
             return response;
         } catch (error) {
@@ -428,8 +429,8 @@ class S3Service {
 
     async getFileInfo(filePath: string) {
         try {
-            const query = qs.stringify({ filePath });
-            const { data: response } = await this.api.get(`/files/info?${query}`);
+            const fileKeyEncoded = encodeURIComponent(filePath);
+            const { data: response } = await this.api.get(`/files/${fileKeyEncoded}/info`);
 
             return response;
         } catch (error) {

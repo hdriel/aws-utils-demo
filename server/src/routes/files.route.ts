@@ -35,9 +35,9 @@ router.get('/content', s3UtilMW, viewFileContentCtrl);
 router.get('/download-zip', s3UtilMW, downloadFilesAsZipCtrl);
 router.get('/download', s3UtilMW, downloadFileCtrl);
 router.get('/stream', s3UtilMW, streamVideoFilesCtrl);
-router.get('/info', s3UtilMW, getFileInfoCtrl);
+router.get('/:file/info', s3UtilMW, getFileInfoCtrl);
 router.get('/data', s3UtilMW, getFileDataCtrl);
-router.get('/url', s3UtilMW, getFileUrlCtrl);
+router.get('/:file/url', s3UtilMW, getFileUrlCtrl);
 
 router.get('/:file/version', s3UtilMW, getFileVersionCtrl);
 router.put('/:file/version', s3UtilMW, toggingFileVersionCtrl);

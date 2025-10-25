@@ -3,7 +3,7 @@ import type { S3Util, UploadedS3File } from '../shared';
 import logger from '../logger';
 
 export const getFileInfoCtrl = async (req: Request, res: Response, next: NextFunction) => {
-    const _filePath = req.query?.filePath as string;
+    const _filePath = req.params?.file as string;
 
     try {
         const s3Util: S3Util = res.locals.s3Util;
@@ -43,7 +43,7 @@ export const getFileDataCtrl = async (req: Request, res: Response, next: NextFun
 
 export const getFileUrlCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const filePath = req.query?.filePath as string;
+        const filePath = req.params?.file as string;
         const expireIn = req.query?.expireIn ? +req.query.expireIn : undefined;
 
         const s3Util: S3Util = res.locals.s3Util;
