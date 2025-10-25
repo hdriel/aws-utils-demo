@@ -191,8 +191,8 @@ class S3Service {
             this.uploadAbortController = new AbortController();
 
             if (file.size === 0) {
-                const { data: response } = await this.api.post('/files/content', {
-                    path: directoryPath + file.name,
+                const fileKeyEncoded = encodeURIComponent(directoryPath + file.name);
+                const { data: response } = await this.api.post(`/files/${fileKeyEncoded}/content`, {
                     data: '',
                     signal: this.uploadAbortController.signal,
                 });
@@ -257,9 +257,10 @@ class S3Service {
                 files
                     .filter((file) => file.size === 0)
                     .map(async (file) => {
-                        const { data: response } = await this.api.post('/files/content', {
-                            path: [directory.replace(/\/$/, ''), file.name].join('/'),
+                        const fileKeyEncoded = encodeURIComponent([directory.replace(/\/$/, ''), file.name].join('/'));
+                        const { data: response } = await this.api.post(`/files/${fileKeyEncoded}/content`, {
                             data: '',
+                            signal: this.uploadAbortController?.signal,
                         });
                         return response;
                     })
@@ -417,8 +418,8 @@ class S3Service {
 
     async getObject(filePath: string): Promise<string> {
         try {
-            const query = qs.stringify({ filePath });
-            const { data: response } = await this.api.get(`/files/data?${query}`);
+            const fileKeyEncoded = encodeURIComponent(filePath);
+            const { data: response } = await this.api.get(`/files/${fileKeyEncoded}/data`);
 
             return response;
         } catch (error) {

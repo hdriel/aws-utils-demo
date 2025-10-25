@@ -29,7 +29,7 @@ export const getFileInfoCtrl = async (req: Request, res: Response, next: NextFun
 
 export const getFileDataCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const filePath = req.query?.filePath as string;
+        const filePath = req.params?.filePath as string;
 
         const s3Util: S3Util = res.locals.s3Util;
         const result = await s3Util.fileContent(filePath, 'utf8');
@@ -197,7 +197,7 @@ export const viewPdfFileCtrl = async (req: Request, res: Response, next: NextFun
 
 export const uploadFileDataCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const fileKey = req.body?.path as string;
+        const fileKey = req.params?.file as string;
         const fileContent = (req.body?.data as string) || '';
 
         const s3Util: S3Util = res.locals.s3Util;
