@@ -42,4 +42,4 @@ router.get('/:file/url', s3UtilMW, getFileUrlCtrl);
 router.get('/:file/version', s3UtilMW, getFileVersionCtrl);
 router.put('/:file/version', s3UtilMW, toggingFileVersionCtrl);
 
-router.delete('/', s3UtilMW, deleteFileCtrl);
+router.delete('/:file', s3UtilMW, deleteFileCtrl);
