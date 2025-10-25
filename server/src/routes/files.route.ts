@@ -28,8 +28,8 @@ router.post('/content', s3UtilMW, uploadFileDataCtrl);
 router.post(['/upload/:fileType', '/upload'], s3UtilMW, uploadSingleFileMW, uploadSingleFileCtrl);
 router.post(['/multi-upload/:fileType', '/multi-upload'], s3UtilMW, uploadMultiFilesMW, uploadMultiFilesCtrl);
 
-router.get('/image', s3UtilMW, viewImageFileCtrl);
-router.get('/pdf', s3UtilMW, viewPdfFileCtrl);
+router.get('/:file/image', s3UtilMW, viewImageFileCtrl);
+router.get('/:file/pdf', s3UtilMW, viewPdfFileCtrl);
 router.get('/content', s3UtilMW, viewFileContentCtrl);
 
 router.get('/download-zip', s3UtilMW, downloadFilesAsZipCtrl);

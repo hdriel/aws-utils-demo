@@ -44,14 +44,14 @@ export const FilePreview: React.FC<Props> = ({ show: showPreviewFile, isPublicBu
 
             {showImagePreview && (
                 <Box className="file-preview">
-                    <img src={`${s3Service.baseURL}/files/image?file=${encodedFileKey}`} alt={file?.name} />
+                    <img src={`${s3Service.baseURL}/files/${encodedFileKey}/image`} alt={file?.name} />
                 </Box>
             )}
 
             {showReadPreview && (
                 <Box className="pdf-preview">
                     <iframe
-                        src={`${s3Service.baseURL}/files/pdf?file=${encodedFileKey}`}
+                        src={`${s3Service.baseURL}/files/${encodedFileKey}/pdf`}
                         style={{ width: '100%', height: '390px', border: 'none' }}
                         title="PDF Preview"
                     />
