@@ -58,7 +58,7 @@ export const getFileUrlCtrl = async (req: Request, res: Response, next: NextFunc
 
 export const getFileVersionCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const filePath = req.query?.filePath as string;
+        const filePath = req.params?.file as string;
 
         const s3Util: S3Util = res.locals.s3Util;
         const result = await s3Util.fileVersion(filePath);
@@ -72,7 +72,7 @@ export const getFileVersionCtrl = async (req: Request, res: Response, next: Next
 
 export const toggingFileVersionCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const filePath = req.query?.filePath as string;
+        const filePath = req.params?.file as string;
         const version = req.body?.version as string;
 
         const s3Util: S3Util = res.locals.s3Util;

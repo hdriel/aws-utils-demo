@@ -440,10 +440,8 @@ class S3Service {
 
     async tagObject(filePath: string, version: string): Promise<void> {
         try {
-            const query = qs.stringify({ filePath });
-            const { data: response } = await this.api.put(`/files/version?${query}`, {
-                version,
-            });
+            const fileKeyEncoded = encodeURIComponent(filePath);
+            const { data: response } = await this.api.put(`/files/${fileKeyEncoded}/version`, { version });
 
             return response;
         } catch (error) {
@@ -454,8 +452,8 @@ class S3Service {
 
     async getTagVersion(filePath: string): Promise<string> {
         try {
-            const query = qs.stringify({ filePath });
-            const { data: response } = await this.api.get(`/files/version?${query}`);
+            const fileKeyEncoded = encodeURIComponent(filePath);
+            const { data: response } = await this.api.get(`/files/${fileKeyEncoded}/version`);
 
             return response;
         } catch (error) {
