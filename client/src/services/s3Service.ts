@@ -388,7 +388,7 @@ class S3Service {
             const encodedFilename = filename ? encodeURIComponent(filename) : undefined;
             const filenameQueryString = encodedFilename ? `&filename=${encodedFilename}` : '';
 
-            const { data } = await this.api.get(`/files/download?${query}${filenameQueryString}`, {
+            const { data } = await this.api.get(`/files/download-zip?${query}${filenameQueryString}`, {
                 responseType: 'blob',
                 timeout: 600_000,
                 signal: this.downloadAbortController.signal,

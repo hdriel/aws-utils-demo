@@ -3,6 +3,7 @@ import logger from '../logger';
 import type { S3Util } from '@hdriel/aws-utils';
 import { getS3BucketUtil } from '../shared';
 import { CredentialsPayload } from '../decs';
+import env from '../dotenv';
 
 export const getBucketListCtrl = async (req: Request, res: Response, next: NextFunction) => {
     const region = req.query.region as string;
@@ -19,7 +20,7 @@ export const getBucketListCtrl = async (req: Request, res: Response, next: NextF
             secretAccessKey,
             region,
             bucketName: 'demo',
-            localstack: false,
+            localstack: accessKeyId === env?.LOCALSTACK_ACCESS_KEY_ID,
         };
         const bucketUtil = getS3BucketUtil(options);
 

@@ -14,6 +14,7 @@ import {
     uploadMultiFilesCtrl,
     viewFileContentCtrl,
     viewPdfFileCtrl,
+    downloadFileCtrl,
 } from '../controls/file.control';
 import { logApiMW } from '../middleware/logAPI.mw';
 import { s3UtilMW } from '../middleware/s3Util.mw';
@@ -31,7 +32,8 @@ router.get('/image', s3UtilMW, viewImageFileCtrl);
 router.get('/pdf', s3UtilMW, viewPdfFileCtrl);
 router.get('/content', s3UtilMW, viewFileContentCtrl);
 
-router.get('/download', s3UtilMW, downloadFilesAsZipCtrl);
+router.get('/download-zip', s3UtilMW, downloadFilesAsZipCtrl);
+router.get('/download', s3UtilMW, downloadFileCtrl);
 router.get('/stream', s3UtilMW, streamVideoFilesCtrl);
 router.get('/info', s3UtilMW, getFileInfoCtrl);
 router.get('/data', s3UtilMW, getFileDataCtrl);

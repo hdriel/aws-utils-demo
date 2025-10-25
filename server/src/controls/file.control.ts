@@ -142,7 +142,7 @@ export const uploadMultiFilesCtrl = (
             size: s3File.size,
         }));
 
-        // todo: store your fileKey in your database
+        // todo: store your fileKeys in your database
 
         logger.info(req.id, 'files uploaded', files);
         return res.json({ success: true, files });
@@ -154,7 +154,7 @@ export const uploadMultiFilesCtrl = (
 export const viewImageFileCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const s3Util: S3Util = res.locals.s3Util;
-        const mw = s3Util.getImageFileViewCtrl({
+        const mw = s3Util.streamImageFileCtrl({
             // fileKey: req.query?.filePath as string, // you get pass the fileKey yourself
             // queryField: 'file', // default value
         });
@@ -169,7 +169,7 @@ export const viewImageFileCtrl = async (req: Request, res: Response, next: NextF
 export const viewFileContentCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const s3Util: S3Util = res.locals.s3Util;
-        const mw = s3Util.getPdfFileViewCtrl({
+        const mw = s3Util.streamPdfFileCtrl({
             // fileKey: req.query?.filePath as string, // you get pass the fileKey yourself
             // queryField: 'file', // default value
         });
@@ -184,7 +184,9 @@ export const viewFileContentCtrl = async (req: Request, res: Response, next: Nex
 export const viewPdfFileCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const s3Util: S3Util = res.locals.s3Util;
-        const mw = await s3Util.getStreamFileCtrl(req.query?.file as string, { forDownloading: false });
+        const mw = s3Util.streamPdfFileCtrl({
+            fileKey: req.query?.file as string,
+        });
 
         return mw(req, res, next);
     } catch (err: any) {
@@ -199,7 +201,7 @@ export const uploadFileDataCtrl = async (req: Request, res: Response, next: Next
         const fileContent = (req.body?.data as string) || '';
 
         const s3Util: S3Util = res.locals.s3Util;
-        const result = await s3Util.uploadFile(fileKey, fileContent);
+        const result = await s3Util.uploadFileContent(fileKey, fileContent);
 
         res.json(result);
     } catch (err: any) {
@@ -210,16 +212,30 @@ export const uploadFileDataCtrl = async (req: Request, res: Response, next: Next
 
 export const downloadFilesAsZipCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const filePaths = ([] as string[])
-            .concat(req.query.file as string[])
-            .filter((v) => v)
-            .map((file) => decodeURIComponent(file)); // already handled decodeURIComponent inside s3Util
+        const s3Util: S3Util = res.locals.s3Util;
+        const mw = await s3Util.streamZipFileCtr({
+            // fileKey: req.query.file as string
+            filename: 'בדיקה אחת.zip',
+        });
+
+        return mw(req, res, next);
+    } catch (err: any) {
+        logger.error(req.id, 'failed on downloadFilesAsZipCtrl', { errMsg: err.message });
+        next(err);
+    }
+};
+
+export const downloadFileCtrl = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        // const filePaths = ([] as string[])
+        //     .concat(req.query.file as string[])
+        //     .filter((v) => v)
+        //     .map((file) => decodeURIComponent(file)); // already handled decodeURIComponent inside s3Util
 
         const s3Util: S3Util = res.locals.s3Util;
-        const mw =
-            filePaths.length === 1
-                ? await s3Util.getStreamFileCtrl(filePaths[0])
-                : await s3Util.getStreamZipFileCtr(filePaths);
+        const mw = await s3Util.streamFileCtrl({
+            // fileKey: filePaths
+        });
 
         return mw(req, res, next);
     } catch (err: any) {
@@ -233,7 +249,7 @@ export const streamVideoFilesCtrl = async (req: Request, res: Response, next: Ne
         const fileKey = req.query?.file as string;
 
         const s3Util: S3Util = res.locals.s3Util;
-        const mw = await s3Util.getStreamVideoFileCtrl({ fileKey });
+        const mw = await s3Util.streamVideoFileCtrl({ fileKey });
 
         return mw(req, res, next);
     } catch (err: any) {

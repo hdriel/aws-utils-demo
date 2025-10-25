@@ -16,7 +16,7 @@ export const uploadSingleFileMW = (req: Request & { s3File?: UploadedS3File }, r
         logger.info(req.id, 'uploading single file', { filename, directory });
 
         const s3Util: S3Util = res.locals.s3Util;
-        const uploadMiddleware = s3Util.uploadSingleFile('file', directory, {
+        const uploadMiddleware = s3Util.uploadSingleFileMW('file', directory, {
             ...(fileType && { fileType }),
             ...(filename && { filename }),
         });
@@ -43,7 +43,7 @@ export const uploadMultiFilesMW = (
         logger.info(req.id, 'uploading multiple files', { directory });
 
         const s3Util: S3Util = res.locals.s3Util;
-        const uploadMiddleware = s3Util.uploadMultipleFiles('files', directory, { ...(fileType && { fileType }) });
+        const uploadMiddleware = s3Util.uploadMultipleFilesMW('files', directory, { ...(fileType && { fileType }) });
 
         return uploadMiddleware(req, res, next);
     } catch (err: any) {
