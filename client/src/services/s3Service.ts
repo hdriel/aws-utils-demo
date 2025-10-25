@@ -140,16 +140,6 @@ class S3Service {
         }
     }
 
-    async treeObjects(): Promise<AwsTreeItem> {
-        try {
-            const { data: response } = await this.api.get(`/directories/tree`);
-            return response;
-        } catch (error) {
-            console.error('Failed to list objects:', error);
-            throw error;
-        }
-    }
-
     async createFolder(folderPath: string): Promise<void> {
         try {
             const { data: response } = await this.api.post('/directories', {

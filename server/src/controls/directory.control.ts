@@ -7,12 +7,18 @@ export const getDirectoryListCtrl = async (req: Request, res: Response, next: Ne
         const s3Util: S3Util = res.locals.s3Util;
 
         const directory = req.query?.directory as string; // already handled decodeURIComponent inside s3Util
-        // const result = await s3Util.directoryList(directory);
-
         const pageNumber = req.query?.page ? +req.query?.page : undefined;
         const pageSize = req.query?.size ? +req.query?.size : undefined;
+
+        // const result = await s3Util.directoryList(directory); // get ALL directory keys
         const result = await s3Util.directoryListPaginated(directory, { pageNumber, pageSize });
 
+        logger.info(req.id, 'get directory file list from directory.', {
+            directory,
+            pageNumber,
+            pageSize,
+            totalFetched: result.totalFetched,
+        });
         res.json(result);
     } catch (err: any) {
         logger.error(req.id, 'failed on getDirectoryListCtrl', { errMsg: err.message });
@@ -22,30 +28,24 @@ export const getDirectoryListCtrl = async (req: Request, res: Response, next: Ne
 
 export const getDirectoryFileListCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        const s3Util: S3Util = res.locals.s3Util;
+
         const directory = req.query?.directory as string; // already handled decodeURIComponent inside s3Util
         const pageNumber = req.query?.page ? +req.query?.page : undefined;
         const pageSize = req.query?.size ? +req.query?.size : undefined;
 
-        const s3Util: S3Util = res.locals.s3Util;
-        const { files: result } = await s3Util.fileListInfoPaginated(directory, { pageNumber, pageSize });
+        // const result = await s3Util.fileList(directory); // get ALL directory files info
+        const result = await s3Util.fileListPaginated(directory, { pageNumber, pageSize });
 
-        res.json(result);
+        logger.info(req.id, 'get directory file list from directory.', {
+            directory,
+            pageNumber,
+            pageSize,
+            totalFetched: result.totalFetched,
+        });
+        res.json(result.files);
     } catch (err: any) {
         logger.error(req.id, 'failed on getDirectoryFileListCtrl', { errMsg: err.message });
-        next(err);
-    }
-};
-
-export const getDirectoryTreeCtrl = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const directory = req.query?.directory as string; // already handled decodeURIComponent inside s3Util
-
-        const s3Util: S3Util = res.locals.s3Util;
-        const result = await s3Util.directoryTree(directory);
-
-        res.json(result);
-    } catch (err: any) {
-        logger.error(req.id, 'failed on getDirectoryTreeCtrl', { errMsg: err.message });
         next(err);
     }
 };
