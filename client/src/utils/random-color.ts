@@ -1,9 +1,10 @@
 import color from 'color';
+import { darken } from '@mui/material';
 
 const ratio = 0.618033988749895;
 let hue = Math.random();
 
-export default function (saturation: number | undefined = undefined, value: number | undefined = undefined) {
+function randomColor(saturation: number | undefined = undefined, value: number | undefined = undefined) {
     hue += ratio;
     hue %= 1;
 
@@ -21,3 +22,7 @@ export default function (saturation: number | undefined = undefined, value: numb
         v: value * 100,
     }).hex();
 }
+
+export default randomColor();
+
+export const randomColorDirectory = (coefficient: number = 0.35) => darken(randomColor(), coefficient);

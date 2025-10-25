@@ -38,7 +38,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
         refreshTrigger,
     });
 
-    console.debug('treeData', treeData);
+    console.log('treeData', treeData);
 
     return (
         <div className="tree-panel">

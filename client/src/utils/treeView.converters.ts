@@ -1,8 +1,8 @@
+import { lighten } from '@mui/material';
 import { ListObjectsOutput, S3ResponseFile } from '../types/aws.ts';
 import { AwsTreeItem, TreeNodeItem } from '../types/ui.ts';
 import { formatFileSize, getFileIcon } from './fileUtils.ts';
-import randomColor from '../utils/random-color.ts';
-import { darken, lighten } from '@mui/material';
+import { randomColorDirectory } from '../utils/random-color.ts';
 
 export const buildTreeFromFiles = (result: ListObjectsOutput, basePath: string = ''): AwsTreeItem => {
     const { files, directories } = result;
@@ -54,7 +54,7 @@ export function buildTreeData(
 
     const nodeId = root.path || '/';
     const isDirectory = root.type === 'directory';
-    const directoryColor = color || darken(randomColor(), 0.25);
+    const directoryColor = color || randomColorDirectory();
 
     return {
         id: nodeId,
@@ -71,3 +71,20 @@ export function buildTreeData(
             .filter((v) => v) as TreeNodeItem[],
     };
 }
+
+export const getNewRootTreeItem = () => {
+    const directoryColor = randomColorDirectory();
+
+    return {
+        id: '/',
+        parentId: null,
+        path: '/',
+        name: '/ (root)',
+        size: '',
+        directory: true,
+        iconName: getFileIcon('', true),
+        color: directoryColor,
+        bgColor: directoryColor && lighten(directoryColor, 0.9),
+        children: [] as TreeNodeItem[],
+    };
+};

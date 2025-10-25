@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import randomColor from '../utils/random-color';
-import { darken, lighten } from '@mui/material';
+import { randomColorDirectory } from '../utils/random-color';
+import { lighten } from '@mui/material';
 import { s3Service } from '../services/s3Service';
 import { TreeNodeItem } from '../types/ui';
 import { formatFileSize, getFileIcon } from '../utils/fileUtils';
-import { buildTreeData } from '../utils/treeView.converters';
+import { getNewRootTreeItem } from '../utils/treeView.converters';
 import { useFetchingList } from './useFetchingList';
 import { useRender } from './useRender.ts';
 
@@ -69,27 +69,25 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
 
     const loadRootFiles = async () => {
         try {
-            const result = await s3Service.listObjects();
-            const data = buildTreeData(result);
-            if (!data) return;
+            await loadNodeFiles('/', 0, true);
             setReset((c) => c + 1);
-            setTreeData(data);
-            setSelectedId(data.id);
+            setSelectedId('/');
         } catch (error) {
             console.error('Failed to load files:', error);
         }
     };
 
-    const loadNodeFiles = async (nodeId: string, page: number = 0) => {
-        const node = findNodeById(treeData, nodeId) as TreeNodeItem;
-        const isExpanded = node?.directory && isExpandedId?.(nodeId);
+    const loadNodeFiles = async (nodeId: string, page: number = 0, reset: boolean = false) => {
+        const root = reset && nodeId === '/' ? getNewRootTreeItem() : null;
+        const node = (findNodeById(treeData, nodeId) as TreeNodeItem) || root;
+        const isExpanded = node?.directory && (isExpandedId?.(nodeId) || reset);
 
         if (node?.directory && isExpanded) {
             try {
                 const nodeData = await s3Service.listObjects(node.path, page);
-                let newChildren: TreeNodeItem[] = [];
+                let newChildren: TreeNodeItem[];
                 if (page) {
-                    const paths = node.children.map((n) => n.path);
+                    const paths = reset ? [] : node.children.map((n) => n.path);
                     const children = nodeData.children
                         .filter((n) => !paths.includes(n.path))
                         .map((currNode) => {
@@ -100,7 +98,7 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
                                 currNodePath = `${node.path === '/' ? '' : (node.path ?? '')}/${currNode.path}`;
                             }
                             const currNodeId = currNodePath;
-                            const directoryColor = isDirectory ? darken(randomColor(), 1) : node.color;
+                            const directoryColor = isDirectory ? randomColorDirectory() : node.color;
 
                             return {
                                 id: currNodeId,
@@ -116,7 +114,7 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
                             } as TreeNodeItem;
                         });
 
-                    newChildren = [...node.children, ...children].filter((v) => v);
+                    newChildren = [...(reset ? [] : node.children), ...children].filter((v) => v);
                 } else {
                     const children = nodeData.children.map((currNode) => {
                         const isDirectory = currNode.type === 'directory';
@@ -126,7 +124,7 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
                             currNodePath = `${node.path === '/' ? '' : (node.path ?? '')}/${currNode.path}`;
                         }
                         const currNodeId = currNodePath;
-                        const directoryColor = isDirectory ? darken(randomColor(), 1) : node.color;
+                        const directoryColor = isDirectory ? randomColorDirectory() : node.color;
 
                         return {
                             id: currNodeId,
@@ -145,8 +143,9 @@ export const useNodeTree = ({ refreshTrigger, onFolderSelect, isExpandedId }: Us
                     newChildren = children;
                 }
 
-                if (treeData) {
-                    const result = updateNodes({ nodes: [treeData], children: newChildren, nodeId });
+                const _treeData = reset && nodeId === '/' ? root : treeData;
+                if (_treeData) {
+                    const result = updateNodes({ nodes: [_treeData], children: newChildren, nodeId });
                     setTreeData({ ...result[0] });
                 }
 
