@@ -1,6 +1,6 @@
 # AWS S3 File Explorer Project
 
-A comprehensive fullstack S3 file explorer built in two weeks, designed to showcase and test my perfect package: `@hdriel/aws-utils`
+A comprehensive fullstack S3 file explorer built in two weeks, designed to showcase and test my perfect package: [@hdriel/aws-utils](https://www.npmjs.com/package/@hdriel/aws-utils) 
 
 [![NPM](https://nodei.co/npm/@hdriel/aws-utils.svg?style=compact)](https://nodei.co/npm/@hdriel/aws-utils/)
 
@@ -203,7 +203,7 @@ Significant thought went into creating comfortable viewing experiences:
 
 ## 💻 Code Reference
 
-Feel free to explore the project code to see how to implement these capabilities in your own projects using the `@hdriel/aws-utils` package.
+Feel free to explore the project code to see how to implement these capabilities in your own projects using the [@hdriel/aws-utils](https://www.npmjs.com/package/@hdriel/aws-utils) package.
 
 ## 🤝 Feedback & Contributions
 
@@ -219,4 +219,4 @@ The MIT License (MIT)
 
 ---
 
-**Built with ❤️ to demonstrate the power and simplicity of my package: `@hdriel/aws-utils`**
+**Built with ❤️ to demonstrate the power and simplicity of my package: [@hdriel/aws-utils](https://www.npmjs.com/package/@hdriel/aws-utils) **
