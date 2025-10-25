@@ -246,7 +246,7 @@ export const downloadFileCtrl = async (req: Request, res: Response, next: NextFu
 
 export const streamVideoFilesCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const fileKey = req.query?.file as string;
+        const fileKey = req.params?.file as string;
 
         const s3Util: S3Util = res.locals.s3Util;
         const mw = await s3Util.streamVideoFileCtrl({ fileKey });

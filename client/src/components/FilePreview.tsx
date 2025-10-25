@@ -18,7 +18,7 @@ export const FilePreview: React.FC<Props> = ({ show: showPreviewFile, isPublicBu
         showPreviewFile && file && isImageFile(file.key),
         showPreviewFile && file && file.key.toLowerCase().endsWith('.pdf'),
         showPreviewFile && file && isVideoFile(file?.name)
-            ? `${s3Service.baseURL}/files/stream?file=${encodedFileKey}`
+            ? `${s3Service.baseURL}/files/${encodedFileKey}/stream`
             : null,
     ];
 
