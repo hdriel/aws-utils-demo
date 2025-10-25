@@ -228,7 +228,7 @@ export const downloadFilesAsZipCtrl = async (req: Request, res: Response, next: 
 export const downloadFileCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
         // const filePaths = ([] as string[])
-        //     .concat(req.query.file as string[])
+        //     .concat(req.params.file as string[])
         //     .filter((v) => v)
         //     .map((file) => decodeURIComponent(file)); // already handled decodeURIComponent inside s3Util
 

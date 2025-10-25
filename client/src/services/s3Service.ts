@@ -336,8 +336,8 @@ class S3Service {
 
             this.downloadAbortController = new AbortController();
 
-            const query = `file=${encodeURIComponent(filePath)}`;
-            const { data, headers } = await this.api.get(`/files/download?${query}`, {
+            const fileKeyEncoded = encodeURIComponent(filePath);
+            const { data, headers } = await this.api.get(`/files/${fileKeyEncoded}/download`, {
                 responseType: 'blob',
                 timeout: 600_000, // 10m timeout
                 signal: this.downloadAbortController.signal,

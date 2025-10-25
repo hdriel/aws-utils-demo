@@ -33,7 +33,7 @@ router.get('/:file/pdf', s3UtilMW, viewPdfFileCtrl);
 router.get('/:file/content', s3UtilMW, viewFileContentCtrl);
 
 router.get('/download-zip', s3UtilMW, downloadFilesAsZipCtrl);
-router.get('/download', s3UtilMW, downloadFileCtrl);
+router.get('/:file/download', s3UtilMW, downloadFileCtrl);
 router.get('/:file/stream', s3UtilMW, streamVideoFilesCtrl);
 router.get('/:file/info', s3UtilMW, getFileInfoCtrl);
 router.get('/:file/data', s3UtilMW, getFileDataCtrl);
