@@ -100,7 +100,7 @@ export const CustomTreeItem = React.forwardRef((props: StyledTreeItemProps, ref:
         ...other
     } = props;
 
-    const iconLabel = <SVGIcon muiIconName={iconName || 'Description'} sx={{ opacity: 0.7 }} />;
+    const iconLabel = <SVGIcon muiIconName={iconName || 'Description'} sx={{ opacity: 0.9 }} />;
 
     const {
         getContextProviderProps,
