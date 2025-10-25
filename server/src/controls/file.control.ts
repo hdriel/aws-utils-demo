@@ -1,21 +1,19 @@
 import { NextFunction, Request, Response } from 'express';
-import { FILE_TYPE, type S3Util, type UploadedS3File } from '../shared';
+import type { S3Util, UploadedS3File } from '../shared';
 import logger from '../logger';
 
 export const getFileInfoCtrl = async (req: Request, res: Response, next: NextFunction) => {
-    const filePath = req.query?.filePath as string;
+    const _filePath = req.query?.filePath as string;
 
     try {
         const s3Util: S3Util = res.locals.s3Util;
-        const result = await s3Util.fileInfo(filePath);
-        const versionResult = await s3Util.fileVersion(filePath);
-
-        const filePaths = decodeURIComponent(filePath).split('/');
-        const fileName = filePaths.pop();
+        const result = await s3Util.fileInfo(_filePath);
+        const versionResult = await s3Util.fileVersion(_filePath);
+        const filePath = result.Key.split('/').slice(0, -1).join('/');
 
         const data = {
-            filePath: filePaths.join('/') || '/',
-            fileName,
+            filePath: filePath ? `/${filePath}` : '/',
+            fileName: result.Name,
             size: result.ContentLength,
             type: result.ContentType,
             lastModified: result.LastModified,
@@ -24,7 +22,7 @@ export const getFileInfoCtrl = async (req: Request, res: Response, next: NextFun
 
         res.json(data);
     } catch (err: any) {
-        logger.error(req.id, 'failed on getFileInfoCtrl', { errMsg: err.message, file: filePath });
+        logger.error(req.id, 'failed on getFileInfoCtrl', { errMsg: err.message, file: _filePath });
         next(err);
     }
 };
@@ -101,112 +99,56 @@ export const deleteFileCtrl = async (req: Request, res: Response, next: NextFunc
     }
 };
 
-export const uploadSingleFileCtrl = (req: Request & { s3File?: UploadedS3File }, res: Response, next: NextFunction) => {
-    const uploadedSingleFileCallback = (err?: any) => {
-        if (err) {
-            logger.warn(req.id, 'failed to upload single file', { message: err.message });
-            return next(err);
-        }
+export const uploadSingleFileCtrl = (
+    req: Request & { s3File?: UploadedS3File },
+    res: Response,
+    _next: NextFunction
+) => {
+    const s3File = req.s3File;
 
-        const s3File = req.s3File;
+    if (s3File) {
+        const file = {
+            key: s3File.key,
+            location: s3File.location,
+            bucket: s3File.bucket,
+            etag: s3File.etag,
+            // @ts-ignore
+            size: s3File.size,
+        };
 
-        if (s3File) {
-            const file = {
-                key: s3File.key,
-                location: s3File.location,
-                bucket: s3File.bucket,
-                etag: s3File.etag,
-                // @ts-ignore
-                size: s3File.size,
-            };
+        // todo: store your fileKey in your database
 
-            logger.info(req.id, 'file uploaded', file);
-            return res.json({ success: true, file });
-        }
-
-        return res.status(400).json({ error: 'No file uploaded' });
-    };
-
-    try {
-        const fileType = req.params?.fileType as FILE_TYPE;
-
-        const encodedDirectory = (req.headers['x-upload-directory'] as string) || '';
-        const encodedFilename = req.headers['x-upload-filename'] as string;
-
-        if (!encodedDirectory) {
-            return res.status(400).json({ error: 'Directory header is required' });
-        }
-
-        let directory = decodeURIComponent(encodedDirectory); // already handled decodeURIComponent inside s3Util
-        directory = directory === '/' ? '' : directory;
-        const filename = encodedFilename; // already handled decodeURIComponent inside s3Util
-
-        logger.info(req.id, 'uploading single file', { filename, directory });
-
-        const s3Util: S3Util = res.locals.s3Util;
-        const uploadMiddleware = s3Util.uploadSingleFile('file', directory, {
-            ...(fileType && { fileType }),
-            filename: filename || undefined,
-        });
-
-        return uploadMiddleware(req, res, uploadedSingleFileCallback);
-    } catch (err: any) {
-        logger.error(req.id, 'failed on uploadMultiFilesCtrl', { errMsg: err.message });
-        next(err);
+        logger.info(req.id, 'file uploaded', file);
+        return res.json({ success: true, file });
     }
+
+    return res.status(400).json({ error: 'No file uploaded' });
 };
 
 export const uploadMultiFilesCtrl = (
     req: Request & { s3Files?: UploadedS3File[] },
     res: Response,
-    next: NextFunction
+    _next: NextFunction
 ) => {
-    const uploadedMultipleFilesCallback: NextFunction = (err?: any) => {
-        if (err) {
-            logger.warn(req.id, 'failed to upload files', { message: err.message });
-            return next(err);
-        }
+    const s3Files = req.s3Files;
 
-        const s3Files = req.s3Files;
+    if (s3Files?.length) {
+        const files = s3Files.map((s3File) => ({
+            key: s3File.key,
+            location: s3File.location,
+            bucket: s3File.bucket,
+            etag: s3File.etag,
+            // @ts-ignore
+            size: s3File.size,
+        }));
 
-        if (s3Files?.length) {
-            const files = s3Files.map((s3File) => ({
-                key: s3File.key,
-                location: s3File.location,
-                bucket: s3File.bucket,
-                etag: s3File.etag,
-                // @ts-ignore
-                size: s3File.size,
-            }));
+        // todo: store your fileKey in your database
 
-            logger.info(req.id, 'files uploaded', files);
-            return res.json({ success: true, files });
-        }
-
-        return res.status(400).json({ error: 'No file uploaded' });
-    };
-
-    try {
-        const fileType = req.params?.fileType as FILE_TYPE;
-        const encodedDirectory = (req.headers['x-upload-directory'] as string) || '/';
-        if (!encodedDirectory) {
-            return res.status(400).json({ error: 'Directory header is required' });
-        }
-        let directory = decodeURIComponent(encodedDirectory); // already handled decodeURIComponent inside s3Util
-        directory = directory === '/' ? '' : directory;
-
-        logger.info(req.id, 'uploading multiple files', { directory });
-
-        const s3Util: S3Util = res.locals.s3Util;
-        const uploadMiddleware = s3Util.uploadMultipleFiles('files', directory, {
-            ...(fileType && { fileType }),
-        });
-
-        return uploadMiddleware(req, res, uploadedMultipleFilesCallback);
-    } catch (err: any) {
-        logger.error(req.id, 'failed on uploadMultiFilesCtrl', { errMsg: err.message });
-        next(err);
+        logger.info(req.id, 'files uploaded', files);
+        return res.json({ success: true, files });
     }
+
+    return res.status(400).json({ error: 'No file uploaded' });
 };
 
 export const viewImageFileCtrl = async (req: Request, res: Response, next: NextFunction) => {
@@ -242,10 +184,7 @@ export const viewFileContentCtrl = async (req: Request, res: Response, next: Nex
 export const viewPdfFileCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const s3Util: S3Util = res.locals.s3Util;
-        const mw = await s3Util.getStreamFileCtrl({
-            filePath: req.query?.file as string,
-            forDownloading: false,
-        });
+        const mw = await s3Util.getStreamFileCtrl(req.query?.file as string, { forDownloading: false });
 
         return mw(req, res, next);
     } catch (err: any) {
@@ -279,8 +218,8 @@ export const downloadFilesAsZipCtrl = async (req: Request, res: Response, next: 
         const s3Util: S3Util = res.locals.s3Util;
         const mw =
             filePaths.length === 1
-                ? await s3Util.getStreamFileCtrl({ filePath: filePaths[0] })
-                : await s3Util.getStreamZipFileCtr({ filePath: filePaths });
+                ? await s3Util.getStreamFileCtrl(filePaths[0])
+                : await s3Util.getStreamZipFileCtr(filePaths);
 
         return mw(req, res, next);
     } catch (err: any) {

@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { Box, Stack, useMediaQuery } from '@mui/material';
-import { Button, Typography, SVGIcon, Chip, Tooltip } from 'mui-simple';
+import { Button, Typography, SVGIcon, Chip, Tooltip, Text } from 'mui-simple';
 import { s3Service } from '../services/s3Service';
 import '../styles/mainScreen.scss';
 import { DeleteBucketDialog } from '../dialogs/DeleteBucketDialog.tsx';
@@ -20,6 +20,73 @@ const Header: React.FC<HeaderProps> = ({ bucketName, isPublicBucket, onLogout, l
         await s3Service.disconnect();
         return onLogout();
     };
+
+    const mobileEnvIcon = localstack ? (
+        <Tooltip title="localstack">
+            <Box
+                sx={{
+                    borderRadius: '10px',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    display: 'flex',
+                    padding: '2px 5px',
+                    backgroundColor: 'rgba(255,255,255,0.2)',
+                }}
+            >
+                <img src="localstack.svg" width={30} height={20} />
+            </Box>
+        </Tooltip>
+    ) : (
+        <Tooltip title="localstack">
+            <Box
+                sx={{
+                    borderRadius: '10px',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    display: 'flex',
+                    padding: '2px 10px',
+                    backgroundColor: 'rgba(255,255,255,0.2)',
+                }}
+            >
+                <SVGIcon muiIconName="Warning" color="yellow" />
+            </Box>
+        </Tooltip>
+    );
+
+    const largeEnvIcon = localstack ? (
+        <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            sx={{
+                padding: '5px 1em 5px 8px',
+                backgroundColor: 'rgba(255,255,255,0.3)',
+                height: '35px',
+                borderRadius: '5px',
+                color: 'white',
+            }}
+        >
+            <img src="localstack.svg" width={30} height={20} />
+            <Text color="white">LOCALSTACK</Text>
+        </Stack>
+    ) : (
+        <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            sx={{
+                padding: '5px 1em',
+                backgroundColor: 'rgba(255,255,255,0.3)',
+                height: '35px',
+                borderRadius: '5px',
+                color: 'white',
+            }}
+        >
+            <SVGIcon muiIconName="Warning" color="yellow" />
+            <Text color="black">PRODUCTION !</Text>
+            <SVGIcon muiIconName="Warning" color="yellow" />
+        </Stack>
+    );
 
     return (
         <Box className="header">
@@ -58,22 +125,7 @@ const Header: React.FC<HeaderProps> = ({ bucketName, isPublicBucket, onLogout, l
 
             {mobileLayout ? (
                 <Stack direction="row" spacing={2}>
-                    {localstack && (
-                        <Tooltip title="localstack">
-                            <Box
-                                sx={{
-                                    borderRadius: '10px',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    display: 'flex',
-                                    padding: '2px 5px',
-                                    backgroundColor: 'rgba(255,255,255,0.2)',
-                                }}
-                            >
-                                <img src="localstack.svg" width={30} height={20} />
-                            </Box>
-                        </Tooltip>
-                    )}
+                    {mobileEnvIcon}
                     <Button
                         variant="contained"
                         color={'#FFFFFF'}
@@ -84,19 +136,7 @@ const Header: React.FC<HeaderProps> = ({ bucketName, isPublicBucket, onLogout, l
                 </Stack>
             ) : (
                 <Stack direction="row" spacing={2}>
-                    {localstack && (
-                        <Box
-                            sx={{
-                                padding: '5px 1em',
-                                backgroundColor: 'rgba(255,255,255,0.3)',
-                                height: '35px',
-                                borderRadius: '5px',
-                                color: 'white',
-                            }}
-                        >
-                            LOCALSTACK
-                        </Box>
-                    )}
+                    {largeEnvIcon}
                     <Button
                         variant="outlined"
                         color="#FFFFFF"

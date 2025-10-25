@@ -17,14 +17,15 @@ import {
 } from '../controls/file.control';
 import { logApiMW } from '../middleware/logAPI.mw';
 import { s3UtilMW } from '../middleware/s3Util.mw';
+import { uploadMultiFilesMW, uploadSingleFileMW } from '../middleware/streaming.mw';
 
 export const router: express.Router = express.Router();
 
 router.use(logApiMW);
 
 router.post('/content', s3UtilMW, uploadFileDataCtrl);
-router.post(['/upload/:fileType', '/upload'], s3UtilMW, uploadSingleFileCtrl);
-router.post(['/multi-upload/:fileType', '/multi-upload'], s3UtilMW, uploadMultiFilesCtrl);
+router.post(['/upload/:fileType', '/upload'], s3UtilMW, uploadSingleFileMW, uploadSingleFileCtrl);
+router.post(['/multi-upload/:fileType', '/multi-upload'], s3UtilMW, uploadMultiFilesMW, uploadMultiFilesCtrl);
 
 router.get('/image', s3UtilMW, viewImageFileCtrl);
 router.get('/pdf', s3UtilMW, viewPdfFileCtrl);

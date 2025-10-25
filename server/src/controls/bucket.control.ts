@@ -44,18 +44,6 @@ export const getBucketInfoCtrl = async (req: Request, res: Response, next: NextF
     }
 };
 
-export const getBucketDirectoryTreeCtrl = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const s3Util: S3Util = res.locals.s3Util;
-        const result = await s3Util.directoryTree();
-
-        res.json(result);
-    } catch (err: any) {
-        logger.error(req.id, 'failed on getBucketDirectoryTreeCtrl', { errMsg: err.message });
-        next(err);
-    }
-};
-
 export const createBucketCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
         // handled on mw
@@ -101,6 +89,19 @@ export const deleteLocalstackBucketCtrl = async (req: Request, res: Response, ne
         res.json(result);
     } catch (err: any) {
         logger.error(req.id, 'failed on deleteLocalstackBucketCtrl', { errMsg: err.message });
+        next(err);
+    }
+};
+
+// Not recommended to pull all bucket tree, could be bigger and failed to fetch
+export const getBucketDirectoryTreeCtrl = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const s3Util: S3Util = res.locals.s3Util;
+        const result = await s3Util.directoryTree();
+
+        res.json(result);
+    } catch (err: any) {
+        logger.error(req.id, 'failed on getBucketDirectoryTreeCtrl', { errMsg: err.message });
         next(err);
     }
 };
