@@ -69,7 +69,7 @@ export const createDirectoryCtrl = async (req: Request, res: Response, next: Nex
 
 export const deleteDirectoryCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const directory = req.query?.directory as string;
+        const directory = req.params?.directory as string;
         if (!directory) {
             throw Error('No directory path provided for deleting directory action');
         }

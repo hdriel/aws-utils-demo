@@ -18,4 +18,4 @@ router.get('/files', s3UtilMW, getDirectoryFileListCtrl);
 
 router.post('/', s3UtilMW, createDirectoryCtrl);
 
-router.delete('/', s3UtilMW, deleteDirectoryCtrl);
+router.delete('/:directory', s3UtilMW, deleteDirectoryCtrl);

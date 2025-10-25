@@ -155,9 +155,7 @@ class S3Service {
 
     async deleteFolder(directoryPath: string): Promise<void> {
         try {
-            const { data: response } = await this.api.delete('/directories', {
-                data: { directory: directoryPath },
-            });
+            const { data: response } = await this.api.delete(`/directories/${encodeURIComponent(directoryPath)}`);
 
             return response;
         } catch (error) {
