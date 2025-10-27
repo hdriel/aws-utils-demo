@@ -29,6 +29,9 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
 
     useEffect(() => {
         loadFiles();
+        if (selectedFiles.size !== 0) {
+            setSelectedFiles(new Set());
+        }
     }, [currentPath]);
 
     useEffect(() => {
@@ -50,10 +53,6 @@ const FilePanel: React.FC<FilePanelProps> = ({ currentPath, onRefresh, isPublicB
             }));
 
             setFiles((prevFiles) => (page ? [...prevFiles, ...loadedFiles] : loadedFiles));
-
-            if (selectedFiles.size !== 0) {
-                setSelectedFiles(new Set());
-            }
 
             return files.length;
         } catch (error) {
