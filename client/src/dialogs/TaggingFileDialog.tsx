@@ -7,8 +7,12 @@ type Props = object;
 
 const versionPlaceholder = 'e.g., 1.0.0';
 
+export type TaggingFileDialogRefState = {
+    open: (key: string) => void;
+};
+
 // eslint-disable-next-line no-empty-pattern
-export const TaggingFileDialog = forwardRef<{ open: (key: string) => void }, Props>(({}, ref) => {
+export const TaggingFileDialog = forwardRef<TaggingFileDialogRefState, Props>(({}, ref) => {
     const [tagDialogOpen, setTagDialogOpen] = useState(false);
     const [fileKey, setFileKey] = useState('');
     const [versionTag, setVersionTag] = useState('');

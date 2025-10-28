@@ -5,10 +5,13 @@ import { s3Service } from '../services/s3Service.ts';
 import { isVideoFile, downloadFile, isImageFile, copyToClipboard } from '../utils/fileUtils.ts';
 import { FilePreview } from './FilePreview.tsx';
 import { S3File } from '../types/aws.ts';
-import { DeleteSelectedFilesDialog } from '../dialogs/DeleteSelectedFilesDialog.tsx';
-import { TaggingFileDialog } from '../dialogs/TaggingFileDialog.tsx';
-import { FileUrlDialog } from '../dialogs/FileUrlDialog.tsx';
-import { FileInfoDialog } from '../dialogs/FileInfoDialog.tsx';
+import {
+    DeleteSelectedFilesDialog,
+    type DeleteSelectedFilesDialogRefState,
+} from '../dialogs/DeleteSelectedFilesDialog.tsx';
+import { TaggingFileDialog, type TaggingFileDialogRefState } from '../dialogs/TaggingFileDialog.tsx';
+import { FileUrlDialog, type FileUrlDialogRefState } from '../dialogs/FileUrlDialog.tsx';
+import { FileInfoDialog, type FileInfoDialogRefState } from '../dialogs/FileInfoDialog.tsx';
 
 interface Props {
     isPublicBucket: boolean;
@@ -27,10 +30,10 @@ export const FileActionsSection: React.FC<Props> = ({
 }) => {
     const [isDownloading, setIsDownloading] = useState(false);
     const [downloadProgress, setDownloadProgress] = useState(0);
-    const deleteDialogRef = useRef<{ open: (keys: string[]) => void }>(null);
-    const tagDialogRef = useRef<{ open: (key: string) => void }>(null);
-    const fileUrlDialogRef = useRef<{ open: (file: S3File | null | undefined) => void }>(null);
-    const fileInfoDialogRef = useRef<{ open: (key: string | undefined) => void }>(null);
+    const deleteDialogRef = useRef<DeleteSelectedFilesDialogRefState>(null);
+    const tagDialogRef = useRef<TaggingFileDialogRefState>(null);
+    const fileUrlDialogRef = useRef<FileUrlDialogRefState>(null);
+    const fileInfoDialogRef = useRef<FileInfoDialogRefState>(null);
 
     const handleAbortDownload = () => {
         s3Service.abortDownloadFiles();

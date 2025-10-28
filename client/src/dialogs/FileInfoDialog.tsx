@@ -15,14 +15,18 @@ interface FileIntoType {
     version: string;
 }
 
+export type FileInfoDialogRefState = {
+    open: (key: string | undefined) => void;
+};
+
 // eslint-disable-next-line no-empty-pattern
-export const FileInfoDialog = forwardRef<{ open: (key: string | string) => void }, Props>(({}, ref) => {
+export const FileInfoDialog = forwardRef<FileInfoDialogRefState, Props>(({}, ref) => {
     const [fileInfoDialogOpen, setFileInfoDialogOpen] = useState(false);
     const [fileKey, setFileKey] = useState('');
     const [fileInfo, setFileInfo] = useState<FileIntoType | null>(null);
 
     useImperativeHandle(ref, () => ({
-        open: (key: string | string) => {
+        open: (key: string | undefined) => {
             setFileKey(key || '');
             if (key) setFileInfoDialogOpen(true);
         },

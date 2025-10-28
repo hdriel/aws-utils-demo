@@ -215,7 +215,6 @@ export const downloadFilesAsZipCtrl = async (req: Request, res: Response, next: 
         const s3Util: S3Util = res.locals.s3Util;
         const mw = await s3Util.streamZipFileCtr({
             // fileKey: req.query.file as string
-            filename: 'בדיקה אחת.zip',
         });
 
         return mw(req, res, next);

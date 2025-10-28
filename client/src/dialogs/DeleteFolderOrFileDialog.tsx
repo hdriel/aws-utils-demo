@@ -10,7 +10,11 @@ interface Props {
     onDeleteCB?: () => void;
 }
 
-export const DeleteFolderOrFileDialog = forwardRef<{ open: (node?: TreeNodeItem) => void }, Props>(
+export type CreateFolderDialogRefState = {
+    open: (node?: TreeNodeItem) => void;
+};
+
+export const DeleteFolderOrFileDialog = forwardRef<CreateFolderDialogRefState, Props>(
     ({ loading, setLoading, onDeleteCB }, ref) => {
         const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
         const [nodeActionSelected, setNodeActionSelected] = useState<TreeNodeItem | null | undefined>();

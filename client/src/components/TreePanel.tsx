@@ -2,8 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Box, Stack } from '@mui/material';
 import { Button, Typography, SVGIcon } from 'mui-simple';
 import '../styles/treeView.scss';
-import { TreeNodeItem } from '../types/ui';
-import { CreateFolderDialog } from '../dialogs/CreateFolderDialog.tsx';
+import { CreateFolderDialog, type CreateFolderDialogRefState } from '../dialogs/CreateFolderDialog.tsx';
 import { DeleteFolderOrFileDialog } from '../dialogs/DeleteFolderOrFileDialog.tsx';
 import { useNodeTree } from '../hooks/useNodeTree.tsx';
 import FilesTreeView from './FilesTreeView/FilesTreeView.tsx';
@@ -16,8 +15,8 @@ interface TreePanelProps {
 }
 
 const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refreshTrigger }) => {
-    const deleteDialogRef = useRef<{ open: (node?: TreeNodeItem) => void }>(null);
-    const createDialogRef = useRef<{ open: () => void }>(null);
+    const deleteDialogRef = useRef<CreateFolderDialogRefState>(null);
+    const createDialogRef = useRef<CreateFolderDialogRefState>(null);
     const TreeViewRef = useRef<{ isExpandedId: (id: string) => boolean }>(null);
     const [colorize, setColorize] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -38,7 +37,7 @@ const TreePanel: React.FC<TreePanelProps> = ({ onFolderSelect, onRefresh, refres
         refreshTrigger,
     });
 
-    console.log('treeData', treeData);
+    console.debug('treeData', treeData);
 
     return (
         <div className="tree-panel">

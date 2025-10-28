@@ -3,7 +3,7 @@ import { Box, Stack, useMediaQuery } from '@mui/material';
 import { Button, Typography, SVGIcon, Chip, Tooltip, Text } from 'mui-simple';
 import { s3Service } from '../services/s3Service';
 import '../styles/mainScreen.scss';
-import { DeleteBucketDialog } from '../dialogs/DeleteBucketDialog.tsx';
+import { DeleteBucketDialog, type DeleteBucketDialogRefState } from '../dialogs/DeleteBucketDialog.tsx';
 
 interface HeaderProps {
     bucketName: string;
@@ -14,7 +14,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ bucketName, isPublicBucket, onLogout, localstack }) => {
     const mobileLayout = useMediaQuery((theme) => theme.breakpoints.down('md'));
-    const deleteDialogRef = useRef<{ open: () => void }>(null);
+    const deleteDialogRef = useRef<DeleteBucketDialogRefState>(null);
 
     const handleLogout = async () => {
         await s3Service.disconnect();

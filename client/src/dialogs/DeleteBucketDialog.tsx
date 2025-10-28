@@ -10,7 +10,11 @@ interface Props {
     onDeleteCB?: () => void;
 }
 
-export const DeleteBucketDialog = forwardRef<{ open: (node?: TreeNodeItem) => void }, Props>(
+export type DeleteBucketDialogRefState = {
+    open: (node?: TreeNodeItem) => void;
+};
+
+export const DeleteBucketDialog = forwardRef<DeleteBucketDialogRefState, Props>(
     ({ localstack, bucketName, onDeleteCB }, ref) => {
         const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 

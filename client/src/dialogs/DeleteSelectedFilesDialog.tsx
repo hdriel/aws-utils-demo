@@ -7,56 +7,56 @@ interface Props {
     onDeleteCB?: () => void;
 }
 
-export const DeleteSelectedFilesDialog = forwardRef<{ open: (keys: string[]) => void }, Props>(
-    ({ onDeleteCB }, ref) => {
-        const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-        const [selectedFileKeys, setSelectedFileKeys] = useState<string[]>([]);
+export type DeleteSelectedFilesDialogRefState = {
+    open: (keys: string[]) => void;
+};
 
-        const handleDelete = async () => {
-            if (!selectedFileKeys.length) return;
+export const DeleteSelectedFilesDialog = forwardRef<DeleteSelectedFilesDialogRefState, Props>(({ onDeleteCB }, ref) => {
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [selectedFileKeys, setSelectedFileKeys] = useState<string[]>([]);
 
-            try {
-                await Promise.allSettled(selectedFileKeys.map(async (fileKey) => s3Service.deleteObject(fileKey)));
-                setDeleteDialogOpen(false);
+    const handleDelete = async () => {
+        if (!selectedFileKeys.length) return;
 
-                onDeleteCB?.();
-            } catch (error) {
-                console.error('Failed to delete files:', error);
-            }
-        };
+        try {
+            await Promise.allSettled(selectedFileKeys.map(async (fileKey) => s3Service.deleteObject(fileKey)));
+            setDeleteDialogOpen(false);
 
-        useImperativeHandle(ref, () => ({
-            open: (keys: string[]) => {
-                setSelectedFileKeys(keys);
-                if (keys.length) setDeleteDialogOpen(true);
-            },
-        }));
+            onDeleteCB?.();
+        } catch (error) {
+            console.error('Failed to delete files:', error);
+        }
+    };
 
-        return (
-            <Dialog
-                open={deleteDialogOpen}
-                onClose={() => setDeleteDialogOpen(false)}
-                title="Confirm Delete"
-                actions={[
-                    { onClick: () => setDeleteDialogOpen(false), label: 'Cancel' },
-                    { onClick: handleDelete, variant: 'contained', color: 'error', label: 'Delete' },
-                ]}
-            >
-                <DialogTitle>Confirm Delete</DialogTitle>
-                <Typography>
-                    Are you sure you want to delete {selectedFileKeys.length} file
-                    {selectedFileKeys.length > 1 ? 's' : ''}?
-                </Typography>
-                <List
-                    buttonItems={false}
-                    items={[...selectedFileKeys].map(
-                        (file) => ({ title: file, style: { color: 'red' } }) as ListItemProps
-                    )}
-                />
+    useImperativeHandle(ref, () => ({
+        open: (keys: string[]) => {
+            setSelectedFileKeys(keys);
+            if (keys.length) setDeleteDialogOpen(true);
+        },
+    }));
 
-                <br />
-                <Typography>This action cannot be undone.</Typography>
-            </Dialog>
-        );
-    }
-);
+    return (
+        <Dialog
+            open={deleteDialogOpen}
+            onClose={() => setDeleteDialogOpen(false)}
+            title="Confirm Delete"
+            actions={[
+                { onClick: () => setDeleteDialogOpen(false), label: 'Cancel' },
+                { onClick: handleDelete, variant: 'contained', color: 'error', label: 'Delete' },
+            ]}
+        >
+            <DialogTitle>Confirm Delete</DialogTitle>
+            <Typography>
+                Are you sure you want to delete {selectedFileKeys.length} file
+                {selectedFileKeys.length > 1 ? 's' : ''}?
+            </Typography>
+            <List
+                buttonItems={false}
+                items={[...selectedFileKeys].map((file) => ({ title: file, style: { color: 'red' } }) as ListItemProps)}
+            />
+
+            <br />
+            <Typography>This action cannot be undone.</Typography>
+        </Dialog>
+    );
+});

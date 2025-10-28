@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { Box, useMediaQuery } from '@mui/material';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+// prettier-ignore
+import {
+    Panel,
+    PanelGroup,
+    PanelResizeHandle
+} from 'react-resizable-panels';
 import TreePanel from './TreePanel';
 import FilePanel from './FilePanel';
 import '../styles/mainScreen.scss';

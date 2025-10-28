@@ -10,7 +10,11 @@ interface Props {
     onCreateFolder?: () => void;
 }
 
-export const CreateFolderDialog = forwardRef<{ open: () => void }, Props>(
+export type CreateFolderDialogRefState = {
+    open: () => void;
+};
+
+export const CreateFolderDialog = forwardRef<CreateFolderDialogRefState, Props>(
     ({ isNodeSelected, path, setLoading, onCreateFolder }, ref) => {
         const [createDialogOpen, setCreateDialogOpen] = useState(false);
         const [newFolderName, setNewFolderName] = useState('');

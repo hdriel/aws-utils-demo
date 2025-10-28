@@ -7,7 +7,11 @@ import { S3File } from '../types/aws.ts';
 
 type Props = object;
 
-export const FileUrlDialog = forwardRef<{ open: (file: S3File | undefined | null) => void }, Props>(
+export type FileUrlDialogRefState = {
+    open: (file: S3File | undefined | null) => void;
+};
+
+export const FileUrlDialog = forwardRef<FileUrlDialogRefState, Props>(
     // eslint-disable-next-line no-empty-pattern
     ({}, ref) => {
         const [tempLink, setTempLink] = useState('');

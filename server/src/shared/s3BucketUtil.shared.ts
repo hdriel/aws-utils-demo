@@ -15,6 +15,7 @@ import type { CredentialsPayload } from '../decs';
  *          bucket: env?.PROJECT_BUCKET,
  *          logger,
  *      });
+ *      s3Utils.initBucket(ACLs.private)
  * ```
  * here in this project I simulate multiple credentials connections for this project proposes
  */
