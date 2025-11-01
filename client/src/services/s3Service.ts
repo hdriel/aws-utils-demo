@@ -6,14 +6,14 @@ import { getProjectEnvVariables } from '../projectEnvVariables.ts';
 import { buildTreeFromFiles } from '../utils/treeView.converters.ts';
 
 class S3Service {
-    private api: Axios;
+    private readonly api: Axios;
     private downloadAbortController: AbortController | null = null;
     private uploadAbortController: AbortController | null = null;
 
     constructor() {
         this.api = axios.create({
             baseURL: this.baseURL,
-            timeout: 30000,
+            timeout: 30_000,
             headers: { 'Content-Type': 'application/json' },
             withCredentials: true,
         });
