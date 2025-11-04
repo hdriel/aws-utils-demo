@@ -28,7 +28,8 @@ export const FilePreview: React.FC<Props> = ({ show: showPreviewFile, isPublicBu
 
     const isPreviewAvailable = showImagePreview || showReadPreview || videoPrivateUrl;
 
-    console.log('showReadPreview', showReadPreview, file?.key);
+    const imageUrl = `${s3Service.baseURL}/files/${encodedFileKey}/image`;
+    const iframeUrl = `${s3Service.baseURL}/files/${encodedFileKey}/iframe`;
 
     return (
         <>
@@ -53,16 +54,16 @@ export const FilePreview: React.FC<Props> = ({ show: showPreviewFile, isPublicBu
 
             {showImagePreview && (
                 <Box>
-                    <span style={{ marginTop: '-10px' }}>&lt;img src="{file?.key}"&gt;</span>
+                    <span style={{ marginTop: '-10px', lineBreak: 'anywhere' }}>&lt;img src="{imageUrl}"&gt;</span>
                     <Box className="file-preview">
-                        <img src={`${s3Service.baseURL}/files/${encodedFileKey}/image`} alt={file?.name} />
+                        <img src={imageUrl} alt={file?.name} />
                     </Box>
                 </Box>
             )}
 
             {showReadPreview && (
                 <Box className="iframe-preview">
-                    Iframe: {file?.key}
+                    <span style={{ marginTop: '-10px', lineBreak: 'anywhere' }}>&lt;iframe src="{iframeUrl}"&gt;</span>
                     <iframe
                         src={`${s3Service.baseURL}/files/${encodedFileKey}/iframe`}
                         style={{ width: '100%', height: '390px', border: 'none' }}
