@@ -169,7 +169,7 @@ export const viewImageFileCtrl = async (req: Request, res: Response, next: NextF
 export const viewFileContentCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const s3Util: S3Util = res.locals.s3Util;
-        const mw = s3Util.streamPdfFileCtrl({
+        const mw = s3Util.streamBufferFileCtrl({
             // fileKey: req.query?.filePath as string, // you get pass the fileKey yourself
             // queryField: 'file', // default value
         });
@@ -184,9 +184,8 @@ export const viewFileContentCtrl = async (req: Request, res: Response, next: Nex
 export const viewPdfFileCtrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const s3Util: S3Util = res.locals.s3Util;
-        const mw = s3Util.streamPdfFileCtrl({
-            fileKey: req.query?.file as string,
-        });
+        // const mw = s3Util.streamBufferFileCtrl({ fileKey: req.params?.file as string });
+        const mw = await s3Util.streamFileCtrl({ fileKey: req.params?.file as string });
 
         return mw(req, res, next);
     } catch (err: any) {

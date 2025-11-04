@@ -4,6 +4,7 @@ import { Box } from '@mui/material';
 import { s3Service } from '../services/s3Service.ts';
 import { isImageFile, isVideoFile } from '../utils/fileUtils.ts';
 import { S3File } from '../types/aws.ts';
+import { SUPPORTED_IFRAME_EXTENSIONS } from '../consts.ts';
 
 interface Props {
     show: boolean;
@@ -16,13 +17,18 @@ export const FilePreview: React.FC<Props> = ({ show: showPreviewFile, isPublicBu
 
     const [showImagePreview, showReadPreview, videoPrivateUrl] = [
         showPreviewFile && file && isImageFile(file.key),
-        showPreviewFile && file && file.key.toLowerCase().endsWith('.pdf'),
+        showPreviewFile &&
+            file &&
+            SUPPORTED_IFRAME_EXTENSIONS.includes(file.key.toLowerCase().split('.').pop() as string) &&
+            !isImageFile(file.key),
         showPreviewFile && file && isVideoFile(file?.name)
             ? `${s3Service.baseURL}/files/${encodedFileKey}/stream`
             : null,
     ];
 
     const isPreviewAvailable = showImagePreview || showReadPreview || videoPrivateUrl;
+
+    console.log('showReadPreview', showReadPreview, file?.key);
 
     return (
         <>
@@ -35,25 +41,32 @@ export const FilePreview: React.FC<Props> = ({ show: showPreviewFile, isPublicBu
             )}
 
             {videoPrivateUrl && (
-                <Box className="file-preview">
-                    <video controls src={videoPrivateUrl}>
-                        Your browser does not support the video tag.
-                    </video>
+                <Box>
+                    <span style={{ marginTop: '-10px' }}>&lt;video src="{file?.key}"&gt;</span>
+                    <Box className="file-preview">
+                        <video controls src={videoPrivateUrl}>
+                            Your browser does not support the video tag.
+                        </video>
+                    </Box>
                 </Box>
             )}
 
             {showImagePreview && (
-                <Box className="file-preview">
-                    <img src={`${s3Service.baseURL}/files/${encodedFileKey}/image`} alt={file?.name} />
+                <Box>
+                    <span style={{ marginTop: '-10px' }}>&lt;img src="{file?.key}"&gt;</span>
+                    <Box className="file-preview">
+                        <img src={`${s3Service.baseURL}/files/${encodedFileKey}/image`} alt={file?.name} />
+                    </Box>
                 </Box>
             )}
 
             {showReadPreview && (
-                <Box className="pdf-preview">
+                <Box className="iframe-preview">
+                    Iframe: {file?.key}
                     <iframe
-                        src={`${s3Service.baseURL}/files/${encodedFileKey}/pdf`}
+                        src={`${s3Service.baseURL}/files/${encodedFileKey}/iframe`}
                         style={{ width: '100%', height: '390px', border: 'none' }}
-                        title="PDF Preview"
+                        title="Iframe Preview"
                     />
                 </Box>
             )}
