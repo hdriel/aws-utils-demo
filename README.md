@@ -207,6 +207,52 @@ Significant thought went into creating comfortable viewing experiences:
 Click on image to watch the video
 [![Main Screen - Preview](./readme-assets/temp-link.webp)](https://youtu.be/5DRV6ACq9jU)
 
+### LocalStack Docker Setup
+
+# FULL LOCALSTACK DEMO:
+please see this project code before using: [aws-utils-demo github link!](https://github.com/hdriel/aws-utils-demo)
+Click the image to watch localstack video
+[![Watch the video](./readme-assets/localstack-login.webp)](https://youtu.be/5DRV6ACq9jU)
+
+
+```yaml
+# docker-compose.yml
+services:
+  localstack:
+  image: localstack/localstack
+  ports:
+    - "127.0.0.1:4566:4566"            # LocalStack Gateway
+    - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+  environment:
+    # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
+    - CLEAR_TMP_FOLDER=0
+    - DEBUG=${DEBUG:-1}
+    - PERSISTENCE=${PERSISTENCE:-1}
+    - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR:-}
+    - LOCALSTACK_API_KEY=${LOCALSTACK_API_KEY:-}  # only required for Pro
+    - SERVICES=s3,lambda,sns,sqs,iam
+    - DATA_DIR=/tmp/localstack/data
+    - START_WEB=1
+    - DOCKER_HOST=unix:///var/run/docker.sock
+    - DEFAULT_REGION=us-east-1
+    - AWS_DEFAULT_REGION=us-east-1
+    - AWS_EXECUTION_ENV=True
+    - ENV=${NODE_ENV}
+    - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-xxxxxxxxx}
+    - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-xxxxxxxxxxxxxxxxxxxxx}
+    - HOSTNAME_EXTERNAL=localhost
+  volumes:
+    - "/var/run/docker.sock:/var/run/docker.sock"
+    - "${VOLUME_DIR_LOCALSTACK:-./docker-data/aws-localstack}:/var/lib/localstack"
+    - "${VOLUME_DIR_LOCALSTACK:-./docker-data/aws-localstack}/aws-s3:/tmp/localstack"
+    - "${VOLUME_DIR_LOCALSTACK:-./docker-data/aws-localstack}/aws-bootstrap:/opt/bootstrap/"
+  networks:
+    - app-network
+```
+
+
+
+
 ## 💻 Code Reference
 
 Feel free to explore the project code to see how to implement these capabilities in your own projects using the [@hdriel/aws-utils](https://www.npmjs.com/package/@hdriel/aws-utils) package.
