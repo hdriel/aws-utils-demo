@@ -4,6 +4,8 @@ A comprehensive fullstack S3 file explorer built in two weeks, designed to showc
 
 [![NPM](https://nodei.co/npm/@hdriel/aws-utils.svg?style=compact)](https://nodei.co/npm/@hdriel/aws-utils/)
 
+[![Watch the video](./readme-assets/demo-bucket-image-preview.webp)](https://youtu.be/5DRV6ACq9jU)
+
 ## 🎯 Project Overview
 
 This project serves dual purposes:
@@ -181,7 +183,7 @@ When you select a folder/file from the tree, you'll see:
    - **Tree View Pagination** - Navigate through extensive folder structures without performance issues
    - **File List Pagination** - Browse large directories seamlessly with automatic loading
 
-![Main Screen - Preview](./readme-assets/demo-bucket-image-preview.webp)
+[![Watch the video](./readme-assets/demo-bucket-image-preview.webp)](https://youtu.be/5DRV6ACq9jU)
 
 
 ### Resizable Panels
