@@ -4,6 +4,7 @@ A comprehensive fullstack S3 file explorer built in two weeks, designed to showc
 
 [![NPM](https://nodei.co/npm/@hdriel/aws-utils.svg?style=compact)](https://nodei.co/npm/@hdriel/aws-utils/)
 
+Click on image to watch the video
 [![Watch the video](./readme-assets/demo-bucket-image-preview.webp)](https://youtu.be/5DRV6ACq9jU)
 
 ## 🎯 Project Overview
@@ -125,7 +126,8 @@ When you check the **LocalStack** option:
 - You can create a new bucket or use an existing one
 - Credentials fields lock on default LocalStack instance credentials
 
-![Login Screen](./readme-assets/login-screen.webp)
+Click on image to watch the video
+[![Login Screen](./readme-assets/login-screen.webp)](https://youtu.be/5DRV6ACq9jU)
 
 ### Main Screen
 
@@ -183,6 +185,7 @@ When you select a folder/file from the tree, you'll see:
    - **Tree View Pagination** - Navigate through extensive folder structures without performance issues
    - **File List Pagination** - Browse large directories seamlessly with automatic loading
 
+Click on image to watch the video
 [![Watch the video](./readme-assets/demo-bucket-image-preview.webp)](https://youtu.be/5DRV6ACq9jU)
 
 
@@ -201,7 +204,8 @@ Significant thought went into creating comfortable viewing experiences:
 - Small screens: Options adapt automatically for optimal viewing
 - Many other responsive design considerations
 
-![Main Screen - Preview](./readme-assets/temp-link.webp)
+Click on image to watch the video
+[![Main Screen - Preview](./readme-assets/temp-link.webp)](https://youtu.be/5DRV6ACq9jU)
 
 ## 💻 Code Reference
 
