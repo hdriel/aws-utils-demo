@@ -166,17 +166,19 @@ export const CustomTreeItem = React.forwardRef((props: StyledTreeItemProps, ref:
                                         onRefreshClick?.(props);
                                     }}
                                 />
-                                <Button
-                                    icon="DeleteForever"
-                                    size="small"
-                                    padding={'0 5px'}
-                                    color={color || 'inherit'}
-                                    tooltipProps={{ title: 'Delete Directory' }}
-                                    onClick={(event) => {
-                                        event.stopPropagation();
-                                        onDeleteClick?.(props);
-                                    }}
-                                />
+                                {directoryPath !== '/' && (
+                                    <Button
+                                        icon="DeleteForever"
+                                        size="small"
+                                        padding={'0 5px'}
+                                        color={color || 'inherit'}
+                                        tooltipProps={{ title: 'Delete Directory' }}
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            onDeleteClick?.(props);
+                                        }}
+                                    />
+                                )}
                             </>
                         ) : (
                             <Button

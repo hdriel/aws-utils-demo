@@ -185,7 +185,10 @@ export const viewPdfFileCtrl = async (req: Request, res: Response, next: NextFun
     try {
         const s3Util: S3Util = res.locals.s3Util;
         // const mw = s3Util.streamBufferFileCtrl({ fileKey: req.params?.file as string });
-        const mw = await s3Util.streamFileCtrl({ fileKey: req.params?.file as string });
+        const mw = await s3Util.streamFileCtrl({
+            fileKey: req.params?.file as string,
+            forDownloading: false,
+        });
 
         return mw(req, res, next);
     } catch (err: any) {
