@@ -60,8 +60,9 @@ export const UploadFilesSection: React.FC<Props> = ({ currentPath, onUploadCB })
             <Text
                 variant="subtitle1"
                 component="h3"
-                sx={{ display: 'flex', alignItems: 'center' }}
+                justifyContent="center"
                 color={allowedMultipleFiles ? 'primary' : undefined}
+                fullWidth
             >
                 Upload Files
                 <Button

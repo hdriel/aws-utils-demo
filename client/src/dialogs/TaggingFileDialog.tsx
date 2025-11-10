@@ -1,5 +1,4 @@
 import { Dialog, InputText } from 'mui-simple';
-import { DialogTitle } from '@mui/material';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { s3Service } from '../services/s3Service.ts';
 
@@ -69,7 +68,6 @@ export const TaggingFileDialog = forwardRef<TaggingFileDialogRefState, Props>(({
                 },
             ]}
         >
-            <DialogTitle>Tag File Version</DialogTitle>
             <InputText
                 autoFocus
                 margin="dense"

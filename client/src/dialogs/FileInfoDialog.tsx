@@ -1,5 +1,4 @@
 import { Dialog, Text } from 'mui-simple';
-import { DialogTitle } from '@mui/material';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { s3Service } from '../services/s3Service.ts';
 import { formatFileSize } from '../utils/fileUtils.ts';
@@ -48,7 +47,6 @@ export const FileInfoDialog = forwardRef<FileInfoDialogRefState, Props>(({}, ref
             onClose={() => setFileInfoDialogOpen(false)}
             actions={[{ onClick: () => setFileInfoDialogOpen(false), label: 'Cancel' }]}
         >
-            <DialogTitle>File Info</DialogTitle>
             {fileInfo && (
                 <div className="file-info-container">
                     <div className="file-name">

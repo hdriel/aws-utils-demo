@@ -266,32 +266,38 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                                     size={12}
                                     padding={0}
                                     icon={<SVGIcon muiIconName="CloudSync" />}
-                                    onClick={() => loadBucketList()}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        return loadBucketList();
+                                    }}
                                     tooltipProps={{ title: 'Re-fetch bucket list options' }}
                                 />
-                                <Tooltip
-                                    title={
-                                        <Text>
-                                            {isPublicAccess ? 'Public bucket access' : 'Private bucket access'}
-                                            <br />
-                                            {selectedOption?.date
-                                                ? ' (Exists localstack bucket - checkbox is in read only mode)'
-                                                : ''}
-                                        </Text>
-                                    }
-                                >
-                                    <Checkbox
-                                        readOnly={!!selectedOption?.date}
-                                        icon="PublicOff"
-                                        checkedIcon="Public"
-                                        color="primary"
-                                        checked={selectedOption ? selectedOption.public : isPublicAccess}
-                                        onChange={(e) => {
-                                            e.stopPropagation();
-                                            setIsPublicAccess(e.target.checked);
-                                        }}
-                                    />
-                                </Tooltip>
+                                <Box onClick={(e) => e.stopPropagation()}>
+                                    <Tooltip
+                                        title={
+                                            <Text>
+                                                {isPublicAccess ? 'Public bucket access' : 'Private bucket access'}
+                                                <br />
+                                                {selectedOption?.date
+                                                    ? ' (Exists localstack bucket - checkbox is in read only mode)'
+                                                    : ''}
+                                            </Text>
+                                        }
+                                        onClose={(e) => e.stopPropagation()}
+                                    >
+                                        <Checkbox
+                                            readOnly={!!selectedOption?.date}
+                                            icon="PublicOff"
+                                            checkedIcon="Public"
+                                            color="primary"
+                                            checked={selectedOption ? selectedOption.public : isPublicAccess}
+                                            onChange={(e) => {
+                                                e.stopPropagation();
+                                                setIsPublicAccess(e.target.checked);
+                                            }}
+                                        />
+                                    </Tooltip>
+                                </Box>
                             </Stack>,
                         ]}
                     />

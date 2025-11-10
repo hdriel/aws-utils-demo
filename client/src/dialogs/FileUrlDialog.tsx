@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useState } from 'react';
-import { Box, DialogTitle, DialogContent } from '@mui/material';
+import { Box } from '@mui/material';
 import { Typography, Button, InputText, Dialog } from 'mui-simple';
 import { copyToClipboard, isImageFile, isVideoFile } from '../utils/fileUtils.ts';
 import { s3Service } from '../services/s3Service.ts';
@@ -69,34 +69,31 @@ export const FileUrlDialog = forwardRef<FileUrlDialogRefState, Props>(
                     },
                 ]}
             >
-                <DialogTitle>Temporary Link</DialogTitle>
-                <DialogContent>
-                    <Typography variant="body2" sx={{ mb: 2 }}>
-                        This link will expire in 1 hour
-                    </Typography>
-                    <InputText
-                        fullWidth
-                        value={tempLink}
-                        endCmp={[<Button onClick={() => copyToClipboard(tempLink)} edge="end" icon="ContentCopy" />]}
-                        readOnly
-                        sx={{ mb: 2 }}
-                        copyAction
-                    />
+                <Typography variant="body2" sx={{ mb: 2 }}>
+                    This link will expire in 1 hour
+                </Typography>
+                <InputText
+                    fullWidth
+                    value={tempLink}
+                    endCmp={[<Button onClick={() => copyToClipboard(tempLink)} edge="end" icon="ContentCopy" />]}
+                    readOnly
+                    sx={{ mb: 2 }}
+                    copyAction
+                />
 
-                    {videoPreviewUrl && (
-                        <Box className="file-preview" mt={2}>
-                            <video controls src={videoPreviewUrl}>
-                                Your browser does not support the video tag.
-                            </video>
-                        </Box>
-                    )}
+                {videoPreviewUrl && (
+                    <Box className="file-preview" mt={2}>
+                        <video controls src={videoPreviewUrl}>
+                            Your browser does not support the video tag.
+                        </video>
+                    </Box>
+                )}
 
-                    {isImageFile(file?.key ?? '') && (
-                        <Box className="file-preview" mt={2}>
-                            <img src={tempLink} alt={file?.key} />
-                        </Box>
-                    )}
-                </DialogContent>
+                {isImageFile(file?.key ?? '') && (
+                    <Box className="file-preview" mt={2}>
+                        <img src={tempLink} alt={file?.key} />
+                    </Box>
+                )}
             </Dialog>
         );
     }

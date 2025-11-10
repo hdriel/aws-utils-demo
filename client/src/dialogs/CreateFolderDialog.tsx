@@ -1,5 +1,4 @@
 import { Dialog, InputText } from 'mui-simple';
-import { DialogTitle } from '@mui/material';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { s3Service } from '../services/s3Service.ts';
 
@@ -57,7 +56,6 @@ export const CreateFolderDialog = forwardRef<CreateFolderDialogRefState, Props>(
                     { onClick: handleCreateFolder, label: 'Create', variant: 'contained' },
                 ]}
             >
-                <DialogTitle>Create New Folder</DialogTitle>
                 <InputText
                     autoFocus
                     margin="dense"

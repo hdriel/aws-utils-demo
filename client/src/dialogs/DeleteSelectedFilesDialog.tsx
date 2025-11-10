@@ -1,5 +1,4 @@
 import { Dialog, List, type ListItemProps, Typography } from 'mui-simple';
-import { DialogTitle } from '@mui/material';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { s3Service } from '../services/s3Service.ts';
 
@@ -45,7 +44,6 @@ export const DeleteSelectedFilesDialog = forwardRef<DeleteSelectedFilesDialogRef
                 { onClick: handleDelete, variant: 'contained', color: 'error', label: 'Delete' },
             ]}
         >
-            <DialogTitle>Confirm Delete</DialogTitle>
             <Typography>
                 Are you sure you want to delete {selectedFileKeys.length} file
                 {selectedFileKeys.length > 1 ? 's' : ''}?

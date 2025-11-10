@@ -1,5 +1,4 @@
 import { Dialog, Text } from 'mui-simple';
-import { DialogTitle } from '@mui/material';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { s3Service } from '../services/s3Service.ts';
 import { TreeNodeItem } from '../types/ui.ts';
@@ -65,7 +64,6 @@ export const DeleteFolderOrFileDialog = forwardRef<CreateFolderDialogRefState, P
                     },
                 ]}
             >
-                <DialogTitle>Confirm Delete</DialogTitle>
                 <Text>Are you sure you want to delete this item?</Text>
                 <Text color="error">
                     {nodeActionSelected?.directory ? 'Directory' : 'File'}: {nodeActionSelected?.name}

@@ -1,5 +1,4 @@
 import { Dialog, Text } from 'mui-simple';
-import { DialogTitle } from '@mui/material';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { s3Service } from '../services/s3Service.ts';
 import { TreeNodeItem } from '../types/ui.ts';
@@ -45,7 +44,6 @@ export const DeleteBucketDialog = forwardRef<DeleteBucketDialogRefState, Props>(
                     },
                 ]}
             >
-                <DialogTitle>Confirm Delete</DialogTitle>
                 <Text>Are you sure you want to delete the entire bucket??</Text>
                 <Text color="error">Bucket: {bucketName}</Text>
                 <br />
